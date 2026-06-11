@@ -1,0 +1,48 @@
+placeholder
+// ==================== FITUR QUICK EXIT ====================
+        
+        function triggerQuickExit() {
+            // Menggunakan .replace() agar halaman SafeSphere terhapus dari history "Back" browser saat itu
+            window.location.replace("https://www.google.com"); 
+            // Alternatif url: bisa diarahkan ke portal akademik universitas agar terlihat sedang mengerjakan tugas
+        }
+
+        // 1. Trigger via klik tombol UI
+        document.getElementById('quickExitBtn')?.addEventListener('click', triggerQuickExit);
+
+        // 2. Trigger via shortcut keyboard (Tekan 'Escape' 2 kali cepat)
+        let escPressCount = 0;
+        let escTimeout;
+
+        document.addEventListener('keydown', (e) => {
+            // Deteksi tombol Escape
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                escPressCount++;
+                
+                if (escPressCount === 1) {
+                    // Beri jeda 1 detik untuk klik kedua
+                    escTimeout = setTimeout(() => {
+                        escPressCount = 0; // Reset jika klik kedua terlalu lama
+                    }, 1000);
+                } else if (escPressCount === 2) {
+                    clearTimeout(escTimeout);
+                    triggerQuickExit();
+                }
+            }
+        // Mobile Menu Toggle dengan Aksesibilitas
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const btn = document.getElementById('mobileMenuBtn');
+    
+    const isHidden = menu.classList.contains('hide');
+    
+    if (isHidden) {
+        menu.classList.remove('hide');
+        btn.setAttribute('aria-expanded', 'true');
+    } else {
+        menu.classList.add('hide');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+}
+        });
+
