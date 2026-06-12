@@ -1,6 +1,7 @@
 // State Pengguna Global
     let currentUser = null; 
     let currentViewedInvoiceId = null;
+    let isChatRequestPending = false;
 
     // --- Helper Sanitasi Input (Simulasi Backend Safety / XSS Protection) ---
     function sanitizeInput(text) {
@@ -48,6 +49,80 @@
       } else {
         element.textContent = message;
       }
+    }
+
+    function appendInlineMarkdown(parent, text) {
+      const pattern = /(\*\*([^*]+)\*\*|__([^_]+)__|\*([^*]+)\*|_([^_]+)_|`([^`]+)`)/g;
+      let lastIndex = 0;
+      let match;
+
+      while ((match = pattern.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+          parent.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+        }
+
+        if (match[2] || match[3]) {
+          parent.appendChild(createEl('strong', { text: match[2] || match[3] }));
+        } else if (match[4] || match[5]) {
+          parent.appendChild(createEl('em', { text: match[4] || match[5] }));
+        } else if (match[6]) {
+          parent.appendChild(createEl('code', { text: match[6] }));
+        }
+
+        lastIndex = pattern.lastIndex;
+      }
+
+      if (lastIndex < text.length) {
+        parent.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+    }
+
+    function renderMarkdownMessage(element, content) {
+      clearElement(element);
+      const lines = String(content || '').replace(/\r\n/g, '\n').split('\n');
+      let paragraphLines = [];
+      let list = null;
+
+      function flushParagraph() {
+        if (paragraphLines.length === 0) return;
+        const p = createEl('p');
+        appendInlineMarkdown(p, paragraphLines.join(' '));
+        element.appendChild(p);
+        paragraphLines = [];
+      }
+
+      function flushList() {
+        if (!list) return;
+        element.appendChild(list);
+        list = null;
+      }
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        const listMatch = trimmed.match(/^[-*]\s+(.+)$/);
+        const numberedMatch = trimmed.match(/^\d+[.)]\s+(.+)$/);
+
+        if (!trimmed) {
+          flushParagraph();
+          flushList();
+          return;
+        }
+
+        if (listMatch || numberedMatch) {
+          flushParagraph();
+          if (!list) list = createEl(numberedMatch ? 'ol' : 'ul');
+          const li = createEl('li');
+          appendInlineMarkdown(li, listMatch ? listMatch[1] : numberedMatch[1]);
+          list.appendChild(li);
+          return;
+        }
+
+        flushList();
+        paragraphLines.push(trimmed.replace(/^#{1,6}\s+/, ''));
+      });
+
+      flushParagraph();
+      flushList();
     }
 
     // --- Routing System (Simulasi SPA) ---
@@ -1033,23 +1108,61 @@
     function handleChatKeyDown(event) {
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
-        sendChatMessage();
+        if (!isChatRequestPending) sendChatMessage();
       }
+    }
+
+    function setChatPending(isPending) {
+      isChatRequestPending = isPending;
+      const input = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('chatSendBtn');
+
+      if (input) {
+        input.readOnly = isPending;
+        input.classList.toggle('is-readonly', isPending);
+        input.setAttribute('aria-busy', String(isPending));
+      }
+      if (sendBtn) {
+        sendBtn.disabled = isPending;
+        sendBtn.innerText = isPending ? 'Mengirim...' : 'Kirim';
+      }
+    }
+
+    function showTypingIndicator() {
+      const container = document.getElementById('chatMessages');
+      if (!container || document.getElementById('chatTypingIndicator')) return;
+
+      const indicator = createEl('div', { className: 'chat-message bot typing' }, [
+        createEl('span'),
+        createEl('span'),
+        createEl('span'),
+        ' SafeBot sedang mengetik...'
+      ]);
+      indicator.id = 'chatTypingIndicator';
+      container.appendChild(indicator);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('chatTypingIndicator');
+      if (indicator) indicator.remove();
     }
 
     function sendChatMessage() {
       const input = document.getElementById('chatInput');
-      if (!input) return;
+      if (!input || isChatRequestPending) return;
 
       const text = sanitizeInput(input.value);
       if (!text) return;
 
       addChatMessage(text, 'user');
       input.value = '';
+      setChatPending(true);
+      showTypingIndicator();
 
       setTimeout(() => {
         processBotResponse(text);
-      }, 700);
+      }, 300);
     }
 
     function addChatMessage(content, sender, actions = []) {
@@ -1059,6 +1172,8 @@
       const message = createEl('div', { className: `chat-message ${sender}` });
       if (Array.isArray(content)) {
         setChildren(message, content);
+      } else if (sender === 'bot') {
+        renderMarkdownMessage(message, content);
       } else {
         message.textContent = content;
       }
@@ -1096,64 +1211,47 @@
       return { score, foundHighRisk, lowerText };
     }
 
-    function processBotResponse(text) {
-      const { score, foundHighRisk, lowerText } = getRiskScore(text);
+    async function processBotResponse(text) {
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            user: currentUser ? { name: currentUser.name, role: currentUser.role } : null
+          })
+        });
 
-      if (score >= 5 || foundHighRisk) {
-        if (!currentUser) {
-          addChatMessage([
-            createEl('strong', { text: 'Peringatan Sistem:', style: 'color:var(--danger);' }),
-            ' Kami mendeteksi situasi berisiko dan mengancam keamanan Anda. Untuk mendapatkan perlindungan dari Konselor atau Satgas, silakan masuk atau buat akun terlebih dahulu.'
-          ], 'bot', [
-            { href: '#login', text: 'Masuk', className: 'btn primary' },
-            { href: '#register', text: 'Daftar Akun', className: 'btn outline' }
-          ]);
-        } else {
-          addChatMessage([
-            createEl('strong', { text: 'Situasi Darurat Terdeteksi.', style: 'color:var(--danger);' }),
-            ` Halo ${currentUser.name}, keselamatan Anda adalah prioritas utama. Segera amankan diri, hubungi Satgas Darurat (0811-XXXX-XXXX), dan buat laporan dengan urgensi Tinggi.`
-          ], 'bot', [
-            { href: '#lapor', text: 'Buat Laporan Sekarang', className: 'btn danger' }
-          ]);
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          if (response.status === 429 && data && typeof data.message === 'string') {
+            addChatMessage(data.message, 'bot');
+            return;
+          }
+          throw new Error(`SafeBot backend returned ${response.status}`);
         }
-        return;
-      }
 
-      if (score >= 2) {
-        addChatMessage('Saya memahami bahwa ini situasi yang membuat tertekan. Mengalami hal seperti itu tidak pernah dibenarkan. Apakah Anda sudah menyimpan bukti? Sangat disarankan untuk melaporkan hal ini secara anonim di menu Lapor.', 'bot');
-        return;
-      }
+        if (!data || typeof data.reply !== 'string') {
+          throw new Error('SafeBot backend response is invalid');
+        }
 
-      if (lowerText === 'halo' || lowerText === 'hai' || lowerText === 'hi' || lowerText === 'p' || lowerText.includes('selamat pagi') || lowerText.includes('selamat siang') || lowerText.includes('selamat malam')) {
-        addChatMessage('Halo. SafeBot di sini. Ada yang ingin kamu ceritakan atau tanyakan hari ini?', 'bot');
-        return;
-      }
+        addChatMessage(data.reply, 'bot', Array.isArray(data.actions) ? data.actions : []);
+      } catch (error) {
+        console.error('SafeBot request failed:', error);
+        const { score, foundHighRisk } = getRiskScore(text);
 
-      if (lowerText.includes('terima kasih') || lowerText.includes('makasih') || lowerText === 'thanks' || lowerText === 'thx') {
-        addChatMessage('Sama-sama. SafeBot selalu ada di sini kalau kamu butuh tempat cerita yang aman.', 'bot');
-        return;
-      }
+        if (score >= 5 || foundHighRisk) {
+          addChatMessage('Maaf, SafeBot sedang tidak dapat dihubungi. Namun pesanmu menunjukkan kemungkinan situasi darurat. Segera cari tempat aman, hubungi kontak darurat kampus atau orang terpercaya, dan buat laporan jika memungkinkan.', 'bot', [
+            { href: '#kontak', text: 'Kontak Darurat', className: 'btn danger' },
+            { href: '#lapor', text: 'Buat Laporan', className: 'btn primary' }
+          ]);
+          return;
+        }
 
-      if (lowerText.includes('bantuan') || lowerText.includes('tolong') || lowerText.includes('cara lapor')) {
-        addChatMessage('Kalau kamu butuh bantuan terkait perundungan, kamu bisa langsung ke menu Lapor Anonim untuk mengisi kronologi. Laporanmu aman bersama kami.', 'bot');
-        return;
+        addChatMessage('Maaf, SafeBot sedang tidak dapat dihubungi. Jika situasi darurat, segera hubungi kontak kampus atau orang terpercaya di sekitarmu.', 'bot');
+      } finally {
+        removeTypingIndicator();
+        setChatPending(false);
       }
-
-      if (lowerText.includes('sedih') || lowerText.includes('takut') || lowerText.includes('capek') || lowerText.includes('lelah') || lowerText.includes('pusing')) {
-        addChatMessage('Rasanya pasti berat. Tarik napas pelan-pelan. SafeBot siap mendengarkan kalau kamu mau cerita lebih detail.', 'bot');
-        return;
-      }
-
-      if (lowerText.length < 15 && !lowerText.includes(' ')) {
-        addChatMessage('Bisa ceritakan lebih detail maksudmu? Aku di sini untuk mendengarkan.', 'bot');
-        return;
-      }
-
-      const responses = [
-        'Terima kasih sudah berbagi. Saya di sini untuk mendengarkan. Apa yang terjadi setelah itu?',
-        'Itu pasti tidak mudah. Bagaimana perasaanmu menyikapi hal tersebut sekarang?',
-        'Memendam masalah sendirian memang berat. Kamu berani karena mau bercerita. Ada lagi yang ingin kamu sampaikan?',
-        'SafeBot mengerti. Jika hal ini terus berlanjut dan membuatmu sangat tidak nyaman, jangan ragu membuat laporan resmi agar tim kampus bisa membantu.'
-      ];
-      addChatMessage(responses[Math.floor(Math.random() * responses.length)], 'bot');
     }
