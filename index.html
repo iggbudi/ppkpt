@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; frame-src https://id.wikipedia.org; object-src 'none'; base-uri 'self'; form-action 'self';">
   <title>SafeSphere - Pelaporan Anonim Anti-Perundungan</title>
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,12 +16,12 @@
   <div id="discreetOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 999999;">
     <iframe src="https://id.wikipedia.org/wiki/Halaman_Utama" style="width: 100%; height: 100%; border: none;"></iframe>
     
-    <button onclick="deactivateDiscreetMode()" style="position: absolute; top: 20px; right: 24px; width: 44px; height: 44px; background: #ffffff; color: #64748b; border: 1px solid #cbd5e1; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 18px; font-weight: bold; cursor: pointer; display: grid; place-items: center; z-index: 10; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'; this.style.color='#0f172a'" onmouseout="this.style.background='#ffffff'; this.style.color='#64748b'">
+    <button id="discreetCloseBtn" style="position: absolute; top: 20px; right: 24px; width: 44px; height: 44px; background: #ffffff; color: #64748b; border: 1px solid #cbd5e1; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 18px; font-weight: bold; cursor: pointer; display: grid; place-items: center; z-index: 10; transition: all 0.2s;">
       ✕
     </button>
   </div>
 
-  <button id="quickEscapeBtn" onclick="activateDiscreetMode()" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: #dc2626; color: white; border: none; border-radius: 50px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); transition: transform 0.2s; display: flex; align-items: center; gap: 8px;">
+  <button id="quickEscapeBtn" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: #dc2626; color: white; border: none; border-radius: 50px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); transition: transform 0.2s; display: flex; align-items: center; gap: 8px;">
     <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
       <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
     </svg>
@@ -29,8 +30,8 @@
 
   <header class="topbar">
     <a href="#beranda" class="brand">
-      <div class="logo">SS</div>
-      <strong>SafeSphere</strong>
+      <img src="image/logo2a.png" alt="Logo SafeSphere" class="brand-logo">
+      <span class="brand-text">SafeSphere</span>
     </a>
     
     <nav class="main-nav">
@@ -48,12 +49,12 @@
 
     <div class="auth-buttons hidden" id="navUser">
       <a href="#dashboard" class="btn secondary">Dashboard Saya</a>
-      <button class="btn outline" onclick="handleLogout()">Keluar</button>
+      <button class="btn outline js-logout" type="button">Keluar</button>
     </div>
 
     <div class="auth-buttons hidden" id="navAdmin">
       <a href="#admin" class="btn danger" style="color:white; background:#dc2626;">Dashboard Admin</a>
-      <button class="btn outline" onclick="handleLogout()">Keluar</button>
+      <button class="btn outline js-logout" type="button">Keluar</button>
     </div>
   </header>
 
@@ -125,7 +126,7 @@
           <p class="muted">Isi laporan secara jujur. Data Anda dilindungi dengan enkripsi end-to-end.</p>
         </div>
 
-        <form id="reportForm" class="form-grid" onsubmit="submitReport(event)">
+        <form id="reportForm" class="form-grid">
           <label for="category">Jenis Kejadian
             <select id="category" required>
               <option value="">Pilih kategori perundungan</option>
@@ -154,7 +155,7 @@
           </label>
 
           <label class="full" for="description">Ceritakan Kronologi Kejadian
-            <textarea id="description" placeholder="Ceritakan secara detail. Sistem kami mendeteksi kata kunci sensitif untuk memprioritaskan keamanan Anda..." required oninput="analyzeSentiment()"></textarea>
+            <textarea id="description" placeholder="Ceritakan secara detail. Sistem kami mendeteksi kata kunci sensitif untuk memprioritaskan keamanan Anda..." required></textarea>
             
             <div id="sentimentContainer" style="margin-top: 10px; display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--line);">
               <div style="flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
@@ -240,16 +241,20 @@
     </div>
 
     <div id="page-chat" class="page">
-      <section class="section card">
-        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-          <div>
-            <h2>Chat Bersama Ahli</h2>
-            <p class="muted">Konsultasi secara anonim dengan psikolog atau konselor berlisensi dari pihak kampus.</p>
-          </div>
-          <button class="btn primary" onclick="alert('Membuka sesi Chat Aman...')">Mulai Sesi Chat</button>
+      <section class="section card chat-section">
+        <div class="card-header">
+          <h2>Chat Bersama SafeBot & Ahli</h2>
+          <p class="muted">Ceritakan keluh kesahmu dengan aman. SafeBot membantu mengenali risiko dan mengarahkan langkah berikutnya.</p>
         </div>
-        <div style="text-align:center; padding: 40px 20px; background:#f8fafc; border-radius:12px; border:1px dashed var(--line);">
-          <p style="color:var(--muted); margin:0;">Silakan klik tombol "Mulai Sesi Chat" untuk terhubung dengan konselor yang sedang online. Identitas Anda akan tetap disamarkan (Anonim).</p>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages" aria-live="polite">
+            <div class="chat-message bot">Halo. Saya SafeBot. Ruang ini aman dan anonim. Ada yang ingin kamu ceritakan atau keluhkan hari ini?</div>
+          </div>
+          <div class="chat-input-area">
+            <textarea id="chatInput" placeholder="Ceritakan detail kejadiannya di sini... (Enter untuk kirim, Shift + Enter untuk baris baru)" rows="4"></textarea>
+            <button class="btn primary" id="chatSendBtn" type="button">Kirim</button>
+          </div>
         </div>
       </section>
     </div>
@@ -261,14 +266,14 @@
           <p class="muted">Daftar untuk mengakses fitur pelaporan dan konsultasi yang lebih terpersonalisasi.</p>
         </div>
 
-        <form id="registerForm" class="form-grid" onsubmit="handleRegister(event)">
+        <form id="registerForm" class="form-grid">
           
           <label class="full" for="regName">Nama Lengkap
             <input id="regName" type="text" placeholder="Masukkan nama lengkap Anda" required>
           </label>
 
           <label class="full" for="regStatus">Status Pengguna
-            <select id="regStatus" onchange="toggleStatusFields()" required>
+            <select id="regStatus" required>
               <option value="">Pilih Status Anda...</option>
               <option value="Mahasiswa">Mahasiswa</option>
               <option value="Umum">Umum / Pekerja</option>
@@ -291,7 +296,7 @@
           </label>
 
           <label class="full" for="regPassword">Password
-            <input id="regPassword" type="password" placeholder="Buat password yang kuat" required oninput="checkPasswordStrength()">
+            <input id="regPassword" type="password" placeholder="Buat password yang kuat" required>
             <span id="pwHelper" class="form-helper">Minimal 6 karakter, 1 huruf kapital, 1 angka, dan 1 karakter spesial (@,#,$,dll).</span>
           </label>
 
@@ -316,21 +321,21 @@
         </div>
 
         <div style="display: flex; border-bottom: 1px solid var(--line); margin-bottom: 24px; margin-top: 16px;">
-          <button id="tabMahasiswa" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid var(--primary); color: var(--primary);" onclick="switchLoginTab('mahasiswa')">Mahasiswa / Umum</button>
-          <button id="tabAdmin" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid transparent; color: var(--muted);" onclick="switchLoginTab('admin')">Admin Kampus</button>
+          <button id="tabMahasiswa" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid var(--primary); color: var(--primary);" type="button">Mahasiswa / Umum</button>
+          <button id="tabAdmin" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid transparent; color: var(--muted);" type="button">Admin Kampus</button>
         </div>
 
         <p id="loginSubtitle" class="muted" style="margin-bottom: 24px;">Silakan masukkan email/nama dan password Anda untuk melanjutkan.</p>
         <div id="loginError" class="result error hidden" style="margin-bottom: 20px; text-align: left;"></div>
 
-        <form class="form-grid" onsubmit="handleMainLogin(event)">
+        <form id="loginForm" class="form-grid">
           <label class="full" style="text-align: left;">Nama / Email
             <input type="text" id="loginEmail" placeholder="Masukkan nama atau email" required>
           </label>
           <label class="full" style="text-align: left;">Password
             <input type="password" id="loginPass" placeholder="Masukkan password" required>
             <div style="text-align: right; margin-top: 8px;">
-              <a href="#" onclick="openForgotModal(event)" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600;">Lupa Password?</a>
+              <a href="#" id="forgotPasswordLink" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600;">Lupa Password?</a>
             </div>
           </label>
           <div class="full" style="margin-top: 10px;">
@@ -343,7 +348,7 @@
         </div>
 
         <div class="social-login">
-          <button class="btn-social btn-google" onclick="alert('Membuka Login Google...')">
+          <button class="btn-social btn-google" id="googleLoginBtn" type="button">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -352,7 +357,7 @@
             </svg>
             Lanjutkan dengan Google
           </button>
-          <button class="btn-social btn-instagram" onclick="alert('Membuka Login Instagram...')">
+          <button class="btn-social btn-instagram" id="instagramLoginBtn" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
@@ -360,7 +365,7 @@
             </svg>
             Lanjutkan dengan Instagram
           </button>
-          <button class="btn-social btn-email" onclick="alert('Kirim Magic Link ke Email...')">
+          <button class="btn-social btn-email" id="emailLoginBtn" type="button">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
               <polyline points="22,6 12,13 2,6"></polyline>
@@ -372,14 +377,14 @@
 
       <div id="forgotPasswordModal" class="modal">
         <div class="modal-content">
-          <span class="close-modal" onclick="closeForgotModal()">&times;</span>
+          <span class="close-modal" id="closeForgotModalBtn">&times;</span>
           <h2 style="margin-top: 10px;">Lupa Password?</h2>
           <p class="muted">Masukkan nomor HP atau Email yang terdaftar. Kami akan mengirimkan kode OTP untuk mereset password Anda.</p>
           <div class="form-grid" style="display:block; text-align:left; margin-top: 20px;">
             <label>No. HP / Email
               <input type="text" id="otpTarget" placeholder="Contoh: 0812xxx atau email@contoh.com" required>
             </label>
-            <button class="btn primary full" style="margin-top: 16px; padding: 12px;" onclick="sendOTP(event)">Kirim Kode OTP</button>
+            <button class="btn primary full" id="sendOtpBtn" type="button" style="margin-top: 16px; padding: 12px;">Kirim Kode OTP</button>
           </div>
         </div>
       </div>
@@ -395,8 +400,8 @@
         <div id="adminDashboardArea">
           
           <div class="dash-actions">
-            <button class="btn-light-primary" onclick="seedDemoData()">Isi Data Demo</button>
-            <button class="btn-light-danger" onclick="clearAllData()">Reset Data</button>
+            <button class="btn-light-primary" id="seedDemoBtn" type="button">Isi Data Demo</button>
+            <button class="btn-light-danger" id="clearDataBtn" type="button">Reset Data</button>
           </div>
 
           <div class="metric-grid">
@@ -435,7 +440,7 @@
 
       <div id="reportDetailModal" class="modal">
         <div class="modal-content" style="max-width: 600px; text-align: left;">
-          <span class="close-modal" onclick="closeReportDetailModal()">&times;</span>
+          <span class="close-modal" id="closeReportDetailBtn">&times;</span>
           <h2 style="margin-top: 10px; color: var(--primary);" id="detailTitle">Detail Laporan</h2>
           
           <div class="invoice-details" id="detailContent" style="margin-top: 20px;">
@@ -455,7 +460,7 @@
             <label style="font-weight: 600; display: block; margin-top: 16px; margin-bottom: 8px; color: var(--ink);">Jadwal Tindak Lanjut / Catatan Admin</label>
             <input type="text" id="updateAppointment" placeholder="Contoh: Jadwal mediasi 15 Juni 2026..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--line); outline: none; background: #f8fafc; font-size: 14px;">
             
-            <button class="btn primary full" onclick="saveReportStatus()" style="margin-top: 16px;">Simpan Perubahan</button>
+            <button class="btn primary full" id="saveReportStatusBtn" type="button" style="margin-top: 16px;">Simpan Perubahan</button>
           </div>
         </div>
       </div>
@@ -492,12 +497,12 @@
       <h4 style="margin: 0 0 4px 0; font-size: 15px; color: var(--ink);">Aksesibilitas</h4>
       <p style="margin: 0 0 12px 0; font-size: 12px; color: var(--muted); line-height: 1.4;">Sesuaikan tampilan untuk kenyamanan Anda.</p>
       
-      <button onclick="toggleA11yFeature('high-contrast')" class="btn outline" style="justify-content: flex-start; font-size: 13px;">👁️ Kontras Tinggi</button>
-      <button onclick="toggleA11yFeature('large-text')" class="btn outline" style="justify-content: flex-start; font-size: 13px;">🔎 Perbesar Teks</button>
-      <button onclick="toggleA11yFeature('dyslexia')" class="btn outline" style="justify-content: flex-start; font-size: 13px;">📖 Ramah Disleksia</button>
+      <button class="btn outline js-a11y-feature" data-a11y-feature="high-contrast" type="button" style="justify-content: flex-start; font-size: 13px;">👁️ Kontras Tinggi</button>
+      <button class="btn outline js-a11y-feature" data-a11y-feature="large-text" type="button" style="justify-content: flex-start; font-size: 13px;">🔎 Perbesar Teks</button>
+      <button class="btn outline js-a11y-feature" data-a11y-feature="dyslexia" type="button" style="justify-content: flex-start; font-size: 13px;">📖 Ramah Disleksia</button>
     </div>
 
-    <button onclick="toggleA11yMenu()" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); cursor: pointer; display: grid; place-items: center; transition: transform 0.2s;" aria-label="Buka Menu Aksesibilitas">
+    <button id="a11yToggleBtn" type="button" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); cursor: pointer; display: grid; place-items: center; transition: transform 0.2s;" aria-label="Buka Menu Aksesibilitas">
       <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 2a8 8 0 100 16 8 8 0 000-16zm0 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-4 4h8v2h-3v6h-2v-6H8v-2z"/>
       </svg>

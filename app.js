@@ -4,9 +4,50 @@
 
     // --- Helper Sanitasi Input (Simulasi Backend Safety / XSS Protection) ---
     function sanitizeInput(text) {
-      const element = document.createElement('div');
-      element.innerText = text;
-      return element.innerHTML.trim();
+      return String(text ?? '').trim();
+    }
+
+    function clearElement(element) {
+      if (!element) return;
+      while (element.firstChild) element.removeChild(element.firstChild);
+    }
+
+    function appendBr(element) {
+      element.appendChild(document.createElement('br'));
+    }
+
+
+    function createEl(tag, options = {}, children = []) {
+      const element = document.createElement(tag);
+      if (options.className) element.className = options.className;
+      if (options.text !== undefined) element.textContent = options.text;
+      if (options.style) {
+        if (typeof options.style === 'string') element.setAttribute('style', options.style);
+        else Object.assign(element.style, options.style);
+      }
+      if (options.type) element.type = options.type;
+      if (options.href) element.href = options.href;
+      if (options.onClick) element.addEventListener('click', options.onClick);
+      children.forEach(child => element.appendChild(typeof child === 'string' ? document.createTextNode(child) : child));
+      return element;
+    }
+
+    function createEmptyState(message) {
+      return createEl('p', { className: 'muted', text: message, style: 'text-align:center; padding:20px;' });
+    }
+
+    function setChildren(element, children) {
+      clearElement(element);
+      children.forEach(child => element.appendChild(typeof child === 'string' ? document.createTextNode(child) : child));
+    }
+
+    function renderStrongPrefixMessage(element, message) {
+      const match = String(message).match(/^<strong>(.*?)<\/strong>\s*(.*)$/);
+      if (match) {
+        setChildren(element, [createEl('strong', { text: match[1] }), match[2] ? ` ${match[2]}` : '']);
+      } else {
+        element.textContent = message;
+      }
     }
 
     // --- Routing System (Simulasi SPA) ---
@@ -60,8 +101,59 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    function bindClick(id, handler) {
+      const element = document.getElementById(id);
+      if (element) element.addEventListener('click', handler);
+    }
+
+    function setupEventListeners() {
+      bindClick('discreetCloseBtn', deactivateDiscreetMode);
+      bindClick('quickEscapeBtn', activateDiscreetMode);
+      document.querySelectorAll('.js-logout').forEach(btn => btn.addEventListener('click', handleLogout));
+
+      const reportForm = document.getElementById('reportForm');
+      if (reportForm) reportForm.addEventListener('submit', submitReport);
+      const description = document.getElementById('description');
+      if (description) description.addEventListener('input', analyzeSentiment);
+
+      bindClick('chatSendBtn', sendChatMessage);
+      const chatInput = document.getElementById('chatInput');
+      if (chatInput) chatInput.addEventListener('keydown', handleChatKeyDown);
+
+      const registerForm = document.getElementById('registerForm');
+      if (registerForm) registerForm.addEventListener('submit', handleRegister);
+      const regStatus = document.getElementById('regStatus');
+      if (regStatus) regStatus.addEventListener('change', toggleStatusFields);
+      const regPassword = document.getElementById('regPassword');
+      if (regPassword) regPassword.addEventListener('input', checkPasswordStrength);
+
+      bindClick('tabMahasiswa', () => switchLoginTab('mahasiswa'));
+      bindClick('tabAdmin', () => switchLoginTab('admin'));
+      const loginForm = document.getElementById('loginForm');
+      if (loginForm) loginForm.addEventListener('submit', handleMainLogin);
+      bindClick('forgotPasswordLink', openForgotModal);
+      bindClick('googleLoginBtn', () => alert('Membuka Login Google...'));
+      bindClick('instagramLoginBtn', () => alert('Membuka Login Instagram...'));
+      bindClick('emailLoginBtn', () => alert('Kirim Magic Link ke Email...'));
+      bindClick('closeForgotModalBtn', closeForgotModal);
+      bindClick('sendOtpBtn', sendOTP);
+
+      bindClick('seedDemoBtn', seedDemoData);
+      bindClick('clearDataBtn', clearAllData);
+      bindClick('closeReportDetailBtn', closeReportDetailModal);
+      bindClick('saveReportStatusBtn', saveReportStatus);
+
+      document.querySelectorAll('.js-a11y-feature').forEach(btn => {
+        btn.addEventListener('click', () => toggleA11yFeature(btn.dataset.a11yFeature));
+      });
+      bindClick('a11yToggleBtn', toggleA11yMenu);
+    }
+
     window.addEventListener('hashchange', handleRouting);
-    window.addEventListener('DOMContentLoaded', handleRouting);
+    window.addEventListener('DOMContentLoaded', () => {
+      setupEventListeners();
+      handleRouting();
+    });
 
 
     // --- Logika Login Utama dengan Proteksi Keamanan ---
@@ -82,7 +174,17 @@
         tabM.style.color = 'var(--muted)';
         tabA.style.borderBottomColor = 'var(--primary)';
         tabA.style.color = 'var(--primary)';
-        subtitle.innerHTML = 'Gunakan kredensial admin Anda.<br><em>(Demo: Username: <b>admin</b>, Password: <b>safesphere</b>)</em>';
+        setChildren(subtitle, [
+          'Gunakan kredensial admin Anda.',
+          createEl('br'),
+          createEl('em', {}, [
+            '(Demo: Username: ',
+            createEl('b', { text: 'admin' }),
+            ', Password: ',
+            createEl('b', { text: 'safesphere' }),
+            ')'
+          ])
+        ]);
         emailInput.placeholder = 'Username admin';
       } else {
         tabA.style.borderBottomColor = 'transparent';
@@ -114,7 +216,10 @@
         // Proteksi Berlapis Kredensial Admin Kampus
         if (user !== 'admin' || pass !== 'safesphere') {
           errorBox.classList.remove('hidden');
-          errorBox.innerHTML = '<strong>⚠️ AKSES DITOLAK:</strong> Kredensial Admin salah. Percobaan login ilegal ini otomatis dicatat oleh sistem pertahanan siber SafeSphere.';
+          setChildren(errorBox, [
+            createEl('strong', { text: '⚠️ AKSES DITOLAK:' }),
+            ' Kredensial Admin salah. Percobaan login ilegal ini otomatis dicatat oleh sistem pertahanan siber SafeSphere.'
+          ]);
           return;
         }
         
@@ -276,23 +381,27 @@
 
       const listContainer = document.getElementById('adminReportList');
       if (reportData.length === 0) {
-        listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada data laporan.</p>';
+        setChildren(listContainer, [createEmptyState('Belum ada data laporan.')]);
         return;
       }
 
-      listContainer.innerHTML = '';
+      clearElement(listContainer);
       reportData.forEach(report => {
         let riskClass = report.urg === 'Tinggi' ? 'risk-tinggi' : (report.urg === 'Sedang' ? 'risk-sedang' : 'risk-rendah');
-        let html = `
-          <div class="report-item" onclick="viewReportDetail('${report.id}')">
-            <div class="report-info">
-              <h4>${report.id} <span style="color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;">${report.date}</span></h4>
-              <p><b>Kategori:</b> ${report.cat} &bull; <b>Pelapor:</b> ${report.displayName || report.author} &bull; <b>Status:</b> <span style="color:var(--primary);">${report.status}</span></p>
-            </div>
-            <div class="risk-badge ${riskClass}">Urgensi ${report.urg}</div>
-          </div>
-        `;
-        listContainer.insertAdjacentHTML('beforeend', html);
+        const title = createEl('h4', {}, [
+          report.id,
+          createEl('span', { text: report.date, style: 'color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;' })
+        ]);
+        const info = createEl('p', {}, [
+          createEl('b', { text: 'Kategori:' }), ' ', report.cat, ' • ',
+          createEl('b', { text: 'Pelapor:' }), ' ', report.displayName || report.author, ' • ',
+          createEl('b', { text: 'Status:' }), ' ',
+          createEl('span', { text: report.status, style: 'color:var(--primary);' })
+        ]);
+        listContainer.appendChild(createEl('div', { className: 'report-item', onClick: () => viewReportDetail(report.id) }, [
+          createEl('div', { className: 'report-info' }, [title, info]),
+          createEl('div', { className: `risk-badge ${riskClass}`, text: `Urgensi ${report.urg}` })
+        ]));
       });
     }
 
@@ -302,27 +411,39 @@
       const userReports = reportData.filter(r => r.author === currentUser.name);
 
       if (userReports.length === 0) {
-        listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Anda belum pernah membuat laporan.</p>';
+        setChildren(listContainer, [createEmptyState('Anda belum pernah membuat laporan.')]);
         return;
       }
 
-      listContainer.innerHTML = '';
+      clearElement(listContainer);
       userReports.forEach(report => {
         let riskClass = report.urg === 'Tinggi' ? 'risk-tinggi' : (report.urg === 'Sedang' ? 'risk-sedang' : 'risk-rendah');
-        let html = `
-          <div class="report-item" onclick="viewInvoiceFromSubmit('${report.id}')">
-            <div class="report-info">
-              <h4>${report.id} <span style="color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;">${report.date}</span></h4>
-              <p><b>Kategori:</b> ${report.cat} &bull; <b>Status Laporan:</b> <span style="color:var(--primary); font-weight:bold;">${report.status}</span></p>
-            </div>
-            <div class="risk-badge ${riskClass}">Lihat Invoice ></div>
-          </div>
-        `;
-        listContainer.insertAdjacentHTML('beforeend', html);
+        const title = createEl('h4', {}, [
+          report.id,
+          createEl('span', { text: report.date, style: 'color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;' })
+        ]);
+        const info = createEl('p', {}, [
+          createEl('b', { text: 'Kategori:' }), ' ', report.cat, ' • ',
+          createEl('b', { text: 'Status Laporan:' }), ' ',
+          createEl('span', { text: report.status, style: 'color:var(--primary); font-weight:bold;' })
+        ]);
+        listContainer.appendChild(createEl('div', { className: 'report-item', onClick: () => viewInvoiceFromSubmit(report.id) }, [
+          createEl('div', { className: 'report-info' }, [title, info]),
+          createEl('div', { className: `risk-badge ${riskClass}`, text: 'Lihat Invoice >' })
+        ]));
       });
     }
 
     let currentDetailId = null;
+
+    function appendField(container, label, value, options = {}) {
+      const field = createEl('div', { style: options.fieldStyle || '' });
+      field.appendChild(createEl('span', { text: label }));
+      appendBr(field);
+      const strong = createEl('strong', { text: value, style: options.strongStyle || '' });
+      field.appendChild(strong);
+      container.appendChild(field);
+    }
 
     function viewReportDetail(id) {
       const report = reportData.find(r => r.id === id);
@@ -332,20 +453,22 @@
       document.getElementById('detailTitle').innerText = 'Detail Kasus ' + report.id;
       
       // INTEGRASI KODE TAMPILAN ADMIN (NAMA ANONIM)
-      const content = `
-        <div style="grid-column: 1 / -1; background: #e8f0ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 8px;">
-          <span style="color: var(--primary2);">Pelapor:</span><br>
-          <strong style="font-size: 16px; color: var(--primary);">${report.displayName || report.author}</strong>
-        </div>
-        <div><span>Waktu Kejadian:</span><br><strong>${report.date}</strong></div>
-        <div><span>Kategori:</span><br><strong>${report.cat}</strong></div>
-        <div><span>Lokasi Kejadian:</span><br><strong>${report.loc}</strong></div>
-        <div><span>Tingkat Risiko:</span><br><strong>${report.urg}</strong></div>
-        <div style="grid-column: 1 / -1;"><span>Lampiran Bukti:</span><br><strong style="color: var(--primary);">${report.evidence || 'Tidak ada lampiran'}</strong></div>
-        <div style="grid-column: 1 / -1;"><span>Kronologi Lengkap:</span><br><strong style="font-weight: 500; font-size: 14px; line-height: 1.5; margin-top: 4px;">"${report.desc}"</strong></div>
-        <div style="grid-column: 1 / -1;"><span>Status Terakhir:</span><br><strong style="color: var(--primary);">${report.status}</strong></div>
-      `;
-      document.getElementById('detailContent').innerHTML = content;
+      const detailContent = document.getElementById('detailContent');
+      clearElement(detailContent);
+
+      const reporterBox = createEl('div', { style: 'grid-column: 1 / -1; background: #e8f0ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 8px;' });
+      reporterBox.appendChild(createEl('span', { text: 'Pelapor:', style: 'color: var(--primary2);' }));
+      appendBr(reporterBox);
+      reporterBox.appendChild(createEl('strong', { text: report.displayName || report.author, style: 'font-size: 16px; color: var(--primary);' }));
+      detailContent.appendChild(reporterBox);
+
+      appendField(detailContent, 'Waktu Kejadian:', report.date);
+      appendField(detailContent, 'Kategori:', report.cat);
+      appendField(detailContent, 'Lokasi Kejadian:', report.loc);
+      appendField(detailContent, 'Tingkat Risiko:', report.urg);
+      appendField(detailContent, 'Lampiran Bukti:', report.evidence || 'Tidak ada lampiran', { fieldStyle: 'grid-column: 1 / -1;', strongStyle: 'color: var(--primary);' });
+      appendField(detailContent, 'Kronologi Lengkap:', `"${report.desc}"`, { fieldStyle: 'grid-column: 1 / -1;', strongStyle: 'font-weight: 500; font-size: 14px; line-height: 1.5; margin-top: 4px;' });
+      appendField(detailContent, 'Status Terakhir:', report.status, { fieldStyle: 'grid-column: 1 / -1;', strongStyle: 'color: var(--primary);' });
       
       let selectStatus = report.status;
       if(selectStatus === 'Baru Masuk' || selectStatus === 'Direview' || selectStatus === 'Diproses' || selectStatus === 'Selesai') {
@@ -442,20 +565,20 @@
         textEl.innerText = node.text;
         
         // Bersihkan opsi lama
-        optionsEl.innerHTML = '';
+        clearElement(optionsEl);
         
         // Buat tombol baru sesuai skenario
         node.options.forEach(opt => {
           const btn = document.createElement('button');
           btn.innerText = opt.text;
-          btn.onclick = () => renderStoryNode(opt.nextNode); // Pindah ke skenario berikutnya saat diklik
+          btn.addEventListener('click', () => renderStoryNode(opt.nextNode)); // Pindah ke skenario berikutnya saat diklik
           optionsEl.appendChild(btn);
         });
 
         // Tampilkan kotak masukan (feedback/akibat) jika ada
         if (node.feedback) {
           feedbackEl.className = `result ${node.feedback.type}`;
-          feedbackEl.innerHTML = node.feedback.message;
+          renderStrongPrefixMessage(feedbackEl, node.feedback.message);
         } else {
           feedbackEl.className = 'result hidden';
         }
@@ -522,10 +645,16 @@
         
         resultBox.classList.remove('hidden');
         resultBox.classList.add('success');
-        resultBox.innerHTML = `<strong>Laporan Berhasil Terkirim & Terenkripsi!</strong><br><br>
-        Nomor Pelacakan Anda: <b style="font-size:18px; color:var(--ink);">${trackingID}</b><br>
-        <em>Harap simpan nomor ini. Data terenkripsi end-to-end.</em><br><br>
-        <button class="btn secondary" type="button" onclick="viewInvoiceFromSubmit('${trackingID}')" style="margin-top: 10px;">Lacak Status Laporan Ini</button>`;
+        setChildren(resultBox, [
+          createEl('strong', { text: 'Laporan Berhasil Terkirim & Terenkripsi!' }),
+          createEl('br'), createEl('br'),
+          'Nomor Pelacakan Anda: ',
+          createEl('b', { text: trackingID, style: 'font-size:18px; color:var(--ink);' }),
+          createEl('br'),
+          createEl('em', { text: 'Harap simpan nomor ini. Data terenkripsi end-to-end.' }),
+          createEl('br'), createEl('br'),
+          createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status Laporan Ini', style: 'margin-top: 10px;', onClick: () => viewInvoiceFromSubmit(trackingID) })
+        ]);
         
         event.target.reset();
       }, 1500);
@@ -558,29 +687,40 @@
         t1 = 'done'; t2 = 'done'; t3 = 'done'; t4 = 'done';
       }
 
-      invoiceBox.innerHTML = `
-        <div class="invoice-header">
-          <h3>Tanda Terima Pengaduan</h3>
-          <p class="muted" style="margin:0;">No. Pelacakan: <strong>${report.id}</strong></p>
-        </div>
-        <div class="invoice-details">
-          <div><span>Tanggal Kejadian:</span><br><strong>${report.date}</strong></div>
-          <div><span>Kategori:</span><br><strong>${report.cat}</strong></div>
-          <div><span>Lokasi:</span><br><strong>${report.loc}</strong></div>
-          <div><span>Tingkat Urgensi:</span><br><strong>${report.urg}</strong></div>
-          <div style="grid-column: 1 / -1;"><span>Lampiran Bukti:</span><br><strong style="color: var(--primary);">${report.evidence || 'Tidak ada lampiran'}</strong></div>
-          <div style="grid-column: 1 / -1;"><span>Kronologi Singkat:</span><br><strong style="font-weight: 500; font-size: 13px; line-height: 1.5; margin-top: 4px;">"${report.desc}"</strong></div>
-        </div>
-        <div class="timeline-container">
-          <h4 style="margin: 0 0 16px 0;">Update Status Pelaporan</h4>
-          <ul class="timeline">
-            <li class="timeline-item ${t1 || 'done'}"><div class="timeline-marker"></div><div class="timeline-content"><h4>Laporan Diterima</h4><p>Laporan masuk ke sistem aman.</p></div></li>
-            <li class="timeline-item ${t2}"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tahap Review (Verifikasi)</h4><p>Tim admin memverifikasi kelayakan berkas.</p></div></li>
-            <li class="timeline-item ${t3}"><div class="timeline-marker"></div><div class="timeline-content"><h4>Sedang Diproses</h4><p>Kasus ditangani unit kemahasiswaan/Satgas PPKS.</p></div></li>
-            <li class="timeline-item ${t4}"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tindak Lanjut & Appointment</h4><p style="color: var(--primary); font-weight: 600; margin-top: 4px;">Info: ${report.appointment}</p></div></li>
-          </ul>
-        </div>
-      `;
+      const header = createEl('div', { className: 'invoice-header' }, [
+        createEl('h3', { text: 'Tanda Terima Pengaduan' }),
+        createEl('p', { className: 'muted', style: 'margin:0;' }, [
+          'No. Pelacakan: ', createEl('strong', { text: report.id })
+        ])
+      ]);
+
+      const details = createEl('div', { className: 'invoice-details' });
+      appendField(details, 'Tanggal Kejadian:', report.date);
+      appendField(details, 'Kategori:', report.cat);
+      appendField(details, 'Lokasi:', report.loc);
+      appendField(details, 'Tingkat Urgensi:', report.urg);
+      appendField(details, 'Lampiran Bukti:', report.evidence || 'Tidak ada lampiran', { fieldStyle: 'grid-column: 1 / -1;', strongStyle: 'color: var(--primary);' });
+      appendField(details, 'Kronologi Singkat:', `"${report.desc}"`, { fieldStyle: 'grid-column: 1 / -1;', strongStyle: 'font-weight: 500; font-size: 13px; line-height: 1.5; margin-top: 4px;' });
+
+      function timelineItem(className, title, description, highlight = false) {
+        const p = createEl('p', { text: description, style: highlight ? 'color: var(--primary); font-weight: 600; margin-top: 4px;' : '' });
+        return createEl('li', { className: `timeline-item ${className}` }, [
+          createEl('div', { className: 'timeline-marker' }),
+          createEl('div', { className: 'timeline-content' }, [createEl('h4', { text: title }), p])
+        ]);
+      }
+
+      const timeline = createEl('div', { className: 'timeline-container' }, [
+        createEl('h4', { text: 'Update Status Pelaporan', style: 'margin: 0 0 16px 0;' }),
+        createEl('ul', { className: 'timeline' }, [
+          timelineItem(t1 || 'done', 'Laporan Diterima', 'Laporan masuk ke sistem aman.'),
+          timelineItem(t2, 'Tahap Review (Verifikasi)', 'Tim admin memverifikasi kelayakan berkas.'),
+          timelineItem(t3, 'Sedang Diproses', 'Kasus ditangani unit kemahasiswaan/Satgas PPKS.'),
+          timelineItem(t4, 'Tindak Lanjut & Appointment', `Info: ${report.appointment}`, true)
+        ])
+      ]);
+
+      setChildren(invoiceBox, [header, details, timeline]);
     }
 
 
@@ -680,7 +820,12 @@
         
         resultBox.classList.remove('hidden');
         resultBox.classList.add('success');
-        resultBox.innerHTML = `<strong>Registrasi Berhasil!</strong> Akun Anda terverifikasi dengan aman. Silakan menuju halaman <a href="#login">Login</a> untuk masuk ke dashboard.`;
+        setChildren(resultBox, [
+          createEl('strong', { text: 'Registrasi Berhasil!' }),
+          ' Akun Anda terverifikasi dengan aman. Silakan menuju halaman ',
+          createEl('a', { href: '#login', text: 'Login' }),
+          ' untuk masuk ke dashboard.'
+        ]);
         event.target.reset();
         document.getElementById('pwHelper').className = 'form-helper';
         document.getElementById('pwHelper').innerText = 'Minimal 6 karakter, 1 huruf kapital, 1 angka, dan 1 karakter spesial.';
@@ -880,4 +1025,135 @@
         label.innerText = 'Terpantau Stabil (Rendah)';
         label.style.color = 'var(--ok)';
       }
+    }
+
+    // ========================================================
+    // FITUR 6: LOGIKA CHATBOT INTERAKTIF (SAFEBOT)
+    // ========================================================
+    function handleChatKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendChatMessage();
+      }
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      if (!input) return;
+
+      const text = sanitizeInput(input.value);
+      if (!text) return;
+
+      addChatMessage(text, 'user');
+      input.value = '';
+
+      setTimeout(() => {
+        processBotResponse(text);
+      }, 700);
+    }
+
+    function addChatMessage(content, sender, actions = []) {
+      const container = document.getElementById('chatMessages');
+      if (!container) return;
+
+      const message = createEl('div', { className: `chat-message ${sender}` });
+      if (Array.isArray(content)) {
+        setChildren(message, content);
+      } else {
+        message.textContent = content;
+      }
+
+      if (actions.length > 0) {
+        message.appendChild(createEl('div', { className: 'chat-message-actions' }, actions.map(action => (
+          createEl('a', {
+            className: action.className,
+            href: action.href,
+            text: action.text
+          })
+        ))));
+      }
+
+      container.appendChild(message);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function getRiskScore(text) {
+      const lowerText = text.toLowerCase();
+      let score = 0;
+      let foundHighRisk = false;
+
+      triggerDictionary.highRisk.forEach(word => {
+        if (lowerText.includes(word)) {
+          score += 5;
+          foundHighRisk = true;
+        }
+      });
+
+      triggerDictionary.medRisk.forEach(word => {
+        if (lowerText.includes(word)) score += 2;
+      });
+
+      return { score, foundHighRisk, lowerText };
+    }
+
+    function processBotResponse(text) {
+      const { score, foundHighRisk, lowerText } = getRiskScore(text);
+
+      if (score >= 5 || foundHighRisk) {
+        if (!currentUser) {
+          addChatMessage([
+            createEl('strong', { text: 'Peringatan Sistem:', style: 'color:var(--danger);' }),
+            ' Kami mendeteksi situasi berisiko dan mengancam keamanan Anda. Untuk mendapatkan perlindungan dari Konselor atau Satgas, silakan masuk atau buat akun terlebih dahulu.'
+          ], 'bot', [
+            { href: '#login', text: 'Masuk', className: 'btn primary' },
+            { href: '#register', text: 'Daftar Akun', className: 'btn outline' }
+          ]);
+        } else {
+          addChatMessage([
+            createEl('strong', { text: 'Situasi Darurat Terdeteksi.', style: 'color:var(--danger);' }),
+            ` Halo ${currentUser.name}, keselamatan Anda adalah prioritas utama. Segera amankan diri, hubungi Satgas Darurat (0811-XXXX-XXXX), dan buat laporan dengan urgensi Tinggi.`
+          ], 'bot', [
+            { href: '#lapor', text: 'Buat Laporan Sekarang', className: 'btn danger' }
+          ]);
+        }
+        return;
+      }
+
+      if (score >= 2) {
+        addChatMessage('Saya memahami bahwa ini situasi yang membuat tertekan. Mengalami hal seperti itu tidak pernah dibenarkan. Apakah Anda sudah menyimpan bukti? Sangat disarankan untuk melaporkan hal ini secara anonim di menu Lapor.', 'bot');
+        return;
+      }
+
+      if (lowerText === 'halo' || lowerText === 'hai' || lowerText === 'hi' || lowerText === 'p' || lowerText.includes('selamat pagi') || lowerText.includes('selamat siang') || lowerText.includes('selamat malam')) {
+        addChatMessage('Halo. SafeBot di sini. Ada yang ingin kamu ceritakan atau tanyakan hari ini?', 'bot');
+        return;
+      }
+
+      if (lowerText.includes('terima kasih') || lowerText.includes('makasih') || lowerText === 'thanks' || lowerText === 'thx') {
+        addChatMessage('Sama-sama. SafeBot selalu ada di sini kalau kamu butuh tempat cerita yang aman.', 'bot');
+        return;
+      }
+
+      if (lowerText.includes('bantuan') || lowerText.includes('tolong') || lowerText.includes('cara lapor')) {
+        addChatMessage('Kalau kamu butuh bantuan terkait perundungan, kamu bisa langsung ke menu Lapor Anonim untuk mengisi kronologi. Laporanmu aman bersama kami.', 'bot');
+        return;
+      }
+
+      if (lowerText.includes('sedih') || lowerText.includes('takut') || lowerText.includes('capek') || lowerText.includes('lelah') || lowerText.includes('pusing')) {
+        addChatMessage('Rasanya pasti berat. Tarik napas pelan-pelan. SafeBot siap mendengarkan kalau kamu mau cerita lebih detail.', 'bot');
+        return;
+      }
+
+      if (lowerText.length < 15 && !lowerText.includes(' ')) {
+        addChatMessage('Bisa ceritakan lebih detail maksudmu? Aku di sini untuk mendengarkan.', 'bot');
+        return;
+      }
+
+      const responses = [
+        'Terima kasih sudah berbagi. Saya di sini untuk mendengarkan. Apa yang terjadi setelah itu?',
+        'Itu pasti tidak mudah. Bagaimana perasaanmu menyikapi hal tersebut sekarang?',
+        'Memendam masalah sendirian memang berat. Kamu berani karena mau bercerita. Ada lagi yang ingin kamu sampaikan?',
+        'SafeBot mengerti. Jika hal ini terus berlanjut dan membuatmu sangat tidak nyaman, jangan ragu membuat laporan resmi agar tim kampus bisa membantu.'
+      ];
+      addChatMessage(responses[Math.floor(Math.random() * responses.length)], 'bot');
     }
