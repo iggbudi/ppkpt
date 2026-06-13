@@ -125,6 +125,25 @@
 
     if (!input || !sendBtn) return;
 
+    var consentAccept = document.getElementById('consentAccept');
+    var chatConsent = document.getElementById('chatConsent');
+    var chatContainer = document.querySelector('.chat-container');
+
+    if (sessionStorage.getItem('chatConsent')) {
+      if (chatConsent) chatConsent.classList.add('hidden');
+      if (chatContainer) chatContainer.classList.remove('hidden');
+    } else {
+      if (chatContainer) chatContainer.classList.add('hidden');
+    }
+
+    if (consentAccept) {
+      consentAccept.addEventListener('click', function() {
+        sessionStorage.setItem('chatConsent', 'true');
+        if (chatConsent) chatConsent.classList.add('hidden');
+        if (chatContainer) chatContainer.classList.remove('hidden');
+      });
+    }
+
     sendBtn.addEventListener('click', sendMessage);
 
     input.addEventListener('keydown', function(e) {
