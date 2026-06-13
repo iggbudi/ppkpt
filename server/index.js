@@ -16,7 +16,7 @@ const chatRateLimitStore = new Map();
 app.set('trust proxy', false);
 app.use(cors({ origin: false }));
 app.use(express.json({ limit: '20kb' }));
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const highRiskReply = 'Saya mendeteksi tanda situasi berisiko tinggi. Keselamatanmu adalah prioritas utama. Jika kamu sedang dalam bahaya, segera menjauh ke tempat aman dan hubungi Satgas/keamanan kampus atau orang terpercaya. Jika memungkinkan, simpan bukti dan buat laporan dengan urgensi Tinggi.';
 const modelFallbackReply = 'Maaf, SafeBot sedang mengalami gangguan koneksi ke layanan AI. Saya tetap ingin kamu aman: jika situasi terasa mendesak, hubungi kontak darurat kampus atau orang terpercaya. Jika memungkinkan, simpan bukti dan buat laporan melalui menu Lapor Anonim.';
@@ -132,7 +132,7 @@ app.use('/api', (req, res) => {
 });
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 if (require.main === module) {
