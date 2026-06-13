@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const helmet = require('helmet');
 const { callMimoChat } = require('./mimoClient');
 const { classifyRisk } = require('./risk');
 
@@ -15,6 +16,20 @@ const chatRateLimitStore = new Map();
 
 app.set('trust proxy', false);
 app.use(cors({ origin: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      frameSrc: ["https://id.wikipedia.org"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"]
+    }
+  },
+  frameguard: { action: 'deny' }
+}));
 app.use(express.json({ limit: '20kb' }));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
