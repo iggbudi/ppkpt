@@ -3,6 +3,20 @@ var currentUser = null;
 var reportData = [];
 var currentViewedInvoiceId = null;
 
+function openModal(modalId) {
+  var modal = document.getElementById(modalId);
+  if (modal && modal.showModal) {
+    modal.showModal();
+  }
+}
+
+function closeModal(modalId) {
+  var modal = document.getElementById(modalId);
+  if (modal && modal.close) {
+    modal.close();
+  }
+}
+
 function updateNavForUser(user) {
   if (!user) {
     document.getElementById('sidebarGuest').classList.remove('hidden');
@@ -129,7 +143,15 @@ function setupEventListeners() {
   }
 
   if (hamburger) {
-    hamburger.addEventListener('click', openSidebar);
+    hamburger.addEventListener('click', function() {
+      var isOpen = hamburger.getAttribute('aria-expanded') === 'true';
+      hamburger.setAttribute('aria-expanded', String(!isOpen));
+      if (isOpen) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
   }
   if (sidebarClose) {
     sidebarClose.addEventListener('click', closeSidebar);

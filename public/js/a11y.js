@@ -1,12 +1,15 @@
 (function() {
   window.toggleA11yMenu = function() {
     var menu = document.getElementById('a11yMenu');
+    var toggle = document.querySelector('[aria-label="Buka Menu Aksesibilitas"]');
     if (menu.classList.contains('hidden')) {
       menu.classList.remove('hidden');
       menu.classList.add('show');
+      if (toggle) toggle.setAttribute('aria-expanded', 'true');
     } else {
       menu.classList.add('hidden');
       menu.classList.remove('show');
+      if (toggle) toggle.setAttribute('aria-expanded', 'false');
     }
   };
 

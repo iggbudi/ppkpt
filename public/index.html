@@ -117,7 +117,7 @@
 
   <header class="topbar">
     <div class="topbar-left">
-      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false" aria-controls="mainNav">
         <span></span>
         <span></span>
         <span></span>
@@ -413,7 +413,7 @@
             <div class="chat-message bot">Halo. Saya SafeBot. Ruang ini aman dan anonim. Ada yang ingin kamu ceritakan atau keluhkan hari ini?</div>
           </div>
           <div class="chat-input-area">
-            <textarea id="chatInput" placeholder="Ceritakan detail kejadiannya di sini... (Enter untuk kirim, Shift + Enter untuk baris baru)" rows="4"></textarea>
+            <textarea id="chatInput" placeholder="Ceritakan detail kejadiannya di sini... (Enter untuk kirim, Shift + Enter untuk baris baru)" rows="4" aria-label="Ketik pesan Anda"></textarea>
             <button class="btn primary" id="chatSendBtn" type="button">Kirim</button>
           </div>
         </div>
@@ -536,7 +536,7 @@
         </div>
       </section>
 
-      <div id="forgotPasswordModal" class="modal">
+      <dialog id="forgotPasswordModal" class="modal">
         <div class="modal-content">
           <span class="close-modal" id="forgotModalCloseBtn">&times;</span>
           <h2 style="margin-top: 10px;">Lupa Password?</h2>
@@ -548,7 +548,7 @@
             <button class="btn primary full" id="sendOtpBtn" style="margin-top: 16px; padding: 12px;">Kirim Kode OTP</button>
           </div>
         </div>
-      </div>
+      </dialog>
     </div>
 
     <div id="page-admin" class="page">
@@ -599,7 +599,7 @@
         </div>
       </section>
 
-      <div id="reportDetailModal" class="modal">
+      <dialog id="reportDetailModal" class="modal">
         <div class="modal-content" style="max-width: 600px; text-align: left;">
           <span class="close-modal" id="reportDetailModalCloseBtn">&times;</span>
           <h2 style="margin-top: 10px; color: var(--primary);" id="detailTitle">Detail Laporan</h2>
@@ -624,7 +624,7 @@
             <button class="btn primary full" id="saveStatusBtn" style="margin-top: 16px;">Simpan Perubahan</button>
           </div>
         </div>
-      </div>
+      </dialog>
     </div>
 
     <div id="page-dashboard" class="page">
@@ -663,7 +663,7 @@
       <button class="btn outline a11y-toggle" data-feature="dyslexia" style="justify-content: flex-start; font-size: 13px;">📖 Ramah Disleksia</button>
     </div>
 
-    <button id="a11yMenuToggle" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); cursor: pointer; display: grid; place-items: center; transition: transform 0.2s;" aria-label="Buka Menu Aksesibilitas">
+    <button id="a11yMenuToggle" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); cursor: pointer; display: grid; place-items: center; transition: transform 0.2s;" aria-label="Buka Menu Aksesibilitas" aria-expanded="false" aria-controls="a11yMenu">
       <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 2a8 8 0 100 16 8 8 0 000-16zm0 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-4 4h8v2h-3v6h-2v-6H8v-2z"/>
       </svg>

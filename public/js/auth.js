@@ -81,11 +81,11 @@
 
   window.openForgotModal = function(event) {
     event.preventDefault();
-    document.getElementById('forgotPasswordModal').classList.add('show');
+    openModal('forgotPasswordModal');
   };
 
   window.closeForgotModal = function() {
-    document.getElementById('forgotPasswordModal').classList.remove('show');
+    closeModal('forgotPasswordModal');
   };
 
   window.sendOTP = function(event) {

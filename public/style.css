@@ -419,22 +419,33 @@ body {
 
 /* --- Modal Styles (Forgot Password) --- */
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(21, 32, 51, 0.6);
-  backdrop-filter: blur(4px);
-  align-items: center;
-  justify-content: center;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0;
+  max-width: 400px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  background: white;
 }
 
-.modal.show {
-  display: flex;
+.modal::backdrop {
+  background-color: rgba(21, 32, 51, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.modal[open] {
   animation: fadeInModal 0.2s ease-out forwards;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .modal-content {

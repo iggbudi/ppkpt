@@ -169,11 +169,11 @@
     }
 
     document.getElementById('updateAppointment').value = report.appointment || '';
-    document.getElementById('reportDetailModal').classList.add('show');
+    openModal('reportDetailModal');
   };
 
   window.closeReportDetailModal = function() {
-    document.getElementById('reportDetailModal').classList.remove('show');
+    closeModal('reportDetailModal');
     currentDetailId = null;
   };
 
