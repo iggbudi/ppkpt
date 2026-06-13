@@ -111,6 +111,15 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true, service: 'safesphere-chat', model: process.env.MIMO_MODEL || 'mimo-v2.5' });
 });
 
+function redactPII(text) {
+  if (!text) return text;
+  // Email addresses
+  let redacted = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL]');
+  // Phone numbers (Indonesian: 08xx, +62xx, 62xx)
+  redacted = redacted.replace(/(\+?62|0)\d{8,12}/g, '[PHONE]');
+  return redacted;
+}
+
 app.post('/api/chat', chatRateLimiter, async (req, res) => {
   const message = req.body?.message;
 
@@ -146,7 +155,8 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   }
 
   try {
-    const reply = await callMimoChat({ message: trimmedMessage, user, risk });
+    const redactedMessage = redactPII(trimmedMessage);
+    const reply = await callMimoChat({ message: redactedMessage, user, risk });
     return res.json({
       reply,
       risk: risk.level,
