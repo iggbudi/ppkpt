@@ -1,4 +1,15 @@
 const crypto = require('crypto');
+const { z } = require('zod');
+
+const reportSchema = z.object({
+  category: z.enum(['Verbal', 'Sosial', 'Cyberbullying', 'Fisik', 'Seksual']),
+  location: z.string().min(1).max(500),
+  urgency: z.enum(['Rendah', 'Sedang', 'Tinggi']),
+  incidentDate: z.string().min(1),
+  description: z.string().min(1).max(5000),
+  evidence: z.string().max(200).optional(),
+  isAnonymous: z.boolean().optional()
+});
 
 function generateId() {
   return 'SSF-' + crypto.randomUUID().substring(0, 8).toUpperCase();
@@ -21,22 +32,14 @@ function setupReportRoutes(app, auditLog) {
 
   // Create report — auth optional (anonymous if no session)
   app.post('/api/reports', (req, res) => {
-    const { category, location, urgency, incidentDate, description, evidence, isAnonymous } = req.body;
-    
-    if (!category || !location || !urgency || !incidentDate || !description) {
-      return res.status(400).json({ error: 'Semua field wajib diisi' });
+    let parsed;
+    try {
+      parsed = reportSchema.parse(req.body);
+    } catch (err) {
+      return res.status(400).json({ error: 'Invalid input', details: err.errors });
     }
 
-    const validCategories = ['Fisik', 'Verbal', 'Sosial', 'Cyberbullying', 'Seksual'];
-    if (!validCategories.includes(category)) {
-      return res.status(400).json({ error: 'Kategori tidak valid' });
-    }
-
-    const validUrgencies = ['Rendah', 'Sedang', 'Tinggi'];
-    if (!validUrgencies.includes(urgency)) {
-      return res.status(400).json({ error: 'Urgensi tidak valid' });
-    }
-
+    const { category, location, urgency, incidentDate, description, evidence, isAnonymous } = parsed;
     const user = req.session.user || null;
     const isAnon = isAnonymous !== false || !user;
     const authorId = isAnon ? null : user.id;

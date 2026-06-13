@@ -47,8 +47,32 @@ app.use(session({
 }));
 
 const auditLog = [];
+
+const loginRateLimitStore = new Map();
+
+function loginRateLimiter(req, res, next) {
+  const key = req.ip || 'unknown';
+  const now = Date.now();
+  const windowMs = 5 * 60 * 1000;
+  const maxAttempts = 5;
+
+  let entry = loginRateLimitStore.get(key);
+  if (!entry || now >= entry.resetAt) {
+    entry = { count: 0, resetAt: now + windowMs };
+  }
+
+  entry.count++;
+  loginRateLimitStore.set(key, entry);
+
+  if (entry.count > maxAttempts) {
+    return res.status(429).json({ error: 'Terlalu banyak percobaan login. Coba lagi dalam 5 menit.' });
+  }
+
+  next();
+}
+
 const { setupAuthRoutes } = require('./auth');
-setupAuthRoutes(app, auditLog);
+setupAuthRoutes(app, auditLog, loginRateLimiter);
 
 const { setupReportRoutes } = require('./reports');
 setupReportRoutes(app, auditLog);
@@ -198,6 +222,11 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   }
 });
 
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err.message);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 app.use('/api', (req, res) => {
   res.status(404).json({ error: 'not found' });
 });
@@ -215,3 +244,11 @@ if (require.main === module) {
 module.exports = app;
 module.exports.app = app;
 module.exports.chatRateLimitStore = chatRateLimitStore;
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err.message);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled Rejection:', reason);
+});
