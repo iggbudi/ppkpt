@@ -78,6 +78,14 @@ setupAuthRoutes(app, loginRateLimiter);
 const { setupReportRoutes } = require('./reports');
 setupReportRoutes(app);
 
+const retentionDays = Number(process.env.RETENTION_DAYS || 90);
+try {
+  const cleanedReports = db.prepare("DELETE FROM reports WHERE createdAt < ? AND status = 'Selesai'").run(Date.now() - (retentionDays * 24 * 60 * 60 * 1000));
+  console.log('Cleaned up ' + cleanedReports.changes + ' old reports');
+} catch (err) {
+  console.error('Retention cleanup failed:', err.message);
+}
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const highRiskReply = 'Saya mendeteksi tanda situasi berisiko tinggi. Keselamatanmu adalah prioritas utama. Jika kamu sedang dalam bahaya, segera menjauh ke tempat aman dan hubungi Satgas/keamanan kampus atau orang terpercaya. Jika memungkinkan, simpan bukti dan buat laporan dengan urgensi Tinggi.';

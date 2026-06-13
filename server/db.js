@@ -39,4 +39,18 @@ db.exec(`
   );
 `);
 
+function cleanupOldReports(daysToKeep) {
+  const cutoff = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
+  const result = db.prepare("DELETE FROM reports WHERE createdAt < ? AND status = 'Selesai'").run(cutoff);
+  return result.changes;
+}
+
+function cleanupOldAudit(daysToKeep) {
+  const cutoff = Date.now() - (daysToKeep * 24 * 60 * 60 * 1000);
+  const result = db.prepare('DELETE FROM audit_log WHERE timestamp < ?').run(cutoff);
+  return result.changes;
+}
+
 module.exports = db;
+module.exports.cleanupOldReports = cleanupOldReports;
+module.exports.cleanupOldAudit = cleanupOldAudit;
