@@ -63,12 +63,18 @@ function setupEventListeners() {
     hamburger.addEventListener('click', function() {
       hamburger.classList.toggle('active');
       mainNav.classList.toggle('open');
+      document.querySelectorAll('.auth-buttons').forEach(function(btn) {
+        btn.classList.toggle('mobile-open');
+      });
     });
     // Close menu when clicking a nav link
     mainNav.querySelectorAll('a').forEach(function(link) {
       link.addEventListener('click', function() {
         hamburger.classList.remove('active');
         mainNav.classList.remove('open');
+        document.querySelectorAll('.auth-buttons').forEach(function(btn) {
+          btn.classList.remove('mobile-open');
+        });
       });
     });
   }
