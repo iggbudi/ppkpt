@@ -121,6 +121,23 @@ function redactPII(text) {
 }
 
 app.post('/api/chat', chatRateLimiter, async (req, res) => {
+  // Per-session rate limit
+  if (!req.session.chatHistory) {
+    req.session.chatHistory = [];
+  }
+  const sessionNow = Date.now();
+  const sessionWindow = 10 * 60 * 1000; // 10 minutes
+  req.session.chatHistory = req.session.chatHistory.filter(t => sessionNow - t < sessionWindow);
+
+  if (req.session.chatHistory.length >= 20) {
+    return res.status(429).json({
+      error: 'rate limit exceeded',
+      message: 'Terlalu banyak pesan. Coba lagi dalam beberapa menit.'
+    });
+  }
+
+  req.session.chatHistory.push(sessionNow);
+
   const message = req.body?.message;
 
   if (typeof message !== 'string') {
