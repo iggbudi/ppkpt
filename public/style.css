@@ -1317,6 +1317,48 @@ footer {
   top: 0;
 }
 
+.form-steps {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+}
+
+.form-step {
+  padding: 8px 16px;
+  background: #f1f5f9;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.form-step.active {
+  background: var(--primary);
+  color: white;
+}
+
+.form-step.done {
+  background: var(--ok);
+  color: white;
+}
+
+.form-section {
+  grid-column: 1 / -1;
+}
+
+.form-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  grid-column: 1 / -1;
+}
+
 /* --- Responsive -------------------------------------------- */
 @media (max-width: 950px) {
   .hero {

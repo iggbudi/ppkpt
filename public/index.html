@@ -241,55 +241,87 @@
 
         <!-- Actual form (hidden until safety check passes) -->
         <form id="reportForm" class="form-grid hidden">
-          <label for="category">Jenis Kejadian
-            <select id="category" required>
-              <option value="">Pilih kategori perundungan</option>
-              <option value="Verbal">Verbal (Mengejek, Menghina)</option>
-              <option value="Sosial">Sosial (Mengucilkan, Fitnah)</option>
-              <option value="Cyberbullying">Cyberbullying (Media Sosial)</option>
-              <option value="Fisik">Fisik (Memukul, Mendorong)</option>
-              <option value="Seksual">Kekerasan/Pelecehan Seksual</option>
-            </select>
-          </label>
+          <div class="form-steps" id="formSteps">
+            <div class="form-step active" data-step="1">1. Kejadian</div>
+            <div class="form-step" data-step="2">2. Deskripsi</div>
+            <div class="form-step" data-step="3">3. Bukti</div>
+            <div class="form-step" data-step="4">4. Review</div>
+          </div>
 
-          <label for="location">Lokasi Kejadian
-            <input id="location" type="text" placeholder="Contoh: Gedung Fakultas Vokasi, Grup WA Angkatan" required>
-          </label>
+          <div class="form-section" id="formStep1">
+            <label for="category">Jenis Kejadian
+              <select id="category" required>
+                <option value="">Pilih kategori perundungan</option>
+                <option value="Verbal">Verbal (Mengejek, Menghina)</option>
+                <option value="Sosial">Sosial (Mengucilkan, Fitnah)</option>
+                <option value="Cyberbullying">Cyberbullying (Media Sosial)</option>
+                <option value="Fisik">Fisik (Memukul, Mendorong)</option>
+                <option value="Seksual">Kekerasan/Pelecehan Seksual</option>
+              </select>
+            </label>
 
-          <label for="incidentDate">Waktu Kejadian
-            <input id="incidentDate" type="date" required>
-          </label>
+            <label for="location">Lokasi Kejadian
+              <input id="location" type="text" placeholder="Contoh: Gedung Fakultas Vokasi, Grup WA Angkatan" required>
+            </label>
 
-          <label for="urgent">Tingkat Urgensi
-            <select id="urgent" required>
-              <option value="Rendah">Rendah (Hanya Melapor)</option>
-              <option value="Sedang">Sedang (Butuh Konseling)</option>
-              <option value="Tinggi">Tinggi (Butuh Tindakan Cepat/Fisik)</option>
-            </select>
-          </label>
+            <label for="incidentDate">Waktu Kejadian
+              <input id="incidentDate" type="date" required>
+            </label>
 
-          <label class="full" for="description">Ceritakan Kronologi Kejadian
-            <textarea id="description" placeholder="Ceritakan secara detail..." required></textarea>
-            <div id="sentimentContainer" style="margin-top: 10px; display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--line);">
-              <div style="flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                <div id="sentimentBar" style="height: 100%; width: 0%; background: var(--ok); transition: width 0.4s ease, background-color 0.4s ease;"></div>
-              </div>
-              <span id="sentimentText" style="font-size: 13px; font-weight: 600; color: var(--muted); min-width: 150px; text-align: right;">Menganalisis teks...</span>
+            <label for="urgent">Tingkat Urgensi
+              <select id="urgent" required>
+                <option value="Rendah">Rendah (Hanya Melapor)</option>
+                <option value="Sedang">Sedang (Butuh Konseling)</option>
+                <option value="Tinggi">Tinggi (Butuh Tindakan Cepat/Fisik)</option>
+              </select>
+            </label>
+
+            <div class="form-nav">
+              <span></span>
+              <button class="btn primary" type="button" id="nextStep1">Selanjutnya</button>
             </div>
-          </label>
+          </div>
 
-          <label class="full" for="evidence">Upload Bukti (Opsional)
-            <input id="evidence" type="file" accept="image/*,.pdf,.doc,.docx">
-            <small class="muted" style="display:block; margin-top:4px;">Format didukung: JPG, PNG, PDF. Maks 5MB.</small>
-          </label>
+          <div class="form-section hidden" id="formStep2">
+            <label class="full" for="description">Ceritakan Kronologi Kejadian
+              <textarea id="description" placeholder="Ceritakan secara detail..." required></textarea>
+              <div id="sentimentContainer" style="margin-top: 10px; display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--line);">
+                <div style="flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                  <div id="sentimentBar" style="height: 100%; width: 0%; background: var(--ok); transition: width 0.4s ease, background-color 0.4s ease;"></div>
+                </div>
+                <span id="sentimentText" style="font-size: 13px; font-weight: 600; color: var(--muted); min-width: 150px; text-align: right;">Menganalisis teks...</span>
+              </div>
+            </label>
 
-          <label class="full" for="isAnonymous" style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 14px; border: 1px dashed var(--primary); border-radius: var(--radius-sm); cursor: pointer;">
-            <input type="checkbox" id="isAnonymous" checked style="width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--primary);">
-            <span style="font-weight: 600; font-size: 14px; color: var(--primary);">Kirim sebagai Anonim (Samarkan nama saya)</span>
-          </label>
+            <div class="form-nav">
+              <button class="btn outline" type="button" id="prevStep2">Kembali</button>
+              <button class="btn primary" type="button" id="nextStep2">Selanjutnya</button>
+            </div>
+          </div>
 
-          <div class="full" style="margin-top: 10px;">
-            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan (Demo)</button>
+          <div class="form-section hidden" id="formStep3">
+            <label class="full" for="evidence">Upload Bukti (Opsional)
+              <input id="evidence" type="file" accept="image/*,.pdf,.doc,.docx">
+              <small class="muted" style="display:block; margin-top:4px;">Format didukung: JPG, PNG, PDF. Maks 5MB.</small>
+            </label>
+
+            <label class="full" for="isAnonymous" style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 14px; border: 1px dashed var(--primary); border-radius: var(--radius-sm); cursor: pointer;">
+              <input type="checkbox" id="isAnonymous" checked style="width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--primary);">
+              <span style="font-weight: 600; font-size: 14px; color: var(--primary);">Kirim sebagai Anonim (Samarkan nama saya)</span>
+            </label>
+
+            <div class="form-nav">
+              <button class="btn outline" type="button" id="prevStep3">Kembali</button>
+              <button class="btn primary" type="button" id="nextStep3">Review Laporan</button>
+            </div>
+          </div>
+
+          <div class="form-section hidden" id="formStep4">
+            <div id="reviewSummary" style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px;"></div>
+            <div class="form-nav">
+              <button class="btn outline" type="button" id="prevStep4">Kembali</button>
+              <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan (Demo)</button>
+            </div>
           </div>
         </form>
 

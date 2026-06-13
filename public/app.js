@@ -267,6 +267,61 @@ function setupEventListeners() {
   var safetyCheck = document.getElementById('safetyCheck');
   var reportForm = document.getElementById('reportForm');
 
+  // Step-by-step form navigation
+  var currentFormStep = 1;
+  var totalFormSteps = 4;
+
+  function updateFormSteps() {
+    document.querySelectorAll('.form-step').forEach(function(step) {
+      var stepNum = parseInt(step.dataset.step);
+      step.classList.remove('active', 'done');
+      if (stepNum === currentFormStep) step.classList.add('active');
+      else if (stepNum < currentFormStep) step.classList.add('done');
+    });
+    document.querySelectorAll('.form-section').forEach(function(section) {
+      section.classList.add('hidden');
+    });
+    var currentSection = document.getElementById('formStep' + currentFormStep);
+    if (currentSection) currentSection.classList.remove('hidden');
+  }
+
+  function goToStep(step) {
+    currentFormStep = step;
+    updateFormSteps();
+  }
+
+  function populateReview() {
+    var summary = document.getElementById('reviewSummary');
+    if (!summary) return;
+    var cat = document.getElementById('category').value || '-';
+    var loc = document.getElementById('location').value || '-';
+    var date = document.getElementById('incidentDate').value || '-';
+    var urg = document.getElementById('urgent').value || '-';
+    var desc = document.getElementById('description').value || '-';
+    var anon = document.getElementById('isAnonymous').checked ? 'Ya' : 'Tidak';
+    summary.innerHTML = '<h3 style="margin-top:0;">Review Laporan</h3>' +
+      '<p><b>Kategori:</b> ' + cat + '</p>' +
+      '<p><b>Lokasi:</b> ' + loc + '</p>' +
+      '<p><b>Tanggal:</b> ' + date + '</p>' +
+      '<p><b>Urgensi:</b> ' + urg + '</p>' +
+      '<p><b>Anonim:</b> ' + anon + '</p>' +
+      '<p><b>Deskripsi:</b> ' + desc.substring(0, 200) + (desc.length > 200 ? '...' : '') + '</p>';
+  }
+
+  var nextStep1 = document.getElementById('nextStep1');
+  if (nextStep1) nextStep1.addEventListener('click', function() { goToStep(2); });
+  var nextStep2 = document.getElementById('nextStep2');
+  if (nextStep2) nextStep2.addEventListener('click', function() { goToStep(3); });
+  var nextStep3 = document.getElementById('nextStep3');
+  if (nextStep3) nextStep3.addEventListener('click', function() { populateReview(); goToStep(4); });
+
+  var prevStep2 = document.getElementById('prevStep2');
+  if (prevStep2) prevStep2.addEventListener('click', function() { goToStep(1); });
+  var prevStep3 = document.getElementById('prevStep3');
+  if (prevStep3) prevStep3.addEventListener('click', function() { goToStep(2); });
+  var prevStep4 = document.getElementById('prevStep4');
+  if (prevStep4) prevStep4.addEventListener('click', function() { goToStep(3); });
+
   if (choiceAnonim) {
     choiceAnonim.addEventListener('click', function() {
       reportChoiceScreen.classList.add('hidden');
@@ -321,6 +376,8 @@ function setupEventListeners() {
     safetySafe.addEventListener('click', function() {
       safetyCheck.classList.add('hidden');
       reportForm.classList.remove('hidden');
+      currentFormStep = 1;
+      updateFormSteps();
     });
   }
 
