@@ -79,8 +79,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: message,
-          user: currentUser ? { name: currentUser.name, role: currentUser.role } : null
+          message: message
         })
       });
 
