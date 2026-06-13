@@ -63,9 +63,11 @@ test('E2E: Login as user', async () => {
 
 test('E2E: Login as admin', async () => {
   const app = require('../index.js');
+  const adminUsername = process.env.ADMIN_USERNAME || 'testadmin';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'testpassword123';
   const res = await request(app, 'POST', '/api/auth/login', {
-    username: 'admin',
-    password: 'safesphere'
+    username: adminUsername,
+    password: adminPassword
   });
   assert.equal(res.status, 200);
   assert.equal(res.body.user.role, 'admin');

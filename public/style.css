@@ -1616,3 +1616,177 @@ body.a11y-dyslexia {
   letter-spacing: 0.5px !important;
   word-spacing: 2px !important;
 }
+
+/* ============================================================
+   File Upload Components
+   ============================================================ */
+
+#fileDropZone {
+  transition: all 0.2s ease;
+}
+
+#fileDropZone:hover,
+#fileDropZone.drag-over {
+  border-color: var(--primary);
+  background: #f0f5ff;
+  transform: scale(1.01);
+}
+
+#fileDropZone.drag-over {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.file-item:hover {
+  background: #f0f5ff;
+  border-color: #bfdbfe;
+}
+
+.file-item .file-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.file-item .file-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-item .file-name {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+}
+
+.file-item .file-meta {
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.file-item .file-status {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.file-item .file-status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.file-item .file-status.clean {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.file-item .file-status.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.file-item .file-status.uploading {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.file-item .file-remove {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 18px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.file-item .file-remove:hover {
+  background: #fee2e2;
+}
+
+.file-item .file-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.file-progress {
+  width: 100%;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.file-progress-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.file-item .file-size {
+  font-size: 12px;
+  color: #999;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .file-item {
+    flex-wrap: wrap;
+  }
+  
+  .file-item .file-info {
+    width: 100%;
+  }
+  
+  .file-item .file-remove {
+    margin-left: auto;
+  }
+}
+
+/* Upload button states */
+button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* File upload animation */
+@keyframes uploadPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.file-status.uploading {
+  animation: uploadPulse 1.5s ease-in-out infinite;
+}
+
+/* Success feedback */
+.upload-success {
+  background: #d1fae5 !important;
+  border-color: #34d399 !important;
+}
+
+.upload-error {
+  background: #fee2e2 !important;
+  border-color: #f87171 !important;
+}

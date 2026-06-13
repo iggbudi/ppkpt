@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "SafeSphere - Pelaporan Anonim Anti-Perundungan",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "node server/start-development.js",
     "test": "cd server && npm test"
   },
   "dependencies": {

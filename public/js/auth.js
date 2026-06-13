@@ -16,7 +16,7 @@
       tabM.style.color = 'var(--muted)';
       tabA.style.borderBottomColor = 'var(--primary)';
       tabA.style.color = 'var(--primary)';
-      subtitle.innerHTML = 'Gunakan kredensial admin Anda.<br><em>(Demo: Username: <b>admin</b>, Password: <b>safesphere</b>)</em>';
+      subtitle.innerHTML = 'Gunakan kredensial admin Anda.';
       emailInput.placeholder = 'Username admin';
     } else {
       tabA.style.borderBottomColor = 'transparent';

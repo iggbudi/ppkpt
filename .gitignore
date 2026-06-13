@@ -5,3 +5,22 @@ ftp.txt
 *.log
 node_modules/
 data/
+
+# Evidence storage
+data/evidence/
+data/quarantine/
+data/temp-uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+*.tgz
+*.tar.gz

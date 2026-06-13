@@ -8,62 +8,132 @@
 
     btn.innerText = 'Mengirim Laporan...';
     btn.style.opacity = '0.7';
+    btn.disabled = true;
 
     try {
-      var response = await fetch('/api/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          category: document.getElementById('category').value,
-          location: sanitizeInput(document.getElementById('location').value),
-          urgency: document.getElementById('urgent').value,
-          incidentDate: document.getElementById('incidentDate').value,
-          description: sanitizeInput(document.getElementById('description').value),
-          evidence: document.getElementById('evidence').files.length > 0
-            ? sanitizeInput(document.getElementById('evidence').files[0].name)
-            : 'Tidak ada lampiran',
-          isAnonymous: document.getElementById('isAnonymous').checked
-        })
-      });
+      // Check if there are files to upload
+      var hasFiles = window.evidenceUpload && window.evidenceUpload.hasFiles();
+      var reportId = null;
 
-      var data = await response.json();
+      if (hasFiles) {
+        var formData = new FormData();
+        formData.append('category', document.getElementById('category').value);
+        formData.append('location', document.getElementById('location').value.trim());
+        formData.append('urgency', document.getElementById('urgent').value);
+        formData.append('incidentDate', document.getElementById('incidentDate').value);
+        formData.append('description', document.getElementById('description').value.trim());
+        formData.append('evidence', document.getElementById('evidence').value.trim() || 'Tidak ada lampiran');
+        formData.append('isAnonymous', String(document.getElementById('isAnonymous').checked));
+        window.evidenceUpload.getSelectedFiles().forEach(function(file) {
+          formData.append('evidence', file);
+        });
 
-      if (!response.ok) {
+        window.activeEvidenceUploadAbort = new AbortController();
+        var reportResponse = await fetch('/api/reports', {
+          method: 'POST',
+          body: formData,
+          signal: window.activeEvidenceUploadAbort.signal
+        });
+        window.activeEvidenceUploadAbort = null;
+
+        var reportData = await reportResponse.json();
+
+        if (!reportResponse.ok) {
+          throw new Error(reportData.error || 'Gagal membuat laporan');
+        }
+
+        reportId = reportData.report.id;
+        var uploadResults = (reportData.evidence || []).map(function(item) {
+          return { success: item.scanStatus === 'clean', evidence: item };
+        });
+        var failedUploads = uploadResults.filter(function(item) { return !item.success; });
+
+        // Clear files after upload
+        window.evidenceUpload.clearFiles();
+
+        // Show success with report data
         resultBox.classList.remove('hidden');
-        resultBox.classList.add('error');
-        resultBox.innerText = data.error || 'Gagal mengirim laporan';
-        btn.innerText = 'Kirim Laporan (Demo)';
-        btn.style.opacity = '1';
-        return;
-      }
+        resultBox.classList.add('success');
+        clearElement(resultBox);
+        resultBox.appendChild(createEl('strong', { text: 'Laporan Berhasil Dikirim!' }));
+        resultBox.appendChild(document.createElement('br'));
+        resultBox.appendChild(document.createElement('br'));
+        resultBox.appendChild(document.createTextNode('Nomor Referensi: '));
+        resultBox.appendChild(createEl('b', { text: reportId }));
+        resultBox.appendChild(document.createElement('br'));
 
-      btn.innerText = 'Kirim Laporan (Demo)';
-      btn.style.opacity = '1';
+        // Show upload summary
+        var successUploads = uploadResults.filter(r => r.success);
+        if (successUploads.length > 0) {
+          resultBox.appendChild(createEl('p', {
+            text: `${successUploads.length} file berhasil diupload.`,
+            style: 'color:var(--ok); font-size:13px; margin-top:8px;'
+          }));
+        }
+        if (failedUploads.length > 0) {
+          resultBox.appendChild(createEl('p', {
+            text: `${failedUploads.length} file gagal diupload.`,
+            style: 'color:var(--warn); font-size:13px;'
+          }));
+        }
 
-      resultBox.classList.remove('hidden');
-      resultBox.classList.add('success');
-      clearElement(resultBox);
-      resultBox.appendChild(createEl('strong', { text: 'Laporan Demo Berhasil Dikirim!' }));
-      resultBox.appendChild(document.createElement('br'));
-      resultBox.appendChild(document.createElement('br'));
-      resultBox.appendChild(document.createTextNode('Nomor Referensi: '));
-      resultBox.appendChild(createEl('b', { text: data.report.id }));
-      resultBox.appendChild(document.createElement('br'));
-      if (data.report.isAnonymous) {
-        resultBox.appendChild(createEl('p', { text: 'Laporan anonim tidak dapat dilacak.', style: 'color:var(--muted); font-size:13px;' }));
+        if (reportData.report.isAnonymous) {
+          resultBox.appendChild(createEl('p', { text: 'Laporan anonim tidak dapat dilacak.', style: 'color:var(--muted); font-size:13px;' }));
+        } else {
+          var trackBtn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
+          trackBtn.addEventListener('click', function() { viewInvoiceFromSubmit(reportId); });
+          resultBox.appendChild(trackBtn);
+        }
       } else {
-        var btn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
-        btn.addEventListener('click', function() { viewInvoiceFromSubmit(data.report.id); });
-        resultBox.appendChild(btn);
+        // No files, use original JSON approach
+        var response = await fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            category: document.getElementById('category').value,
+            location: sanitizeInput(document.getElementById('location').value),
+            urgency: document.getElementById('urgent').value,
+            incidentDate: document.getElementById('incidentDate').value,
+            description: sanitizeInput(document.getElementById('description').value),
+            evidence: document.getElementById('evidence').value.trim() || 'Tidak ada lampiran',
+            isAnonymous: document.getElementById('isAnonymous').checked
+          })
+        });
+
+        var data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Gagal mengirim laporan');
+        }
+
+        resultBox.classList.remove('hidden');
+        resultBox.classList.add('success');
+        clearElement(resultBox);
+        resultBox.appendChild(createEl('strong', { text: 'Laporan Demo Berhasil Dikirim!' }));
+        resultBox.appendChild(document.createElement('br'));
+        resultBox.appendChild(document.createElement('br'));
+        resultBox.appendChild(document.createTextNode('Nomor Referensi: '));
+        resultBox.appendChild(createEl('b', { text: data.report.id }));
+        resultBox.appendChild(document.createElement('br'));
+        if (data.report.isAnonymous) {
+          resultBox.appendChild(createEl('p', { text: 'Laporan anonim tidak dapat dilacak.', style: 'color:var(--muted); font-size:13px;' }));
+        } else {
+          var trackBtn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
+          trackBtn.addEventListener('click', function() { viewInvoiceFromSubmit(data.report.id); });
+          resultBox.appendChild(trackBtn);
+        }
       }
 
       event.target.reset();
     } catch (err) {
-      btn.innerText = 'Kirim Laporan (Demo)';
-      btn.style.opacity = '1';
       resultBox.classList.remove('hidden');
       resultBox.classList.add('error');
-      resultBox.innerText = 'Koneksi gagal. Coba lagi.';
+      resultBox.innerText = err.name === 'AbortError' ? 'Pengiriman dibatalkan.' : (err.message || 'Koneksi gagal. Coba lagi.');
+    } finally {
+      window.activeEvidenceUploadAbort = null;
+      btn.innerText = 'Kirim Laporan (Demo)';
+      btn.style.opacity = '1';
+      btn.disabled = false;
     }
   };
 

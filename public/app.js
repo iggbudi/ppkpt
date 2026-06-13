@@ -139,6 +139,7 @@ function setupEventListeners() {
   function closeSidebar() {
     if (sidebar) sidebar.classList.remove('open');
     if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+    if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
   }
 
@@ -342,13 +343,32 @@ function setupEventListeners() {
     var urg = document.getElementById('urgent').value || '-';
     var desc = document.getElementById('description').value || '-';
     var anon = document.getElementById('isAnonymous').checked ? 'Ya' : 'Tidak';
-    summary.innerHTML = '<h3 style="margin-top:0;">Review Laporan</h3>' +
-      '<p><b>Kategori:</b> ' + cat + '</p>' +
-      '<p><b>Lokasi:</b> ' + loc + '</p>' +
-      '<p><b>Tanggal:</b> ' + date + '</p>' +
-      '<p><b>Urgensi:</b> ' + urg + '</p>' +
-      '<p><b>Anonim:</b> ' + anon + '</p>' +
-      '<p><b>Deskripsi:</b> ' + desc.substring(0, 200) + (desc.length > 200 ? '...' : '') + '</p>';
+    
+    // Gunakan DOM API alih-alih innerHTML untuk keamanan
+    summary.textContent = ''; // Clear
+    
+    var h3 = document.createElement('h3');
+    h3.style.marginTop = '0';
+    h3.textContent = 'Review Laporan';
+    summary.appendChild(h3);
+    
+    var fields = [
+      { label: 'Kategori:', value: cat },
+      { label: 'Lokasi:', value: loc },
+      { label: 'Tanggal:', value: date },
+      { label: 'Urgensi:', value: urg },
+      { label: 'Anonim:', value: anon },
+      { label: 'Deskripsi:', value: desc.substring(0, 200) + (desc.length > 200 ? '...' : '') }
+    ];
+    
+    fields.forEach(function(field) {
+      var p = document.createElement('p');
+      var b = document.createElement('b');
+      b.textContent = field.label;
+      p.appendChild(b);
+      p.appendChild(document.createTextNode(' ' + field.value));
+      summary.appendChild(p);
+    });
   }
 
   var nextStep1 = document.getElementById('nextStep1');
@@ -370,7 +390,7 @@ function setupEventListeners() {
       reportChoiceScreen.classList.add('hidden');
       reportFormSection.classList.remove('hidden');
       document.getElementById('reportFormTitle').innerText = 'Form Lapor Anonim';
-      document.getElementById('reportFormSubtitle').innerText = 'Identitas Anda tidak akan dikumpulkan.';
+      document.getElementById('reportFormSubtitle').innerText = 'Identitas akun tidak disimpan pada laporan atau audit pembuatan laporan anonim.';
       var anonCheckbox = document.getElementById('isAnonymous');
       if (anonCheckbox) {
         anonCheckbox.checked = true;

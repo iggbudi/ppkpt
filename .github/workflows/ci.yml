@@ -13,26 +13,81 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
       
       - name: Install root dependencies
-        run: npm install
+        run: npm ci
       
       - name: Install server dependencies
-        run: cd server && npm install
+        run: cd server && npm ci
       
-      - name: Run tests
+      - name: Run all tests (including security)
         run: cd server && npm test
+        env:
+          NODE_ENV: test
+          SESSION_SECRET: test-session-secret-for-ci-only
+          ADMIN_USERNAME: testadmin
+          ADMIN_PASSWORD: testpassword123
       
-      - name: Run npm audit
+      - name: Run npm audit (root)
         run: npm audit --audit-level=high
       
-      - name: Run server audit
+      - name: Run npm audit (server)
         run: cd server && npm audit --audit-level=high
       
-      - name: Check for secrets
+      - name: Check for hardcoded secrets (Gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Check for common secret patterns
         run: |
-          grep -r "sk-" --include="*.js" --include="*.html" . 2>/dev/null | grep -v node_modules | grep -v .env.example || echo "No secrets found"
+          echo "Scanning for potential hardcoded secrets..."
+          FOUND_SECRETS=0
+          
+          # Check for hardcoded passwords in source
+          if grep -rn "password.*=.*['\"].*['\"]" --include="*.js" --include="*.ts" server/ | grep -v "node_modules" | grep -v ".test." | grep -v "process.env" | grep -v "passwordHash" | grep -v "// safe:" | grep -v "password.*req.body" | grep -v "password.*parsed"; then
+            echo "WARNING: Potential hardcoded password found in source code"
+            FOUND_SECRETS=1
+          fi
+          
+          # Check for hardcoded session secrets
+          if grep -rn "secret.*=.*['\"]" --include="*.js" server/ | grep -v "node_modules" | grep -v ".test." | grep -v "process.env" | grep -v "secret.*\|\|"; then
+            echo "WARNING: Potential hardcoded secret found"
+            FOUND_SECRETS=1
+          fi
+          
+          # Check for API keys pattern
+          if grep -rn "sk-\|api[_-]key\|apikey" --include="*.js" --include="*.html" . | grep -v "node_modules" | grep -v ".env.example" | grep -v "test" | grep -v "// safe:"; then
+            echo "WARNING: Potential API key pattern found"
+            FOUND_SECRETS=1
+          fi
+          
+          if [ $FOUND_SECRETS -eq 1 ]; then
+            echo ""
+            echo "========================================="
+            echo "Secret scan found potential issues above."
+            echo "Please review and ensure no real secrets"
+            echo "are committed to the repository."
+            echo "========================================="
+            exit 1
+          else
+            echo "No obvious hardcoded secrets found."
+          fi
+      
+      - name: Verify test isolation (no production data changes)
+        run: |
+          # Check that test database path is in-memory or temp
+          echo "Verifying test database isolation..."
+          if [ -f "data/safesphere.db" ]; then
+            echo "WARNING: Production database file exists, tests may not be isolated"
+          else
+            echo "OK: No production database file found (tests use in-memory db)"
+          fi

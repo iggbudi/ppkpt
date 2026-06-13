@@ -7,10 +7,36 @@ const loginSchema = z.object({
   password: z.string().min(1).max(200)
 });
 
-const users = [
-  { id: 1, username: 'admin', passwordHash: bcrypt.hashSync('safesphere', 10), role: 'admin', name: 'Admin PPKS' },
-  { id: 2, username: 'demo', passwordHash: bcrypt.hashSync('demo123', 10), role: 'user', name: 'Demo User' }
-];
+// Admin bootstrap dari environment variable
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const ADMIN_NAME = process.env.ADMIN_NAME || 'Admin PPKS';
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// Buat users array secara dinamis
+const users = [];
+
+// Hanya buat admin jika credential disediakan
+if (ADMIN_USERNAME && ADMIN_PASSWORD) {
+  users.push({
+    id: 1,
+    username: ADMIN_USERNAME,
+    passwordHash: bcrypt.hashSync(ADMIN_PASSWORD, 10),
+    role: 'admin',
+    name: ADMIN_NAME
+  });
+}
+
+// Demo user hanya untuk development
+if (NODE_ENV === 'development' || NODE_ENV === 'test') {
+  users.push({
+    id: 2,
+    username: 'demo',
+    passwordHash: bcrypt.hashSync('demo123', 10),
+    role: 'user',
+    name: 'Demo User'
+  });
+}
 
 const insertAudit = db.prepare('INSERT INTO audit_log (timestamp, userId, action, targetId, ip, details) VALUES (?, ?, ?, ?, ?, ?)');
 

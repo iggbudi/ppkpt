@@ -5,9 +5,9 @@
   "description": "MVP SafeSphere chat backend for Xiaomi MiMo-v2.5",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node start-development.js",
     "check": "node --check index.js && node --check mimoClient.js && node --check risk.js && node --check test/chat.test.js",
-    "test": "node --test"
+    "test": "node --require ./test/setup.js --test"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -17,6 +17,8 @@
     "express": "^4.21.2",
     "express-session": "^1.19.0",
     "helmet": "^8.2.0",
+    "multer": "^2.1.1",
+    "sharp": "^0.35.1",
     "zod": "^4.4.3"
   }
 }

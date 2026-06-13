@@ -4,6 +4,13 @@
   var originalTitle = document.title;
 
   window.activateDiscreetMode = function() {
+    if (window.activeEvidenceUploadAbort) window.activeEvidenceUploadAbort.abort();
+    if (window.evidenceUpload) window.evidenceUpload.quickEscape();
+    ['description', 'evidence', 'location', 'chatInput'].forEach(function(id) {
+      var input = document.getElementById(id);
+      if (input) input.value = '';
+    });
+    history.replaceState(null, '', window.location.pathname + '#beranda');
     document.getElementById('discreetOverlay').style.display = 'block';
     document.getElementById('quickEscapeBtn').style.display = 'none';
     document.title = 'Wikipedia bahasa Indonesia';
