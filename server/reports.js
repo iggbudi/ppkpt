@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { z } = require('zod');
+const express = require('express');
 const db = require('./db');
 
 const reportSchema = z.object({
@@ -138,6 +139,38 @@ function setupReportRoutes(app) {
       details: row.details ? JSON.parse(row.details) : {}
     }));
     res.json({ log });
+  });
+
+  // Export all data (admin only)
+  app.get('/api/export', requireAuth, requireAdmin, (req, res) => {
+    const reports = db.prepare('SELECT * FROM reports').all();
+    const auditLog = db.prepare('SELECT * FROM audit_log').all();
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', 'attachment; filename=safesphere-backup-' + new Date().toISOString().slice(0, 10) + '.json');
+    res.json({ reports, auditLog, exportedAt: Date.now() });
+  });
+
+  // Import data (admin only)
+  app.post('/api/import', requireAuth, requireAdmin, express.json({ limit: '10mb' }), (req, res) => {
+    const { reports: incomingReports } = req.body;
+
+    if (!Array.isArray(incomingReports)) {
+      return res.status(400).json({ error: 'Invalid backup format' });
+    }
+
+    const insertMany = db.transaction((items) => {
+      for (const r of items) {
+        db.prepare(`
+          INSERT OR REPLACE INTO reports (id, category, location, urgency, incidentDate, status, description, evidence, appointment, createdAt, authorId, authorName, isAnonymous)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(r.id, r.category, r.location, r.urgency, r.incidentDate, r.status, r.description, r.evidence, r.appointment, r.createdAt, r.authorId, r.authorName, r.isAnonymous);
+      }
+    });
+
+    insertMany(incomingReports);
+
+    res.json({ ok: true, imported: incomingReports.length });
   });
 }
 
