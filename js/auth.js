@@ -53,9 +53,9 @@
       currentUser = { role: 'admin', name: 'Admin PPKS' };
       Storage.save('currentUser', currentUser);
 
-      document.getElementById('navGuest').classList.add('hidden');
-      document.getElementById('navUser').classList.add('hidden');
-      document.getElementById('navAdmin').classList.remove('hidden');
+      document.getElementById('sidebarGuest').classList.add('hidden');
+      document.getElementById('sidebarUser').classList.add('hidden');
+      document.getElementById('sidebarAdmin').classList.remove('hidden');
       document.getElementById('welcomeMessage').classList.remove('hidden');
       document.getElementById('welcomeName').innerText = currentUser.name;
       var userAvatar = document.getElementById('userAvatar');
@@ -68,9 +68,9 @@
       currentUser = { role: 'mahasiswa', name: user };
       Storage.save('currentUser', currentUser);
 
-      document.getElementById('navGuest').classList.add('hidden');
-      document.getElementById('navAdmin').classList.add('hidden');
-      document.getElementById('navUser').classList.remove('hidden');
+      document.getElementById('sidebarGuest').classList.add('hidden');
+      document.getElementById('sidebarAdmin').classList.add('hidden');
+      document.getElementById('sidebarUser').classList.remove('hidden');
       document.getElementById('userNameDisplay').innerText = 'Halo, ' + user + '!';
       document.getElementById('welcomeMessage').classList.remove('hidden');
       document.getElementById('welcomeName').innerText = currentUser.name;
@@ -90,9 +90,9 @@
     currentUser = null;
     Storage.remove('currentUser');
 
-    document.getElementById('navGuest').classList.remove('hidden');
-    document.getElementById('navUser').classList.add('hidden');
-    document.getElementById('navAdmin').classList.add('hidden');
+    document.getElementById('sidebarGuest').classList.remove('hidden');
+    document.getElementById('sidebarUser').classList.add('hidden');
+    document.getElementById('sidebarAdmin').classList.add('hidden');
     document.getElementById('welcomeMessage').classList.add('hidden');
     document.getElementById('invoiceResult').classList.add('hidden');
     currentViewedInvoiceId = null;

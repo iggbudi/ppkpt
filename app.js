@@ -28,13 +28,13 @@ function handleRouting() {
   }
 
   document.querySelectorAll('.page').forEach(function(page) { page.classList.remove('active'); });
-  document.querySelectorAll('.main-nav a').forEach(function(link) { link.classList.remove('active'); });
+  document.querySelectorAll('.sidebar-link').forEach(function(link) { link.classList.remove('active'); });
 
   var targetPageId = 'page-' + hash.substring(1);
   var targetElement = document.getElementById(targetPageId);
   if (targetElement) targetElement.classList.add('active');
 
-  var activeLink = document.querySelector('.main-nav a[href="' + hash + '"]');
+  var activeLink = document.querySelector('.sidebar-link[href="' + hash + '"]');
   if (activeLink) activeLink.classList.add('active');
 
   if (hash === '#admin') {
@@ -56,28 +56,39 @@ function handleRouting() {
 }
 
 function setupEventListeners() {
-  // Hamburger menu toggle
+  // Sidebar toggle
   var hamburger = document.getElementById('hamburgerBtn');
-  var mainNav = document.getElementById('mainNav');
-  if (hamburger && mainNav) {
-    hamburger.addEventListener('click', function() {
-      hamburger.classList.toggle('active');
-      mainNav.classList.toggle('open');
-      document.querySelectorAll('.auth-buttons').forEach(function(btn) {
-        btn.classList.toggle('mobile-open');
-      });
-    });
-    // Close menu when clicking a nav link
-    mainNav.querySelectorAll('a').forEach(function(link) {
-      link.addEventListener('click', function() {
-        hamburger.classList.remove('active');
-        mainNav.classList.remove('open');
-        document.querySelectorAll('.auth-buttons').forEach(function(btn) {
-          btn.classList.remove('mobile-open');
-        });
-      });
-    });
+  var sidebar = document.getElementById('sidebar');
+  var sidebarOverlay = document.getElementById('sidebarOverlay');
+  var sidebarClose = document.getElementById('sidebarClose');
+
+  function openSidebar() {
+    if (sidebar) sidebar.classList.add('open');
+    if (sidebarOverlay) sidebarOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
   }
+
+  function closeSidebar() {
+    if (sidebar) sidebar.classList.remove('open');
+    if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (hamburger) {
+    hamburger.addEventListener('click', openSidebar);
+  }
+  if (sidebarClose) {
+    sidebarClose.addEventListener('click', closeSidebar);
+  }
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeSidebar);
+  }
+
+  // Close sidebar when clicking a nav link
+  var sidebarLinks = document.querySelectorAll('.sidebar-link[href]');
+  sidebarLinks.forEach(function(link) {
+    link.addEventListener('click', closeSidebar);
+  });
 
   var loginForm = document.querySelector('#page-login form');
   if (loginForm) loginForm.addEventListener('submit', handleMainLogin);
@@ -102,19 +113,7 @@ function setupEventListeners() {
   if (tabMahasiswa) tabMahasiswa.addEventListener('click', function() { switchLoginTab('mahasiswa'); });
   if (tabAdmin) tabAdmin.addEventListener('click', function() { switchLoginTab('admin'); });
 
-  var userMenuTrigger = document.getElementById('userMenuTrigger');
-  var userDropdown = document.getElementById('userDropdown');
-  if (userMenuTrigger && userDropdown) {
-    userMenuTrigger.addEventListener('click', function(e) {
-      e.stopPropagation();
-      userDropdown.classList.toggle('hidden');
-    });
-    document.addEventListener('click', function() {
-      userDropdown.classList.add('hidden');
-    });
-  }
-
-  // Logout buttons (nav user and nav admin)
+  // Logout buttons (sidebar user and admin)
   document.querySelectorAll('#navUserLogoutBtn, #navAdminLogoutBtn').forEach(function(btn) {
     btn.addEventListener('click', handleLogout);
   });
@@ -197,6 +196,23 @@ function setupEventListeners() {
       showTopSystemAlert('Membuka sesi Chat Aman...');
     });
   }
+
+  // Smart sticky nav
+  var topbar = document.querySelector('.topbar');
+  var lastScrollY = window.scrollY;
+  var topbarHeight = topbar ? topbar.offsetHeight : 0;
+
+  window.addEventListener('scroll', function() {
+    var currentScrollY = window.scrollY;
+    
+    if (currentScrollY > lastScrollY && currentScrollY > topbarHeight) {
+      topbar.style.transform = 'translateY(-100%)';
+    } else {
+      topbar.style.transform = 'translateY(0)';
+    }
+    
+    lastScrollY = currentScrollY;
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -205,13 +221,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   if (currentUser) {
     if (currentUser.role === 'admin') {
-      document.getElementById('navGuest').classList.add('hidden');
-      document.getElementById('navUser').classList.add('hidden');
-      document.getElementById('navAdmin').classList.remove('hidden');
+      document.getElementById('sidebarGuest').classList.add('hidden');
+      document.getElementById('sidebarUser').classList.add('hidden');
+      document.getElementById('sidebarAdmin').classList.remove('hidden');
     } else {
-      document.getElementById('navGuest').classList.add('hidden');
-      document.getElementById('navAdmin').classList.add('hidden');
-      document.getElementById('navUser').classList.remove('hidden');
+      document.getElementById('sidebarGuest').classList.add('hidden');
+      document.getElementById('sidebarAdmin').classList.add('hidden');
+      document.getElementById('sidebarUser').classList.remove('hidden');
     }
     document.getElementById('welcomeMessage').classList.remove('hidden');
     document.getElementById('welcomeName').innerText = currentUser.name;
