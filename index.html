@@ -245,22 +245,24 @@
     </div>
 
     <div id="page-chat" class="page">
-      <section class="section card">
+      <section class="section card chat-section">
         <div class="card-header">
-          <h2>Chat Bersama Ahli</h2>
-          <p class="muted">Konsultasi secara anonim dengan SafeBot — asisten AI konseling berbasis MiMo LLM.</p>
+          <h2>Chat Bersama SafeBot & Ahli</h2>
+          <p class="muted">Ceritakan keluh kesahmu dengan aman. SafeBot membantu mengenali risiko dan mengarahkan langkah berikutnya.</p>
         </div>
 
-        <div id="chatMessages" class="chat-messages">
-          <div class="chat-message bot">
-            <div class="chat-avatar">SB</div>
-            <div class="chat-bubble">Halo! Saya SafeBot, asisten konseling SafeSphere. Ada yang bisa saya bantu hari ini?</div>
+        <div class="safebot-disclaimer" role="note">
+          <strong>Catatan keamanan:</strong> SafeBot adalah pendamping awal, bukan pengganti layanan darurat, konselor, atau keputusan resmi kampus. Jika kamu sedang dalam bahaya langsung, segera hubungi kontak darurat atau orang terpercaya di sekitarmu.
+        </div>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages" aria-live="polite">
+            <div class="chat-message bot">Halo. Saya SafeBot. Ruang ini aman dan anonim. Ada yang ingin kamu ceritakan atau keluhkan hari ini?</div>
           </div>
-        </div>
-
-        <div class="chat-input-area">
-          <textarea id="chatInput" placeholder="Ketik pesan Anda..." rows="1"></textarea>
-          <button id="chatSendBtn" class="btn primary">Kirim</button>
+          <div class="chat-input-area">
+            <textarea id="chatInput" placeholder="Ceritakan detail kejadiannya di sini... (Enter untuk kirim, Shift + Enter untuk baris baru)" rows="4"></textarea>
+            <button class="btn primary" id="chatSendBtn" type="button">Kirim</button>
+          </div>
         </div>
       </section>
     </div>

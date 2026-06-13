@@ -2,62 +2,74 @@
   var chatHistory = [];
   var isWaiting = false;
 
-  function addChatMessage(role, content) {
+  function addChatMessage(content, sender, actions) {
     var container = document.getElementById('chatMessages');
-    var div = document.createElement('div');
-    div.className = 'chat-message ' + role;
+    if (!container) return;
 
-    var avatar = document.createElement('div');
-    avatar.className = 'chat-avatar';
-    avatar.innerText = role === 'bot' ? 'SB' : 'You';
+    var message = createEl('div', { className: 'chat-message ' + sender });
 
-    var bubble = document.createElement('div');
-    bubble.className = 'chat-bubble';
-    bubble.innerText = content;
+    if (sender === 'bot') {
+      renderMarkdownMessage(message, content);
+    } else {
+      message.textContent = content;
+    }
 
-    div.appendChild(avatar);
-    div.appendChild(bubble);
-    container.appendChild(div);
+    if (actions && actions.length > 0) {
+      var actionsDiv = createEl('div', { className: 'chat-message-actions' });
+      actions.forEach(function(action) {
+        var btn = createEl('a', {
+          className: action.className || 'btn primary',
+          href: action.href || '#',
+          text: action.text || 'Action'
+        });
+        actionsDiv.appendChild(btn);
+      });
+      message.appendChild(actionsDiv);
+    }
+
+    container.appendChild(message);
     container.scrollTop = container.scrollHeight;
-
-    return bubble;
   }
 
   function showTyping() {
     var container = document.getElementById('chatMessages');
-    var div = document.createElement('div');
-    div.className = 'chat-message bot';
-    div.id = 'typingIndicator';
+    if (!container || document.getElementById('chatTypingIndicator')) return;
 
-    var avatar = document.createElement('div');
-    avatar.className = 'chat-avatar';
-    avatar.innerText = 'SB';
-
-    var typing = document.createElement('div');
-    typing.className = 'chat-typing';
-    typing.innerHTML = '<span></span><span></span><span></span>';
-
-    div.appendChild(avatar);
-    div.appendChild(typing);
-    container.appendChild(div);
+    var indicator = createEl('div', { className: 'chat-message bot typing' }, [
+      createEl('span'),
+      createEl('span'),
+      createEl('span'),
+      ' SafeBot sedang mengetik...'
+    ]);
+    indicator.id = 'chatTypingIndicator';
+    container.appendChild(indicator);
     container.scrollTop = container.scrollHeight;
   }
 
   function hideTyping() {
-    var el = document.getElementById('typingIndicator');
+    var el = document.getElementById('chatTypingIndicator');
     if (el) el.remove();
   }
 
   async function sendMessage() {
     var input = document.getElementById('chatInput');
+    if (!input || isWaiting) return;
+
     var message = input.value.trim();
-    if (!message || isWaiting) return;
+    if (!message) return;
 
     isWaiting = true;
     input.value = '';
     input.style.height = 'auto';
+    input.readOnly = true;
 
-    addChatMessage('user', message);
+    var sendBtn = document.getElementById('chatSendBtn');
+    if (sendBtn) {
+      sendBtn.disabled = true;
+      sendBtn.innerText = 'Mengirim...';
+    }
+
+    addChatMessage(message, 'user');
     chatHistory.push({ role: 'user', content: message });
 
     showTyping();
@@ -66,24 +78,45 @@
       var response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message, history: chatHistory })
+        body: JSON.stringify({
+          message: message,
+          user: currentUser ? { name: currentUser.name, role: currentUser.role } : null
+        })
       });
 
       var data = await response.json();
 
       hideTyping();
 
-      if (data.error) {
-        addChatMessage('bot', 'Maaf, terjadi kesalahan: ' + data.error);
+      if (!response.ok) {
+        if (response.status === 429 && data && data.message) {
+          addChatMessage(data.message, 'bot');
+        } else {
+          addChatMessage('Maaf, terjadi kesalahan. Coba lagi nanti.', 'bot');
+        }
       } else {
-        addChatMessage('bot', data.reply);
+        addChatMessage(data.reply, 'bot', data.actions || []);
         chatHistory.push({ role: 'assistant', content: data.reply });
       }
     } catch (err) {
       hideTyping();
-      addChatMessage('bot', 'Koneksi gagal. Pastikan server berjalan dan coba lagi.');
+
+      var riskScore = getRiskScore(message);
+      if (riskScore.score >= 5 || riskScore.foundHighRisk) {
+        addChatMessage('Maaf, SafeBot sedang tidak dapat dihubungi. Namun pesanmu menunjukkan kemungkinan situasi darurat. Segera cari tempat aman, hubungi kontak darurat kampus atau orang terpercaya.', 'bot', [
+          { href: '#kontak', text: 'Kontak Darurat', className: 'btn danger' },
+          { href: '#lapor', text: 'Buat Laporan', className: 'btn primary' }
+        ]);
+      } else {
+        addChatMessage('Maaf, SafeBot sedang tidak dapat dihubungi. Jika situasi darurat, segera hubungi kontak kampus atau orang terpercaya di sekitarmu.', 'bot');
+      }
     }
 
+    input.readOnly = false;
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.innerText = 'Kirim';
+    }
     isWaiting = false;
   }
 
