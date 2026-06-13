@@ -51,7 +51,7 @@ function handleRouting() {
     window.location.hash = '#login';
     return;
   }
-  if (hash === '#dashboard' && (!currentUser || currentUser.role !== 'mahasiswa')) {
+  if (hash === '#dashboard' && (!currentUser || (currentUser.role !== 'user' && currentUser.role !== 'mahasiswa'))) {
     showTopSystemAlert('Silakan login sebagai Mahasiswa untuk membuka Dashboard.');
     window.location.hash = '#login';
     return;

@@ -109,7 +109,7 @@
   window.renderInvoice = renderInvoice;
 
   window.updateUserDashboardUI = function() {
-    if (!currentUser || currentUser.role !== 'mahasiswa') return;
+    if (!currentUser || (currentUser.role !== 'user' && currentUser.role !== 'mahasiswa')) return;
     var listContainer = document.getElementById('userReportList');
     var userReports = reportData.filter(function(r) { return r.author === currentUser.name; });
 
