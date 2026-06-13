@@ -41,11 +41,6 @@ function handleRouting() {
     hash = '#beranda';
   }
 
-  if (hash === '#lapor' && !currentUser) {
-    showTopSystemAlert('Anda harus Masuk (Login) terlebih dahulu untuk membuat laporan.');
-    window.location.hash = '#login';
-    return;
-  }
   if (hash === '#admin' && (!currentUser || currentUser.role !== 'admin')) {
     showTopSystemAlert('Akses Ditolak. Anda tidak memiliki otoritas Admin.');
     window.location.hash = '#login';
@@ -258,6 +253,74 @@ function setupEventListeners() {
     dismissBanner.addEventListener('click', function() {
       demoBanner.style.display = 'none';
       sessionStorage.setItem('bannerDismissed', 'true');
+    });
+  }
+
+  // Report choice flow
+  var choiceAnonim = document.getElementById('choiceAnonim');
+  var choiceRahasia = document.getElementById('choiceRahasia');
+  var reportChoiceScreen = document.getElementById('reportChoiceScreen');
+  var reportFormSection = document.getElementById('reportFormSection');
+  var backToChoice = document.getElementById('backToChoice');
+  var safetyDanger = document.getElementById('safetyDanger');
+  var safetySafe = document.getElementById('safetySafe');
+  var safetyCheck = document.getElementById('safetyCheck');
+  var reportForm = document.getElementById('reportForm');
+
+  if (choiceAnonim) {
+    choiceAnonim.addEventListener('click', function() {
+      reportChoiceScreen.classList.add('hidden');
+      reportFormSection.classList.remove('hidden');
+      document.getElementById('reportFormTitle').innerText = 'Form Lapor Anonim';
+      document.getElementById('reportFormSubtitle').innerText = 'Identitas Anda tidak akan dikumpulkan.';
+      var anonCheckbox = document.getElementById('isAnonymous');
+      if (anonCheckbox) {
+        anonCheckbox.checked = true;
+        anonCheckbox.disabled = true;
+      }
+    });
+  }
+
+  if (choiceRahasia) {
+    choiceRahasia.addEventListener('click', function() {
+      if (!currentUser) {
+        showTopSystemAlert('Silakan login terlebih dahulu untuk melapor secara rahasia.');
+        window.location.hash = '#login';
+        return;
+      }
+      reportChoiceScreen.classList.add('hidden');
+      reportFormSection.classList.remove('hidden');
+      document.getElementById('reportFormTitle').innerText = 'Form Lapor Rahasia';
+      document.getElementById('reportFormSubtitle').innerText = 'Identitas Anda disimpan dengan akses terbatas.';
+      var anonCheckbox2 = document.getElementById('isAnonymous');
+      if (anonCheckbox2) {
+        anonCheckbox2.checked = false;
+        anonCheckbox2.disabled = false;
+      }
+    });
+  }
+
+  if (backToChoice) {
+    backToChoice.addEventListener('click', function() {
+      reportFormSection.classList.add('hidden');
+      reportChoiceScreen.classList.remove('hidden');
+      if (safetyCheck) safetyCheck.classList.remove('hidden');
+      if (reportForm) reportForm.classList.add('hidden');
+      var resultBox = document.getElementById('reportResult');
+      if (resultBox) resultBox.classList.add('hidden');
+    });
+  }
+
+  if (safetyDanger) {
+    safetyDanger.addEventListener('click', function() {
+      window.location.hash = '#kontak';
+    });
+  }
+
+  if (safetySafe) {
+    safetySafe.addEventListener('click', function() {
+      safetyCheck.classList.add('hidden');
+      reportForm.classList.remove('hidden');
     });
   }
 

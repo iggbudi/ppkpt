@@ -191,13 +191,56 @@
     </div>
 
     <div id="page-lapor" class="page">
-      <section class="section card">
+      <!-- Choice screen -->
+      <section class="section card" id="reportChoiceScreen">
         <div class="card-header">
-          <h2>Form Lapor Anonim</h2>
-          <p class="muted">Isi laporan secara jujur. Data disimpan secara lokal untuk demo ini.</p>
+          <h2>Buat Laporan</h2>
+          <p class="muted">Pilih cara melapor sesuai kenyamanan Anda.</p>
+        </div>
+        <div class="report-choice-grid">
+          <div class="report-choice-card" id="choiceAnonim">
+            <h3>Lapor Anonim</h3>
+            <p>Identitas Anda tidak akan dikumpulkan. Cocok jika Anda hanya ingin melaporkan kejadian tanpa melacak status.</p>
+            <ul>
+              <li>Tidak perlu login</li>
+              <li>Identitas tidak disimpan</li>
+              <li>Tidak bisa melacak status</li>
+            </ul>
+            <button class="btn primary full" type="button">Pilih Anonim</button>
+          </div>
+          <div class="report-choice-card" id="choiceRahasia">
+            <h3>Lapor Rahasia</h3>
+            <p>Identitas Anda disimpan dengan akses terbatas. Anda bisa melacak status laporan.</p>
+            <ul>
+              <li>Perlu login</li>
+              <li>Identitas hanya bisa dilihat admin</li>
+              <li>Bisa melacak status laporan</li>
+            </ul>
+            <button class="btn secondary full" type="button">Pilih Rahasia</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Report form section (hidden initially) -->
+      <section class="section card hidden" id="reportFormSection">
+        <div class="card-header">
+          <h2 id="reportFormTitle">Form Lapor Anonim</h2>
+          <p class="muted" id="reportFormSubtitle">Isi laporan secara jujur. Data disimpan secara lokal untuk demo ini.</p>
+          <button class="btn outline" id="backToChoice" type="button" style="margin-top: 8px;">Kembali</button>
         </div>
 
-        <form id="reportForm" class="form-grid">
+        <!-- Safety check -->
+        <div id="safetyCheck" class="safety-check">
+          <h3>Apakah Anda dalam bahaya sekarang?</h3>
+          <p class="muted">Jika Anda atau orang lain dalam bahaya langsung, hubungi kontak darurat terlebih dahulu.</p>
+          <div class="safety-options">
+            <button class="btn danger full" id="safetyDanger" type="button">Ya, saya dalam bahaya langsung</button>
+            <button class="btn primary full" id="safetySafe" type="button">Tidak, saya aman untuk melapor</button>
+          </div>
+        </div>
+
+        <!-- Actual form (hidden until safety check passes) -->
+        <form id="reportForm" class="form-grid hidden">
           <label for="category">Jenis Kejadian
             <select id="category" required>
               <option value="">Pilih kategori perundungan</option>
@@ -226,8 +269,7 @@
           </label>
 
           <label class="full" for="description">Ceritakan Kronologi Kejadian
-            <textarea id="description" placeholder="Ceritakan secara detail. Sistem kami mendeteksi kata kunci sensitif untuk memprioritaskan keamanan Anda..." required></textarea>
-            
+            <textarea id="description" placeholder="Ceritakan secara detail..." required></textarea>
             <div id="sentimentContainer" style="margin-top: 10px; display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--line);">
               <div style="flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
                 <div id="sentimentBar" style="height: 100%; width: 0%; background: var(--ok); transition: width 0.4s ease, background-color 0.4s ease;"></div>
@@ -243,7 +285,7 @@
 
           <label class="full" for="isAnonymous" style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 14px; border: 1px dashed var(--primary); border-radius: var(--radius-sm); cursor: pointer;">
             <input type="checkbox" id="isAnonymous" checked style="width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--primary);">
-            <span style="font-weight: 600; font-size: 14px; color: var(--primary);">Kirim sebagai Anonim (Samarkan nama saya jadi 1 huruf)</span>
+            <span style="font-weight: 600; font-size: 14px; color: var(--primary);">Kirim sebagai Anonim (Samarkan nama saya)</span>
           </label>
 
           <div class="full" style="margin-top: 10px;">
