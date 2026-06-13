@@ -56,6 +56,23 @@ function handleRouting() {
 }
 
 function setupEventListeners() {
+  // Hamburger menu toggle
+  var hamburger = document.getElementById('hamburgerBtn');
+  var mainNav = document.getElementById('mainNav');
+  if (hamburger && mainNav) {
+    hamburger.addEventListener('click', function() {
+      hamburger.classList.toggle('active');
+      mainNav.classList.toggle('open');
+    });
+    // Close menu when clicking a nav link
+    mainNav.querySelectorAll('a').forEach(function(link) {
+      link.addEventListener('click', function() {
+        hamburger.classList.remove('active');
+        mainNav.classList.remove('open');
+      });
+    });
+  }
+
   var loginForm = document.querySelector('#page-login form');
   if (loginForm) loginForm.addEventListener('submit', handleMainLogin);
 
