@@ -49,9 +49,7 @@ async function callMimoChat({ message, user = null, risk = null }) {
 
   if (!apiKey) throw new Error('MIMO_API_KEY is required');
 
-  const userContext = user?.name
-    ? `Konteks pengguna: nama ${user.name}, role ${user.role || 'tidak diketahui'}.`
-    : 'Konteks pengguna: belum login atau anonim.';
+  const userContext = 'Konteks pengguna: anonim atau belum login.';
   const riskContext = risk?.level === 'medium'
     ? 'Risk classifier mendeteksi risiko sedang. Sarankan pengguna menyimpan bukti dan mempertimbangkan laporan anonim.'
     : `Risk classifier: ${risk?.level || 'low'}.`;
