@@ -31,6 +31,25 @@ app.use(helmet({
   frameguard: { action: 'deny' }
 }));
 app.use(express.json({ limit: '20kb' }));
+
+const session = require('express-session');
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'safesphere-session-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'strict',
+    maxAge: 24 * 60 * 60 * 1000
+  }
+}));
+
+const auditLog = [];
+const { setupAuthRoutes } = require('./auth');
+setupAuthRoutes(app, auditLog);
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const highRiskReply = 'Saya mendeteksi tanda situasi berisiko tinggi. Keselamatanmu adalah prioritas utama. Jika kamu sedang dalam bahaya, segera menjauh ke tempat aman dan hubungi Satgas/keamanan kampus atau orang terpercaya. Jika memungkinkan, simpan bukti dan buat laporan dengan urgensi Tinggi.';
