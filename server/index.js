@@ -146,6 +146,13 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   const risk = classifyRisk(trimmedMessage);
 
   if (risk.level === 'high') {
+    auditLog.push({
+      timestamp: Date.now(),
+      userId: req.session?.user?.id || null,
+      action: 'chat.high_risk_escalation',
+      ip: req.ip,
+      details: { keywords: risk.matchedKeywords }
+    });
     return res.json({
       reply: highRiskReply,
       risk: risk.level,
