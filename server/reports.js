@@ -1,3 +1,9 @@
+const crypto = require('crypto');
+
+function generateId() {
+  return 'SSF-' + crypto.randomUUID().substring(0, 8).toUpperCase();
+}
+
 function setupReportRoutes(app, auditLog) {
   const reports = [];
 
@@ -22,12 +28,12 @@ function setupReportRoutes(app, auditLog) {
     }
 
     const user = req.session.user || null;
-    const maskedName = user
-      ? (isAnonymous !== false ? user.name.charAt(0).toUpperCase() + '***' : user.name)
-      : 'Anonim';
+    const isAnon = isAnonymous !== false || !user;
+    const authorId = isAnon ? null : user.id;
+    const authorName = isAnon ? 'Anonim' : (isAnonymous !== false ? user.name.charAt(0).toUpperCase() + '***' : user.name);
 
     const report = {
-      id: 'SSF-2026-' + Math.floor(1000 + Math.random() * 9000),
+      id: generateId(),
       category,
       location,
       urgency,
@@ -37,20 +43,20 @@ function setupReportRoutes(app, auditLog) {
       evidence: evidence || 'Tidak ada lampiran',
       appointment: 'Menunggu proses peninjauan awal dari tim Satgas.',
       createdAt: Date.now(),
-      authorId: user ? user.id : null,
-      authorName: maskedName,
-      isAnonymous: isAnonymous !== false
+      authorId: authorId,
+      authorName: authorName,
+      isAnonymous: isAnon
     };
 
     reports.push(report);
 
     auditLog.push({
       timestamp: Date.now(),
-      userId: user ? user.id : null,
+      userId: isAnon ? null : user.id,
       action: 'report.create',
       targetId: report.id,
-      ip: req.ip,
-      details: { category, urgency, isAnonymous: report.isAnonymous }
+      ip: isAnon ? null : req.ip,
+      details: { category, urgency, isAnonymous: isAnon }
     });
 
     res.json({ report });
