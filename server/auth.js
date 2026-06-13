@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { z } = require('zod');
+const db = require('./db');
 
 const loginSchema = z.object({
   username: z.string().min(1).max(100),
@@ -11,7 +12,9 @@ const users = [
   { id: 2, username: 'demo', passwordHash: bcrypt.hashSync('demo123', 10), role: 'user', name: 'Demo User' }
 ];
 
-function setupAuthRoutes(app, auditLog, loginRateLimiter) {
+const insertAudit = db.prepare('INSERT INTO audit_log (timestamp, userId, action, targetId, ip, details) VALUES (?, ?, ?, ?, ?, ?)');
+
+function setupAuthRoutes(app, loginRateLimiter) {
   app.post('/api/auth/login', loginRateLimiter, (req, res) => {
     const { username, password } = req.body;
 
@@ -33,13 +36,7 @@ function setupAuthRoutes(app, auditLog, loginRateLimiter) {
       }
       req.session.user = { id: user.id, username: user.username, role: user.role, name: user.name };
 
-      auditLog.push({
-        timestamp: Date.now(),
-        userId: user.id,
-        action: 'auth.login',
-        ip: req.ip,
-        details: { username: user.username, role: user.role }
-      });
+      insertAudit.run(Date.now(), user.id, 'auth.login', null, req.ip, JSON.stringify({ username: user.username, role: user.role }));
 
       res.json({ user: req.session.user });
     });
@@ -47,13 +44,7 @@ function setupAuthRoutes(app, auditLog, loginRateLimiter) {
 
   app.post('/api/auth/logout', (req, res) => {
     if (req.session.user) {
-      auditLog.push({
-        timestamp: Date.now(),
-        userId: req.session.user.id,
-        action: 'auth.logout',
-        ip: req.ip,
-        details: {}
-      });
+      insertAudit.run(Date.now(), req.session.user.id, 'auth.logout', null, req.ip, '{}');
     }
     req.session.destroy();
     res.json({ ok: true });

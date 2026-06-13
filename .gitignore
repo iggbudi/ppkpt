@@ -4,3 +4,4 @@ ftp.txt
 !.env.example
 *.log
 node_modules/
+data/

@@ -6,6 +6,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { callMimoChat } = require('./mimoClient');
 const { classifyRisk } = require('./risk');
+const db = require('./db');
+
+const insertAudit = db.prepare('INSERT INTO audit_log (timestamp, userId, action, targetId, ip, details) VALUES (?, ?, ?, ?, ?, ?)');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
@@ -46,8 +49,6 @@ app.use(session({
   }
 }));
 
-const auditLog = [];
-
 const loginRateLimitStore = new Map();
 
 function loginRateLimiter(req, res, next) {
@@ -72,10 +73,10 @@ function loginRateLimiter(req, res, next) {
 }
 
 const { setupAuthRoutes } = require('./auth');
-setupAuthRoutes(app, auditLog, loginRateLimiter);
+setupAuthRoutes(app, loginRateLimiter);
 
 const { setupReportRoutes } = require('./reports');
-setupReportRoutes(app, auditLog);
+setupReportRoutes(app);
 
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
@@ -187,13 +188,7 @@ app.post('/api/chat', chatRateLimiter, async (req, res) => {
   const risk = classifyRisk(trimmedMessage);
 
   if (risk.level === 'high') {
-    auditLog.push({
-      timestamp: Date.now(),
-      userId: req.session?.user?.id || null,
-      action: 'chat.high_risk_escalation',
-      ip: req.ip,
-      details: { keywords: risk.matchedKeywords }
-    });
+    insertAudit.run(Date.now(), req.session?.user?.id || null, 'chat.high_risk_escalation', null, req.ip, JSON.stringify({ keywords: risk.matchedKeywords }));
     return res.json({
       reply: highRiskReply,
       risk: risk.level,

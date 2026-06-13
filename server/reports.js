@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { z } = require('zod');
+const db = require('./db');
 
 const reportSchema = z.object({
   category: z.enum(['Verbal', 'Sosial', 'Cyberbullying', 'Fisik', 'Seksual']),
@@ -15,8 +16,16 @@ function generateId() {
   return 'SSF-' + crypto.randomUUID().substring(0, 8).toUpperCase();
 }
 
-function setupReportRoutes(app, auditLog) {
-  const reports = [];
+function setupReportRoutes(app) {
+  const insertReport = db.prepare('INSERT INTO reports (id, category, location, urgency, incidentDate, status, description, evidence, appointment, createdAt, authorId, authorName, isAnonymous) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+  const selectAllReports = db.prepare('SELECT * FROM reports');
+  const selectReportById = db.prepare('SELECT * FROM reports WHERE id = ?');
+  const selectReportsByAuthor = db.prepare('SELECT * FROM reports WHERE authorId = ?');
+  const updateReportStatus = db.prepare('UPDATE reports SET status = ?, appointment = ? WHERE id = ?');
+  const deleteAllReports = db.prepare('DELETE FROM reports');
+  const countReports = db.prepare('SELECT COUNT(*) as count FROM reports');
+  const insertAudit = db.prepare('INSERT INTO audit_log (timestamp, userId, action, targetId, ip, details) VALUES (?, ?, ?, ?, ?, ?)');
+  const selectAllAudit = db.prepare('SELECT * FROM audit_log ORDER BY timestamp DESC');
 
   function requireAuth(req, res, next) {
     if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
@@ -30,7 +39,6 @@ function setupReportRoutes(app, auditLog) {
     next();
   }
 
-  // Create report — auth optional (anonymous if no session)
   app.post('/api/reports', (req, res) => {
     let parsed;
     try {
@@ -42,140 +50,94 @@ function setupReportRoutes(app, auditLog) {
     const { category, location, urgency, incidentDate, description, evidence, isAnonymous } = parsed;
     const user = req.session.user || null;
     const isAnon = isAnonymous !== false || !user;
-    const authorId = isAnon ? null : user.id;
-    const authorName = isAnon ? 'Anonim' : (isAnonymous !== false ? user.name.charAt(0).toUpperCase() + '***' : user.name);
+    const authorIdVal = isAnon ? null : user.id;
+    const authorNameVal = isAnon ? 'Anonim' : (isAnonymous !== false ? user.name.charAt(0).toUpperCase() + '***' : user.name);
 
-    const report = {
-      id: generateId(),
-      category,
-      location,
-      urgency,
-      incidentDate,
-      status: 'Baru Masuk',
-      description,
-      evidence: evidence || 'Tidak ada lampiran',
-      appointment: 'Menunggu proses peninjauan awal dari tim Satgas.',
-      createdAt: Date.now(),
-      authorId: authorId,
-      authorName: authorName,
-      isAnonymous: isAnon
-    };
+    const reportId = generateId();
 
-    reports.push(report);
+    insertReport.run(reportId, category, location, urgency, incidentDate, 'Baru Masuk', description, evidence || 'Tidak ada lampiran', 'Menunggu proses peninjauan awal dari tim Satgas.', Date.now(), authorIdVal, authorNameVal, isAnon ? 1 : 0);
 
-    auditLog.push({
-      timestamp: Date.now(),
-      userId: isAnon ? null : user.id,
-      action: 'report.create',
-      targetId: report.id,
-      ip: isAnon ? null : req.ip,
-      details: { category, urgency, isAnonymous: isAnon }
-    });
+    insertAudit.run(Date.now(), isAnon ? null : user.id, 'report.create', reportId, isAnon ? null : req.ip, JSON.stringify({ category, urgency, isAnonymous: isAnon }));
 
-    res.json({ report });
+    res.json({ report: selectReportById.get(reportId) });
   });
 
   app.get('/api/reports', requireAuth, (req, res) => {
     const user = req.session.user;
-    let userReports;
-
-    if (user.role === 'admin') {
-      userReports = reports;
-    } else {
-      userReports = reports.filter(r => r.authorId === user.id);
-    }
-
+    const userReports = user.role === 'admin' ? selectAllReports.all() : selectReportsByAuthor.all(user.id);
     res.json({ reports: userReports });
   });
 
   app.get('/api/reports/:id', requireAuth, (req, res) => {
     const user = req.session.user;
-    const report = reports.find(r => r.id === req.params.id);
-    
+    const report = selectReportById.get(req.params.id);
+
     if (!report) return res.status(404).json({ error: 'Laporan tidak ditemukan' });
-    
+
     if (user.role !== 'admin' && report.authorId !== user.id) {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    auditLog.push({
-      timestamp: Date.now(),
-      userId: user.id,
-      action: 'report.view',
-      targetId: report.id,
-      ip: req.ip,
-      details: {}
-    });
+    insertAudit.run(Date.now(), user.id, 'report.view', report.id, req.ip, '{}');
 
     res.json({ report });
   });
 
   app.patch('/api/reports/:id/status', requireAuth, requireAdmin, (req, res) => {
     const { status, appointment } = req.body;
-    const report = reports.find(r => r.id === req.params.id);
-    
+    const report = selectReportById.get(req.params.id);
+
     if (!report) return res.status(404).json({ error: 'Laporan tidak ditemukan' });
-    
+
     const validStatuses = ['Baru Masuk', 'Direview', 'Diproses', 'Selesai'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Status tidak valid' });
     }
 
     const oldStatus = report.status;
-    report.status = status;
-    if (appointment) report.appointment = appointment;
+    updateReportStatus.run(status, appointment || report.appointment, report.id);
 
-    auditLog.push({
-      timestamp: Date.now(),
-      userId: req.session.user.id,
-      action: 'report.status_update',
-      targetId: report.id,
-      ip: req.ip,
-      details: { oldStatus, newStatus: status }
-    });
+    insertAudit.run(Date.now(), req.session.user.id, 'report.status_update', report.id, req.ip, JSON.stringify({ oldStatus, newStatus: status }));
 
-    res.json({ report });
+    res.json({ report: selectReportById.get(report.id) });
   });
 
   app.post('/api/reports/seed', requireAuth, requireAdmin, (req, res) => {
     const dummies = [
-      { id: 'SSF-2026-1001', category: 'Cyberbullying', location: 'Grup WA Kelas', urgency: 'Tinggi', incidentDate: '2026-06-02', status: 'Baru Masuk', description: 'Saya diejek dan foto saya disebar di grup tanpa izin.', evidence: 'demo-bukti.png', appointment: 'Menunggu proses peninjauan awal.', createdAt: Date.now() - 20000, authorId: 2, authorName: 'D***', isAnonymous: true },
-      { id: 'SSF-2026-1002', category: 'Verbal', location: 'Ruang Kelas', urgency: 'Sedang', incidentDate: '2026-06-05', status: 'Direview', description: 'Saya sering dihina soal penampilan saat presentasi.', evidence: 'Tidak ada lampiran', appointment: 'Sedang dalam peninjauan bukti oleh Admin.', createdAt: Date.now() - 15000, authorId: 2, authorName: 'demo_user', isAnonymous: false },
-      { id: 'SSF-2026-1003', category: 'Sosial', location: 'Lingkungan Kampus', urgency: 'Rendah', incidentDate: '2026-06-06', status: 'Selesai', description: 'Teman saya dikucilkan dari kelompok tugas.', evidence: 'Tidak ada lampiran', appointment: 'Telah dilakukan mediasi dan edukasi pencegahan.', createdAt: Date.now() - 10000, authorId: 2, authorName: 'D***', isAnonymous: true },
-      { id: 'SSF-2026-1004', category: 'Fisik', location: 'Parkiran Kampus', urgency: 'Tinggi', incidentDate: '2026-06-08', status: 'Diproses', description: 'Ada tindakan represif dan ancaman jika saya melapor.', evidence: 'rekaman_suara.mp3', appointment: 'Jadwal Konseling: Kasus dialihkan ke Satgas PPKS.', createdAt: Date.now() - 5000, authorId: 2, authorName: 'demo_user', isAnonymous: false }
+      { id: 'SSF-2026-1001', category: 'Cyberbullying', location: 'Grup WA Kelas', urgency: 'Tinggi', incidentDate: '2026-06-02', status: 'Baru Masuk', description: 'Saya diejek dan foto saya disebar di grup tanpa izin.', evidence: 'demo-bukti.png', appointment: 'Menunggu proses peninjauan awal.', createdAt: Date.now() - 20000, authorId: 2, authorName: 'D***', isAnonymous: 1 },
+      { id: 'SSF-2026-1002', category: 'Verbal', location: 'Ruang Kelas', urgency: 'Sedang', incidentDate: '2026-06-05', status: 'Direview', description: 'Saya sering dihina soal penampilan saat presentasi.', evidence: 'Tidak ada lampiran', appointment: 'Sedang dalam peninjauan bukti oleh Admin.', createdAt: Date.now() - 15000, authorId: 2, authorName: 'demo_user', isAnonymous: 0 },
+      { id: 'SSF-2026-1003', category: 'Sosial', location: 'Lingkungan Kampus', urgency: 'Rendah', incidentDate: '2026-06-06', status: 'Selesai', description: 'Teman saya dikucilkan dari kelompok tugas.', evidence: 'Tidak ada lampiran', appointment: 'Telah dilakukan mediasi dan edukasi pencegahan.', createdAt: Date.now() - 10000, authorId: 2, authorName: 'D***', isAnonymous: 1 },
+      { id: 'SSF-2026-1004', category: 'Fisik', location: 'Parkiran Kampus', urgency: 'Tinggi', incidentDate: '2026-06-08', status: 'Diproses', description: 'Ada tindakan represif dan ancaman jika saya melapor.', evidence: 'rekaman_suara.mp3', appointment: 'Jadwal Konseling: Kasus dialihkan ke Satgas PPKS.', createdAt: Date.now() - 5000, authorId: 2, authorName: 'demo_user', isAnonymous: 0 }
     ];
 
-    reports.length = 0;
-    dummies.forEach(d => reports.push(d));
-
-    auditLog.push({
-      timestamp: Date.now(),
-      userId: req.session.user.id,
-      action: 'reports.seed',
-      ip: req.ip,
-      details: { count: dummies.length }
+    const insertMany = db.transaction((items) => {
+      deleteAllReports.run();
+      for (const d of items) {
+        insertReport.run(d.id, d.category, d.location, d.urgency, d.incidentDate, d.status, d.description, d.evidence, d.appointment, d.createdAt, d.authorId, d.authorName, d.isAnonymous);
+      }
     });
+    insertMany(dummies);
+
+    insertAudit.run(Date.now(), req.session.user.id, 'reports.seed', null, req.ip, JSON.stringify({ count: dummies.length }));
 
     res.json({ ok: true, count: dummies.length });
   });
 
   app.delete('/api/reports', requireAuth, requireAdmin, (req, res) => {
-    const count = reports.length;
-    reports.length = 0;
+    const { count } = countReports.get();
+    deleteAllReports.run();
 
-    auditLog.push({
-      timestamp: Date.now(),
-      userId: req.session.user.id,
-      action: 'reports.clear',
-      ip: req.ip,
-      details: { cleared: count }
-    });
+    insertAudit.run(Date.now(), req.session.user.id, 'reports.clear', null, req.ip, JSON.stringify({ cleared: count }));
 
     res.json({ ok: true, cleared: count });
   });
 
   app.get('/api/audit', requireAuth, requireAdmin, (req, res) => {
-    res.json({ log: auditLog });
+    const log = selectAllAudit.all().map(row => ({
+      ...row,
+      details: row.details ? JSON.parse(row.details) : {}
+    }));
+    res.json({ log });
   });
 }
 
