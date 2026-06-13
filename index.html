@@ -239,15 +239,21 @@
 
     <div id="page-chat" class="page">
       <section class="section card">
-        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
-          <div>
-            <h2>Chat Bersama Ahli</h2>
-            <p class="muted">Konsultasi secara anonim dengan psikolog atau konselor berlisensi dari pihak kampus.</p>
-          </div>
-          <button class="btn primary">Mulai Sesi Chat</button>
+        <div class="card-header">
+          <h2>Chat Bersama Ahli</h2>
+          <p class="muted">Konsultasi secara anonim dengan SafeBot — asisten AI konseling berbasis MiMo LLM.</p>
         </div>
-        <div style="text-align:center; padding: 40px 20px; background:#f8fafc; border-radius:12px; border:1px dashed var(--line);">
-          <p style="color:var(--muted); margin:0;">Silakan klik tombol "Mulai Sesi Chat" untuk terhubung dengan konselor yang sedang online. Identitas Anda akan tetap disamarkan (Anonim).</p>
+
+        <div id="chatMessages" class="chat-messages">
+          <div class="chat-message bot">
+            <div class="chat-avatar">SB</div>
+            <div class="chat-bubble">Halo! Saya SafeBot, asisten konseling SafeSphere. Ada yang bisa saya bantu hari ini?</div>
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <textarea id="chatInput" placeholder="Ketik pesan Anda..." rows="1"></textarea>
+          <button id="chatSendBtn" class="btn primary">Kirim</button>
         </div>
       </section>
     </div>
@@ -517,6 +523,7 @@
   <script src="js/edukasi.js"></script>
   <script src="js/a11y.js"></script>
   <script src="js/safety.js"></script>
+  <script src="js/chat.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
