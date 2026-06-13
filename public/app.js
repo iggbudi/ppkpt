@@ -67,6 +67,35 @@ function handleRouting() {
   var activeLink = document.querySelector('.sidebar-link[href="' + hash + '"]');
   if (activeLink) activeLink.classList.add('active');
 
+  // Update document title
+  var pageTitles = {
+    '#beranda': 'Beranda - SafeSphere',
+    '#lapor': 'Lapor Anonim - SafeSphere',
+    '#edukasi': 'Edukasi - SafeSphere',
+    '#kontak': 'Kontak Darurat - SafeSphere',
+    '#chat': 'Chat Ahli - SafeSphere',
+    '#login': 'Masuk - SafeSphere',
+    '#register': 'Daftar - SafeSphere',
+    '#admin': 'Dashboard Admin - SafeSphere',
+    '#dashboard': 'Dashboard Saya - SafeSphere'
+  };
+  document.title = pageTitles[hash] || 'SafeSphere';
+
+  // Focus heading for screen readers
+  if (targetElement) {
+    var heading = targetElement.querySelector('h1, h2');
+    if (heading) {
+      heading.setAttribute('tabindex', '-1');
+      heading.focus();
+    }
+  }
+
+  // aria-current on active nav link
+  document.querySelectorAll('.sidebar-link').forEach(function(link) {
+    link.removeAttribute('aria-current');
+  });
+  if (activeLink) activeLink.setAttribute('aria-current', 'page');
+
   if (hash === '#admin') {
     setTimeout(function() {
       if (typeof initChart === 'function' && !document.getElementById('categoryChart').dataset.initialized) {
