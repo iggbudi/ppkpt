@@ -96,6 +96,50 @@ test('chat API rate limits repeated requests per client', async () => {
   }
 });
 
+test('static file exposure: package.json is not served as raw file', async () => {
+  const { server, baseUrl } = await startServer();
+  try {
+    const response = await fetch(`${baseUrl}/package.json`);
+    const body = await response.text();
+    assert.equal(body.includes('"safesphere-chat-backend"'), false, 'package.json content must not be exposed');
+  } finally {
+    server.close();
+  }
+});
+
+test('static file exposure: server source is not served as raw file', async () => {
+  const { server, baseUrl } = await startServer();
+  try {
+    const response = await fetch(`${baseUrl}/server/index.js`);
+    const body = await response.text();
+    assert.equal(body.includes('callMimoChat'), false, 'server source must not be exposed');
+  } finally {
+    server.close();
+  }
+});
+
+test('static file exposure: .git config is not served as raw file', async () => {
+  const { server, baseUrl } = await startServer();
+  try {
+    const response = await fetch(`${baseUrl}/.git/config`);
+    const body = await response.text();
+    assert.equal(body.includes('[core]'), false, '.git/config must not be exposed');
+  } finally {
+    server.close();
+  }
+});
+
+test('static file exposure: .env is not served as raw file', async () => {
+  const { server, baseUrl } = await startServer();
+  try {
+    const response = await fetch(`${baseUrl}/.env`);
+    const body = await response.text();
+    assert.equal(body.includes('MIMO_API_KEY'), false, '.env content must not be exposed');
+  } finally {
+    server.close();
+  }
+});
+
 test('chat API does not allow X-Forwarded-For rotation to bypass rate limit', async () => {
   chatRateLimitStore.clear();
   const { server, baseUrl } = await startServer();
