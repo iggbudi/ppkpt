@@ -50,6 +50,9 @@ const auditLog = [];
 const { setupAuthRoutes } = require('./auth');
 setupAuthRoutes(app, auditLog);
 
+const { setupReportRoutes } = require('./reports');
+setupReportRoutes(app, auditLog);
+
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const highRiskReply = 'Saya mendeteksi tanda situasi berisiko tinggi. Keselamatanmu adalah prioritas utama. Jika kamu sedang dalam bahaya, segera menjauh ke tempat aman dan hubungi Satgas/keamanan kampus atau orang terpercaya. Jika memungkinkan, simpan bukti dan buat laporan dengan urgensi Tinggi.';
