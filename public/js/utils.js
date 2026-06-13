@@ -21,6 +21,8 @@
     alertDiv.style.fontSize = '14px';
     alertDiv.style.border = '1px solid #fecaca';
     alertDiv.innerText = message;
+    alertDiv.setAttribute('role', 'status');
+    alertDiv.setAttribute('aria-live', 'polite');
 
     document.body.appendChild(alertDiv);
     setTimeout(function() { alertDiv.remove(); }, 3500);
