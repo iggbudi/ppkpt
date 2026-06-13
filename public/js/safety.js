@@ -49,18 +49,26 @@
   };
 
   window.getRiskScore = function(text) {
+    var lowerText = text.toLowerCase();
     var score = 0;
-    var lower = text.toLowerCase();
+    var foundHighRisk = false;
 
     triggerDictionary.highRisk.forEach(function(word) {
-      if (lower.includes(word)) score += 5;
+      if (lowerText.includes(word)) {
+        score += 5;
+        foundHighRisk = true;
+      }
     });
 
     triggerDictionary.medRisk.forEach(function(word) {
-      if (lower.includes(word)) score += 2;
+      if (lowerText.includes(word)) score += 2;
     });
 
-    return score;
+    var level = 'low';
+    if (score >= 5 || foundHighRisk) level = 'high';
+    else if (score >= 2) level = 'medium';
+
+    return { score: score, level: level, foundHighRisk: foundHighRisk };
   };
 
   window.analyzeSentiment = function() {
