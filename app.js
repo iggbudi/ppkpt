@@ -79,83 +79,85 @@ function setupEventListeners() {
   if (tabMahasiswa) tabMahasiswa.addEventListener('click', function() { switchLoginTab('mahasiswa'); });
   if (tabAdmin) tabAdmin.addEventListener('click', function() { switchLoginTab('admin'); });
 
-  document.querySelectorAll('[onclick="handleLogout()"]').forEach(function(btn) {
-    btn.removeAttribute('onclick');
+  // Logout buttons (nav user and nav admin)
+  document.querySelectorAll('#navUser .btn.outline, #navAdmin .btn.outline').forEach(function(btn) {
     btn.addEventListener('click', handleLogout);
   });
 
+  // Quick escape button
   var quickEscapeBtn = document.getElementById('quickEscapeBtn');
   if (quickEscapeBtn) {
-    quickEscapeBtn.removeAttribute('onclick');
     quickEscapeBtn.addEventListener('click', activateDiscreetMode);
   }
 
+  // Discreet mode close button
   var discreetClose = document.querySelector('#discreetOverlay button');
   if (discreetClose) {
-    discreetClose.removeAttribute('onclick');
     discreetClose.addEventListener('click', deactivateDiscreetMode);
   }
 
-  var forgotLink = document.querySelector('[onclick="openForgotModal(event)"]');
+  // Forgot password link
+  var forgotLink = document.querySelector('#page-login a[href="#"]');
   if (forgotLink) {
-    forgotLink.removeAttribute('onclick');
     forgotLink.addEventListener('click', openForgotModal);
   }
 
-  var otpBtn = document.querySelector('[onclick="sendOTP(event)"]');
+  // OTP send button
+  var otpBtn = document.querySelector('#forgotPasswordModal .btn.primary');
   if (otpBtn) {
-    otpBtn.removeAttribute('onclick');
     otpBtn.addEventListener('click', sendOTP);
   }
 
-  var seedBtn = document.querySelector('[onclick="seedDemoData()"]');
+  // Admin buttons
+  var seedBtn = document.querySelector('#adminDashboardArea .btn-light-primary');
   if (seedBtn) {
-    seedBtn.removeAttribute('onclick');
     seedBtn.addEventListener('click', seedDemoData);
   }
 
-  var clearBtn = document.querySelector('[onclick="clearAllData()"]');
+  var clearBtn = document.querySelector('#adminDashboardArea .btn-light-danger');
   if (clearBtn) {
-    clearBtn.removeAttribute('onclick');
     clearBtn.addEventListener('click', clearAllData);
   }
 
-  var detailClose = document.querySelector('[onclick="closeReportDetailModal()"]');
+  // Admin detail modal
+  var detailClose = document.querySelector('#reportDetailModal .close-modal');
   if (detailClose) {
-    detailClose.removeAttribute('onclick');
     detailClose.addEventListener('click', closeReportDetailModal);
   }
 
-  var saveStatusBtn = document.querySelector('[onclick="saveReportStatus()"]');
+  var saveStatusBtn = document.querySelector('#reportDetailModal .btn.primary');
   if (saveStatusBtn) {
-    saveStatusBtn.removeAttribute('onclick');
     saveStatusBtn.addEventListener('click', saveReportStatus);
   }
 
+  // A11y widget toggle
   var a11yToggle = document.querySelector('[aria-label="Buka Menu Aksesibilitas"]');
   if (a11yToggle) {
-    a11yToggle.removeAttribute('onclick');
     a11yToggle.addEventListener('click', toggleA11yMenu);
   }
 
-  document.querySelectorAll('[onclick^="toggleA11yFeature"]').forEach(function(btn) {
-    var feature = btn.getAttribute('onclick').match(/toggleA11yFeature\('(.+?)'\)/);
-    if (feature) {
-      btn.removeAttribute('onclick');
-      btn.addEventListener('click', function() { toggleA11yFeature(feature[1]); });
-    }
-  });
+  // A11y feature buttons (Kontras Tinggi, Perbesar Teks, Ramah Disleksia)
+  var a11yFeatures = ['high-contrast', 'large-text', 'dyslexia'];
+  var a11yMenu = document.getElementById('a11yMenu');
+  if (a11yMenu) {
+    var a11yBtns = a11yMenu.querySelectorAll('button');
+    a11yBtns.forEach(function(btn, idx) {
+      if (a11yFeatures[idx]) {
+        btn.addEventListener('click', function() { toggleA11yFeature(a11yFeatures[idx]); });
+      }
+    });
+  }
 
+  // Social login buttons (placeholder)
   document.querySelectorAll('.btn-social').forEach(function(btn) {
-    btn.removeAttribute('onclick');
     btn.addEventListener('click', function() {
       showTopSystemAlert('Fitur ini akan segera tersedia.');
     });
   });
 
+  // Chat button (placeholder)
   var chatBtn = document.querySelector('#page-chat .btn-primary');
   if (chatBtn) {
-    chatBtn.removeAttribute('onclick');
     chatBtn.addEventListener('click', function() {
       showTopSystemAlert('Membuka sesi Chat Aman...');
     });
