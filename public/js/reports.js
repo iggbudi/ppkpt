@@ -42,9 +42,13 @@
 
       resultBox.classList.remove('hidden');
       resultBox.classList.add('success');
+      var trackingBtn = data.report.isAnonymous 
+        ? '<p style="color:var(--muted); font-size:13px;">Laporan anonim tidak dapat dilacak.</p>'
+        : '<button class="btn secondary" type="button" onclick="viewInvoiceFromSubmit(\'' + data.report.id + '\')" style="margin-top: 10px;">Lacak Status</button>';
+
       resultBox.innerHTML = '<strong>Laporan Demo Berhasil Dikirim!</strong><br><br>' +
-        'Nomor Pelacakan: <b>' + data.report.id + '</b><br>' +
-        '<button class="btn secondary" type="button" onclick="viewInvoiceFromSubmit(\'' + data.report.id + '\')" style="margin-top: 10px;">Lacak Status</button>';
+        'Nomor Referensi: <b>' + data.report.id + '</b><br>' +
+        trackingBtn;
 
       event.target.reset();
     } catch (err) {
