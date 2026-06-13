@@ -27,6 +27,16 @@ function setupReportRoutes(app, auditLog) {
       return res.status(400).json({ error: 'Semua field wajib diisi' });
     }
 
+    const validCategories = ['Fisik', 'Verbal', 'Sosial', 'Cyberbullying', 'Seksual'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ error: 'Kategori tidak valid' });
+    }
+
+    const validUrgencies = ['Rendah', 'Sedang', 'Tinggi'];
+    if (!validUrgencies.includes(urgency)) {
+      return res.status(400).json({ error: 'Urgensi tidak valid' });
+    }
+
     const user = req.session.user || null;
     const isAnon = isAnonymous !== false || !user;
     const authorId = isAnon ? null : user.id;
