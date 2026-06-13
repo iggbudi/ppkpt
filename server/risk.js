@@ -1,10 +1,10 @@
 const triggerDictionary = {
   highRisk: [
-    'bunuh', 'mati', 'ancam', 'mengancam', 'diancam', 'pukul', 'dipukul', 'hajar', 'dihajar',
+    'bunuh', 'mati', 'ancam', 'mengancam', 'diancam', 'terancam', 'pukul', 'dipukul', 'memukul', 'hajar', 'dihajar',
     'tampar', 'ditampar', 'cekik', 'dicekik', 'bunuh diri', 'self harm', 'sayat',
     'kunci', 'dikunci', 'seksual', 'raba', 'diraba', 'leceh', 'dilecehkan', 'perkosa',
-    'diperkosa', 'paksa', 'dipaksa', 'sebar video', 'sebar foto', 'telanjang',
-    'senjata', 'pisau', 'darah', 'luka', 'depresi berat', 'akhiri hidup', 'doxing'
+    'diperkosa', 'paksa', 'dipaksa', 'sebar video', 'sebar foto', 'disebar', 'telanjang',
+    'senjata', 'pisau', 'darah', 'luka', 'depresi berat', 'akhiri hidup', 'ingin bunuh diri', 'tidak ingin hidup', 'doxing'
   ],
   medRisk: [
     'hina', 'menghina', 'ejek', 'diejek', 'olok', 'diolok', 'kucil', 'dikucilkan',
