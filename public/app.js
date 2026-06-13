@@ -285,6 +285,27 @@ function setupEventListeners() {
     if (currentSection) currentSection.classList.remove('hidden');
   }
 
+  function validateStep(step) {
+    var section = document.getElementById('formStep' + step);
+    if (!section) return true;
+    var requiredFields = section.querySelectorAll('[required]');
+    var firstInvalid = null;
+    requiredFields.forEach(function(field) {
+      if (!field.value || (field.value.trim && field.value.trim() === '')) {
+        field.style.borderColor = 'var(--danger)';
+        if (!firstInvalid) firstInvalid = field;
+      } else {
+        field.style.borderColor = '';
+      }
+    });
+    if (firstInvalid) {
+      firstInvalid.focus();
+      showTopSystemAlert('Harap isi semua field yang wajib diisi.');
+      return false;
+    }
+    return true;
+  }
+
   function goToStep(step) {
     currentFormStep = step;
     updateFormSteps();
@@ -309,11 +330,11 @@ function setupEventListeners() {
   }
 
   var nextStep1 = document.getElementById('nextStep1');
-  if (nextStep1) nextStep1.addEventListener('click', function() { goToStep(2); });
+  if (nextStep1) nextStep1.addEventListener('click', function() { if (validateStep(1)) goToStep(2); });
   var nextStep2 = document.getElementById('nextStep2');
-  if (nextStep2) nextStep2.addEventListener('click', function() { goToStep(3); });
+  if (nextStep2) nextStep2.addEventListener('click', function() { if (validateStep(2)) goToStep(3); });
   var nextStep3 = document.getElementById('nextStep3');
-  if (nextStep3) nextStep3.addEventListener('click', function() { populateReview(); goToStep(4); });
+  if (nextStep3) nextStep3.addEventListener('click', function() { if (validateStep(3)) { populateReview(); goToStep(4); } });
 
   var prevStep2 = document.getElementById('prevStep2');
   if (prevStep2) prevStep2.addEventListener('click', function() { goToStep(1); });

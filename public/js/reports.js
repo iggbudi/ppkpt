@@ -42,13 +42,20 @@
 
       resultBox.classList.remove('hidden');
       resultBox.classList.add('success');
-      var trackingBtn = data.report.isAnonymous 
-        ? '<p style="color:var(--muted); font-size:13px;">Laporan anonim tidak dapat dilacak.</p>'
-        : '<button class="btn secondary" type="button" onclick="viewInvoiceFromSubmit(\'' + data.report.id + '\')" style="margin-top: 10px;">Lacak Status</button>';
-
-      resultBox.innerHTML = '<strong>Laporan Demo Berhasil Dikirim!</strong><br><br>' +
-        'Nomor Referensi: <b>' + data.report.id + '</b><br>' +
-        trackingBtn;
+      clearElement(resultBox);
+      resultBox.appendChild(createEl('strong', { text: 'Laporan Demo Berhasil Dikirim!' }));
+      resultBox.appendChild(document.createElement('br'));
+      resultBox.appendChild(document.createElement('br'));
+      resultBox.appendChild(document.createTextNode('Nomor Referensi: '));
+      resultBox.appendChild(createEl('b', { text: data.report.id }));
+      resultBox.appendChild(document.createElement('br'));
+      if (data.report.isAnonymous) {
+        resultBox.appendChild(createEl('p', { text: 'Laporan anonim tidak dapat dilacak.', style: 'color:var(--muted); font-size:13px;' }));
+      } else {
+        var btn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
+        btn.addEventListener('click', function() { viewInvoiceFromSubmit(data.report.id); });
+        resultBox.appendChild(btn);
+      }
 
       event.target.reset();
     } catch (err) {
@@ -87,27 +94,72 @@
       t1 = 'done'; t2 = 'done'; t3 = 'done'; t4 = 'done';
     }
 
-    invoiceBox.innerHTML = '<div class="invoice-header">' +
-      '<h3>Tanda Terima Pengaduan</h3>' +
-      '<p class="muted" style="margin:0;">No. Pelacakan: <strong>' + report.id + '</strong></p>' +
-      '</div>' +
-      '<div class="invoice-details">' +
-      '<div><span>Tanggal Kejadian:</span><br><strong>' + report.incidentDate + '</strong></div>' +
-      '<div><span>Kategori:</span><br><strong>' + report.category + '</strong></div>' +
-      '<div><span>Lokasi:</span><br><strong>' + report.location + '</strong></div>' +
-      '<div><span>Tingkat Urgensi:</span><br><strong>' + report.urgency + '</strong></div>' +
-      '<div style="grid-column: 1 / -1;"><span>Lampiran Bukti:</span><br><strong style="color: var(--primary);">' + (report.evidence || 'Tidak ada lampiran') + '</strong></div>' +
-      '<div style="grid-column: 1 / -1;"><span>Kronologi Singkat:</span><br><strong style="font-weight: 500; font-size: 13px; line-height: 1.5; margin-top: 4px;">"' + report.description + '"</strong></div>' +
-      '</div>' +
-      '<div class="timeline-container">' +
-      '<h4 style="margin: 0 0 16px 0;">Update Status Pelaporan</h4>' +
-      '<ul class="timeline">' +
-      '<li class="timeline-item ' + (t1 || 'done') + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Laporan Diterima</h4><p>Laporan disimpan di server demo.</p></div></li>' +
-      '<li class="timeline-item ' + t2 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tahap Review (Verifikasi)</h4><p>Tim admin memverifikasi kelayakan berkas.</p></div></li>' +
-      '<li class="timeline-item ' + t3 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Sedang Diproses</h4><p>Kasus ditangani unit kemahasiswaan/Satgas PPKS.</p></div></li>' +
-      '<li class="timeline-item ' + t4 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tindak Lanjut & Appointment</h4><p style="color: var(--primary); font-weight: 600; margin-top: 4px;">Info: ' + report.appointment + '</p></div></li>' +
-      '</ul>' +
-      '</div>';
+    clearElement(invoiceBox);
+
+    var header = createEl('div', { className: 'invoice-header' });
+    header.appendChild(createEl('h3', { text: 'Tanda Terima Pengaduan' }));
+    var trackingP = createEl('p', { className: 'muted', style: 'margin:0;' });
+    trackingP.appendChild(document.createTextNode('No. Pelacakan: '));
+    trackingP.appendChild(createEl('strong', { text: report.id }));
+    header.appendChild(trackingP);
+    invoiceBox.appendChild(header);
+
+    var details = createEl('div', { className: 'invoice-details' });
+    var invFields = [
+      { label: 'Tanggal Kejadian:', value: report.incidentDate },
+      { label: 'Kategori:', value: report.category },
+      { label: 'Lokasi:', value: report.location },
+      { label: 'Tingkat Urgensi:', value: report.urgency }
+    ];
+    invFields.forEach(function(f) {
+      var d = createEl('div');
+      d.appendChild(createEl('span', { text: f.label }));
+      appendBr(d);
+      d.appendChild(createEl('strong', { text: f.value }));
+      details.appendChild(d);
+    });
+
+    var evidenceDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
+    evidenceDiv.appendChild(createEl('span', { text: 'Lampiran Bukti:' }));
+    appendBr(evidenceDiv);
+    evidenceDiv.appendChild(createEl('strong', { text: report.evidence || 'Tidak ada lampiran', style: 'color: var(--primary);' }));
+    details.appendChild(evidenceDiv);
+
+    var descDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
+    descDiv.appendChild(createEl('span', { text: 'Kronologi Singkat:' }));
+    appendBr(descDiv);
+    descDiv.appendChild(createEl('strong', { text: '"' + report.description + '"', style: 'font-weight: 500; font-size: 13px; line-height: 1.5; margin-top: 4px;' }));
+    details.appendChild(descDiv);
+    invoiceBox.appendChild(details);
+
+    var timelineContainer = createEl('div', { className: 'timeline-container' });
+    timelineContainer.appendChild(createEl('h4', { text: 'Update Status Pelaporan', style: 'margin: 0 0 16px 0;' }));
+    var ul = createEl('ul', { className: 'timeline' });
+
+    var timelineSteps = [
+      { cls: t1 || 'done', title: 'Laporan Diterima', desc: 'Laporan disimpan di server demo.' },
+      { cls: t2, title: 'Tahap Review (Verifikasi)', desc: 'Tim admin memverifikasi kelayakan berkas.' },
+      { cls: t3, title: 'Sedang Diproses', desc: 'Kasus ditangani unit kemahasiswaan/Satgas PPKS.' }
+    ];
+    timelineSteps.forEach(function(s) {
+      var li = createEl('li', { className: 'timeline-item ' + s.cls });
+      li.appendChild(createEl('div', { className: 'timeline-marker' }));
+      var tc = createEl('div', { className: 'timeline-content' });
+      tc.appendChild(createEl('h4', { text: s.title }));
+      tc.appendChild(createEl('p', { text: s.desc }));
+      li.appendChild(tc);
+      ul.appendChild(li);
+    });
+
+    var li4 = createEl('li', { className: 'timeline-item ' + t4 });
+    li4.appendChild(createEl('div', { className: 'timeline-marker' }));
+    var tc4 = createEl('div', { className: 'timeline-content' });
+    tc4.appendChild(createEl('h4', { text: 'Tindak Lanjut & Appointment' }));
+    tc4.appendChild(createEl('p', { text: 'Info: ' + (report.appointment || ''), style: 'color: var(--primary); font-weight: 600; margin-top: 4px;' }));
+    li4.appendChild(tc4);
+    ul.appendChild(li4);
+    timelineContainer.appendChild(ul);
+    invoiceBox.appendChild(timelineContainer);
   }
 
   window.renderInvoice = renderInvoice;
@@ -119,32 +171,42 @@
     try {
       var response = await fetch('/api/reports');
       if (!response.ok) {
-        listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Gagal memuat laporan.</p>';
+        clearElement(listContainer);
+        listContainer.appendChild(createEl('p', { className: 'muted', style: 'text-align:center; padding:20px;', text: 'Gagal memuat laporan.' }));
         return;
       }
       var data = await response.json();
       var userReports = data.reports;
     } catch (err) {
-      listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Gagal memuat laporan.</p>';
+      clearElement(listContainer);
+      listContainer.appendChild(createEl('p', { className: 'muted', style: 'text-align:center; padding:20px;', text: 'Gagal memuat laporan.' }));
       return;
     }
 
+    clearElement(listContainer);
     if (userReports.length === 0) {
-      listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Anda belum pernah membuat laporan.</p>';
+      listContainer.appendChild(createEl('p', { className: 'muted', style: 'text-align:center; padding:20px;', text: 'Anda belum pernah membuat laporan.' }));
       return;
     }
 
-    listContainer.innerHTML = '';
     userReports.forEach(function(report) {
       var riskClass = report.urgency === 'Tinggi' ? 'risk-tinggi' : (report.urgency === 'Sedang' ? 'risk-sedang' : 'risk-rendah');
-      var html = '<div class="report-item" onclick="viewInvoiceFromSubmit(\'' + report.id + '\')">' +
-        '<div class="report-info">' +
-        '<h4>' + report.id + ' <span style="color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;">' + report.incidentDate + '</span></h4>' +
-        '<p><b>Kategori:</b> ' + report.category + ' &bull; <b>Status Laporan:</b> <span style="color:var(--primary); font-weight:bold;">' + report.status + '</span></p>' +
-        '</div>' +
-        '<div class="risk-badge ' + riskClass + '">Lihat Invoice &gt;</div>' +
-        '</div>';
-      listContainer.insertAdjacentHTML('beforeend', html);
+      var item = createEl('button', { className: 'report-item', type: 'button' });
+      item.addEventListener('click', function() { viewInvoiceFromSubmit(report.id); });
+      var info = createEl('div', { className: 'report-info' });
+      info.appendChild(createEl('h4', {}, [
+        report.id,
+        createEl('span', { text: report.incidentDate, style: 'color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;' })
+      ]));
+      var p = createEl('p');
+      p.appendChild(document.createTextNode('Kategori: '));
+      p.appendChild(createEl('b', { text: report.category }));
+      p.appendChild(document.createTextNode(' \u2022 Status Laporan: '));
+      p.appendChild(createEl('span', { text: report.status, style: 'color:var(--primary); font-weight:bold;' }));
+      info.appendChild(p);
+      item.appendChild(info);
+      item.appendChild(createEl('div', { className: 'risk-badge ' + riskClass, text: 'Lihat Invoice >' }));
+      listContainer.appendChild(item);
     });
   };
 })();

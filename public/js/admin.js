@@ -82,22 +82,32 @@
     }
 
     var listContainer = document.getElementById('adminReportList');
+    clearElement(listContainer);
     if (reportData.length === 0) {
-      listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Belum ada data laporan.</p>';
+      listContainer.appendChild(createEl('p', { className: 'muted', style: 'text-align:center; padding:20px;', text: 'Belum ada data laporan.' }));
       return;
     }
 
-    listContainer.innerHTML = '';
     reportData.forEach(function(report) {
       var riskClass = report.urgency === 'Tinggi' ? 'risk-tinggi' : (report.urgency === 'Sedang' ? 'risk-sedang' : 'risk-rendah');
-      var html = '<div class="report-item" onclick="viewReportDetail(\'' + report.id + '\')">' +
-        '<div class="report-info">' +
-        '<h4>' + report.id + ' <span style="color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;">' + report.incidentDate + '</span></h4>' +
-        '<p><b>Kategori:</b> ' + report.category + ' &bull; <b>Pelapor:</b> ' + report.authorName + ' &bull; <b>Status:</b> <span style="color:var(--primary);">' + report.status + '</span></p>' +
-        '</div>' +
-        '<div class="risk-badge ' + riskClass + '">Urgensi ' + report.urgency + '</div>' +
-        '</div>';
-      listContainer.insertAdjacentHTML('beforeend', html);
+      var item = createEl('button', { className: 'report-item', type: 'button' });
+      item.addEventListener('click', function() { viewReportDetail(report.id); });
+      var info = createEl('div', { className: 'report-info' });
+      info.appendChild(createEl('h4', {}, [
+        report.id,
+        createEl('span', { text: report.incidentDate, style: 'color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;' })
+      ]));
+      var p = createEl('p');
+      p.appendChild(document.createTextNode('Kategori: '));
+      p.appendChild(createEl('b', { text: report.category }));
+      p.appendChild(document.createTextNode(' \u2022 Pelapor: '));
+      p.appendChild(createEl('b', { text: report.authorName }));
+      p.appendChild(document.createTextNode(' \u2022 Status: '));
+      p.appendChild(createEl('span', { text: report.status, style: 'color:var(--primary);' }));
+      info.appendChild(p);
+      item.appendChild(info);
+      item.appendChild(createEl('div', { className: 'risk-badge ' + riskClass, text: 'Urgensi ' + report.urgency }));
+      listContainer.appendChild(item);
     });
   };
 
@@ -110,18 +120,46 @@
 
     document.getElementById('detailTitle').innerText = 'Detail Kasus ' + report.id;
 
-    var content = '<div style="grid-column: 1 / -1; background: #e8f0ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 8px;">' +
-      '<span style="color: var(--primary2);">Pelapor:</span><br>' +
-      '<strong style="font-size: 16px; color: var(--primary);">' + report.authorName + '</strong>' +
-      '</div>' +
-      '<div><span>Waktu Kejadian:</span><br><strong>' + report.incidentDate + '</strong></div>' +
-      '<div><span>Kategori:</span><br><strong>' + report.category + '</strong></div>' +
-      '<div><span>Lokasi Kejadian:</span><br><strong>' + report.location + '</strong></div>' +
-      '<div><span>Tingkat Risiko:</span><br><strong>' + report.urgency + '</strong></div>' +
-      '<div style="grid-column: 1 / -1;"><span>Lampiran Bukti:</span><br><strong style="color: var(--primary);">' + (report.evidence || 'Tidak ada lampiran') + '</strong></div>' +
-      '<div style="grid-column: 1 / -1;"><span>Kronologi Lengkap:</span><br><strong style="font-weight: 500; font-size: 14px; line-height: 1.5; margin-top: 4px;">"' + report.description + '"</strong></div>' +
-      '<div style="grid-column: 1 / -1;"><span>Status Terakhir:</span><br><strong style="color: var(--primary);">' + report.status + '</strong></div>';
-    document.getElementById('detailContent').innerHTML = content;
+    var contentEl = document.getElementById('detailContent');
+    clearElement(contentEl);
+
+    var reporterBox = createEl('div', { style: 'grid-column: 1 / -1; background: #e8f0ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 8px;' });
+    reporterBox.appendChild(createEl('span', { text: 'Pelapor:', style: 'color: var(--primary2);' }));
+    appendBr(reporterBox);
+    reporterBox.appendChild(createEl('strong', { text: report.authorName, style: 'font-size: 16px; color: var(--primary);' }));
+    contentEl.appendChild(reporterBox);
+
+    var fields = [
+      { label: 'Waktu Kejadian:', value: report.incidentDate },
+      { label: 'Kategori:', value: report.category },
+      { label: 'Lokasi Kejadian:', value: report.location },
+      { label: 'Tingkat Risiko:', value: report.urgency }
+    ];
+    fields.forEach(function(f) {
+      var d = createEl('div');
+      d.appendChild(createEl('span', { text: f.label }));
+      appendBr(d);
+      d.appendChild(createEl('strong', { text: f.value }));
+      contentEl.appendChild(d);
+    });
+
+    var evidenceDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
+    evidenceDiv.appendChild(createEl('span', { text: 'Lampiran Bukti:' }));
+    appendBr(evidenceDiv);
+    evidenceDiv.appendChild(createEl('strong', { text: report.evidence || 'Tidak ada lampiran', style: 'color: var(--primary);' }));
+    contentEl.appendChild(evidenceDiv);
+
+    var descDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
+    descDiv.appendChild(createEl('span', { text: 'Kronologi Lengkap:' }));
+    appendBr(descDiv);
+    descDiv.appendChild(createEl('strong', { text: '"' + report.description + '"', style: 'font-weight: 500; font-size: 14px; line-height: 1.5; margin-top: 4px;' }));
+    contentEl.appendChild(descDiv);
+
+    var statusDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
+    statusDiv.appendChild(createEl('span', { text: 'Status Terakhir:' }));
+    appendBr(statusDiv);
+    statusDiv.appendChild(createEl('strong', { text: report.status, style: 'color: var(--primary);' }));
+    contentEl.appendChild(statusDiv);
 
     var selectStatus = report.status;
     if (selectStatus === 'Baru Masuk' || selectStatus === 'Direview' || selectStatus === 'Diproses' || selectStatus === 'Selesai') {
