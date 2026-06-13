@@ -52,8 +52,17 @@
     </div>
 
     <div class="auth-buttons hidden" id="navUser">
-      <a href="#dashboard" class="btn secondary">Dashboard Saya</a>
-      <button class="btn outline" id="navUserLogoutBtn">Keluar</button>
+      <div class="user-menu">
+        <button class="user-menu-trigger" id="userMenuTrigger" type="button">
+          <span class="user-avatar" id="userAvatar">U</span>
+          <span class="user-name" id="navUserName">User</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="user-dropdown hidden" id="userDropdown">
+          <a href="#dashboard" class="dropdown-item">Dashboard Saya</a>
+          <button class="dropdown-item" id="navUserLogoutBtn" type="button">Keluar</button>
+        </div>
+      </div>
     </div>
 
     <div class="auth-buttons hidden" id="navAdmin">

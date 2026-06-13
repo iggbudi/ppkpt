@@ -102,8 +102,20 @@ function setupEventListeners() {
   if (tabMahasiswa) tabMahasiswa.addEventListener('click', function() { switchLoginTab('mahasiswa'); });
   if (tabAdmin) tabAdmin.addEventListener('click', function() { switchLoginTab('admin'); });
 
+  var userMenuTrigger = document.getElementById('userMenuTrigger');
+  var userDropdown = document.getElementById('userDropdown');
+  if (userMenuTrigger && userDropdown) {
+    userMenuTrigger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      userDropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', function() {
+      userDropdown.classList.add('hidden');
+    });
+  }
+
   // Logout buttons (nav user and nav admin)
-  document.querySelectorAll('#navUser .btn.outline, #navAdmin .btn.outline').forEach(function(btn) {
+  document.querySelectorAll('#navUserLogoutBtn, #navAdminLogoutBtn').forEach(function(btn) {
     btn.addEventListener('click', handleLogout);
   });
 
@@ -203,6 +215,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.getElementById('welcomeMessage').classList.remove('hidden');
     document.getElementById('welcomeName').innerText = currentUser.name;
+    var userAvatar = document.getElementById('userAvatar');
+    if (userAvatar) userAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
+    var navUserName = document.getElementById('navUserName');
+    if (navUserName) navUserName.innerText = currentUser.name;
   }
 
   setupEventListeners();

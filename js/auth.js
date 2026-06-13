@@ -58,6 +58,10 @@
       document.getElementById('navAdmin').classList.remove('hidden');
       document.getElementById('welcomeMessage').classList.remove('hidden');
       document.getElementById('welcomeName').innerText = currentUser.name;
+      var userAvatar = document.getElementById('userAvatar');
+      if (userAvatar) userAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
+      var navUserName = document.getElementById('navUserName');
+      if (navUserName) navUserName.innerText = currentUser.name;
 
       window.location.hash = '#admin';
     } else {
@@ -70,6 +74,10 @@
       document.getElementById('userNameDisplay').innerText = 'Halo, ' + user + '!';
       document.getElementById('welcomeMessage').classList.remove('hidden');
       document.getElementById('welcomeName').innerText = currentUser.name;
+      var userAvatar = document.getElementById('userAvatar');
+      if (userAvatar) userAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
+      var navUserName = document.getElementById('navUserName');
+      if (navUserName) navUserName.innerText = currentUser.name;
 
       window.location.hash = '#dashboard';
     }
