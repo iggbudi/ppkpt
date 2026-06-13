@@ -2,9 +2,9 @@
   "name": "safesphere",
   "version": "1.0.0",
   "description": "SafeSphere - Pelaporan Anonim Anti-Perundungan",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server/index.js",
+    "test": "cd server && npm test"
   },
   "dependencies": {
     "express": "^4.18.0",
