@@ -10,6 +10,10 @@
   
 </head>
 <body>
+  <div id="demoBanner" class="demo-banner">
+    <span>MODE DEMO — SafeSphere adalah purwarupa kompetisi. Jangan masukkan data nyata atau pribadi.</span>
+    <button id="dismissBanner" class="demo-banner-close" type="button" aria-label="Tutup banner">&times;</button>
+  </div>
 
   <div id="discreetOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 999999;">
     <iframe src="https://id.wikipedia.org/wiki/Halaman_Utama" style="width: 100%; height: 100%; border: none;"></iframe>
@@ -189,7 +193,7 @@
       <section class="section card">
         <div class="card-header">
           <h2>Form Lapor Anonim</h2>
-          <p class="muted">Isi laporan secara jujur. Data Anda dilindungi dengan enkripsi end-to-end.</p>
+          <p class="muted">Isi laporan secara jujur. Data disimpan secara lokal untuk demo ini.</p>
         </div>
 
         <form id="reportForm" class="form-grid">
@@ -242,7 +246,7 @@
           </label>
 
           <div class="full" style="margin-top: 10px;">
-            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan Terenkripsi</button>
+            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan (Demo)</button>
           </div>
         </form>
 

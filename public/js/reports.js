@@ -6,7 +6,7 @@
     var resultBox = document.getElementById('reportResult');
     var btn = event.target.querySelector('button[type="submit"]');
 
-    btn.innerText = 'Mengamankan Laporan...';
+    btn.innerText = 'Mengirim Laporan (Demo)...';
     btn.style.opacity = '0.7';
 
     setTimeout(function() {
@@ -44,14 +44,14 @@
       if (window.location.hash === '#admin') updateDashboardUI();
       if (window.location.hash === '#dashboard') updateUserDashboardUI();
 
-      btn.innerText = 'Kirim Laporan Terenkripsi';
+      btn.innerText = 'Kirim Laporan (Demo)';
       btn.style.opacity = '1';
 
       resultBox.classList.remove('hidden');
       resultBox.classList.add('success');
-      resultBox.innerHTML = '<strong>Laporan Berhasil Terkirim & Terenkripsi!</strong><br><br>' +
+      resultBox.innerHTML = '<strong>Laporan Demo Berhasil Dikirim!</strong><br><br>' +
         'Nomor Pelacakan Anda: <b style="font-size:18px; color:var(--ink);">' + trackingID + '</b><br>' +
-        '<em>Harap simpan nomor ini. Data terenkripsi end-to-end.</em><br><br>' +
+        '<em>Simulasi: data disimpan di browser lokal.</em><br><br>' +
         '<button class="btn secondary" type="button" onclick="viewInvoiceFromSubmit(\'' + trackingID + '\')" style="margin-top: 10px;">Lacak Status Laporan Ini</button>';
 
       event.target.reset();
@@ -100,7 +100,7 @@
       '<div class="timeline-container">' +
       '<h4 style="margin: 0 0 16px 0;">Update Status Pelaporan</h4>' +
       '<ul class="timeline">' +
-      '<li class="timeline-item ' + (t1 || 'done') + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Laporan Diterima</h4><p>Laporan masuk ke sistem aman.</p></div></li>' +
+      '<li class="timeline-item ' + (t1 || 'done') + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Laporan Diterima</h4><p>Simulasi: laporan disimpan di browser lokal.</p></div></li>' +
       '<li class="timeline-item ' + t2 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tahap Review (Verifikasi)</h4><p>Tim admin memverifikasi kelayakan berkas.</p></div></li>' +
       '<li class="timeline-item ' + t3 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Sedang Diproses</h4><p>Kasus ditangani unit kemahasiswaan/Satgas PPKS.</p></div></li>' +
       '<li class="timeline-item ' + t4 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tindak Lanjut & Appointment</h4><p style="color: var(--primary); font-weight: 600; margin-top: 4px;">Info: ' + report.appointment + '</p></div></li>' +

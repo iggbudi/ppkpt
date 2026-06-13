@@ -123,7 +123,7 @@
     setTimeout(function() {
       btn.innerText = 'Kirim Kode OTP';
       btn.style.opacity = '1';
-      showTopSystemAlert('Kode OTP berhasil dikirim ke: ' + target);
+      showTopSystemAlert('Simulasi: OTP tidak benar-benar dikirim (demo)');
       closeForgotModal();
     }, 1500);
   };
@@ -214,7 +214,7 @@
     }
 
     var btn = event.target.querySelector('button[type="submit"]');
-    btn.innerText = 'Mendaftarkan...';
+    btn.innerText = 'Mendaftarkan (Simulasi)...';
     btn.style.opacity = '0.7';
 
     setTimeout(function() {
@@ -223,7 +223,7 @@
 
       resultBox.classList.remove('hidden');
       resultBox.classList.add('success');
-      resultBox.innerHTML = '<strong>Registrasi Berhasil!</strong> Akun Anda terverifikasi. Silakan menuju <a href="#login">Login</a>.';
+      resultBox.innerHTML = '<strong>Registrasi Demo Berhasil! (Simulasi)</strong> Akun Anda terverifikasi. Silakan menuju <a href="#login">Login</a>.';
       event.target.reset();
       document.getElementById('pwHelper').className = 'form-helper';
       document.getElementById('pwHelper').innerText = 'Minimal 6 karakter, 1 huruf kapital, 1 angka, dan 1 karakter spesial.';

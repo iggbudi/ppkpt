@@ -185,9 +185,22 @@ function setupEventListeners() {
   // Social login buttons (placeholder)
   document.querySelectorAll('.btn-social').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      showTopSystemAlert('Fitur ini akan segera tersedia.');
+      showTopSystemAlert('Simulasi: fitur ini belum aktif');
     });
   });
+
+  // Demo banner dismiss
+  var demoBanner = document.getElementById('demoBanner');
+  var dismissBanner = document.getElementById('dismissBanner');
+  if (demoBanner && dismissBanner) {
+    if (sessionStorage.getItem('bannerDismissed')) {
+      demoBanner.style.display = 'none';
+    }
+    dismissBanner.addEventListener('click', function() {
+      demoBanner.style.display = 'none';
+      sessionStorage.setItem('bannerDismissed', 'true');
+    });
+  }
 
   // Chat button (placeholder)
   var chatBtn = document.querySelector('#page-chat .btn-primary');
