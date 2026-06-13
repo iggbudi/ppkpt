@@ -102,7 +102,7 @@
       '<div class="timeline-container">' +
       '<h4 style="margin: 0 0 16px 0;">Update Status Pelaporan</h4>' +
       '<ul class="timeline">' +
-      '<li class="timeline-item ' + (t1 || 'done') + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Laporan Diterima</h4><p>Simulasi: laporan disimpan di browser lokal.</p></div></li>' +
+      '<li class="timeline-item ' + (t1 || 'done') + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Laporan Diterima</h4><p>Laporan disimpan di server demo.</p></div></li>' +
       '<li class="timeline-item ' + t2 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tahap Review (Verifikasi)</h4><p>Tim admin memverifikasi kelayakan berkas.</p></div></li>' +
       '<li class="timeline-item ' + t3 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Sedang Diproses</h4><p>Kasus ditangani unit kemahasiswaan/Satgas PPKS.</p></div></li>' +
       '<li class="timeline-item ' + t4 + '"><div class="timeline-marker"></div><div class="timeline-content"><h4>Tindak Lanjut & Appointment</h4><p style="color: var(--primary); font-weight: 600; margin-top: 4px;">Info: ' + report.appointment + '</p></div></li>' +
