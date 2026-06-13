@@ -23,29 +23,40 @@
     });
   };
 
-  window.seedDemoData = function() {
-    var dummies = [
-      { id: 'SSF-2026-1001', cat: 'Cyberbullying', loc: 'Grup WA Kelas', urg: 'Tinggi', date: '2026-06-02', status: 'Baru Masuk', desc: 'Saya diejek dan foto saya disebar di grup tanpa izin.', evidence: 'demo-bukti.png', appointment: 'Menunggu proses peninjauan awal.', createdAt: Date.now() - 20000, author: 'demo_user', displayName: 'D***' },
-      { id: 'SSF-2026-1002', cat: 'Verbal', loc: 'Ruang Kelas', urg: 'Sedang', date: '2026-06-05', status: 'Direview', desc: 'Saya sering dihina soal penampilan saat presentasi.', evidence: 'Tidak ada lampiran', appointment: 'Sedang dalam peninjauan bukti oleh Admin.', createdAt: Date.now() - 15000, author: 'demo_user', displayName: 'demo_user' },
-      { id: 'SSF-2026-1003', cat: 'Sosial', loc: 'Lingkungan Kampus', urg: 'Rendah', date: '2026-06-06', status: 'Selesai', desc: 'Teman saya dikucilkan dari kelompok tugas.', evidence: 'Tidak ada lampiran', appointment: 'Telah dilakukan mediasi dan edukasi pencegahan.', createdAt: Date.now() - 10000, author: 'demo_user', displayName: 'D***' },
-      { id: 'SSF-2026-1004', cat: 'Fisik', loc: 'Parkiran Kampus', urg: 'Tinggi', date: '2026-06-08', status: 'Diproses', desc: 'Ada tindakan represif dan ancaman jika saya melapor.', evidence: 'rekaman_suara.mp3', appointment: 'Jadwal Konseling: Kasus dialihkan ke Satgas PPKS.', createdAt: Date.now() - 5000, author: 'demo_user', displayName: 'demo_user' }
-    ];
-
-    reportData = dummies.slice();
-    Storage.save('reports', reportData);
-    updateDashboardUI();
-    showTopSystemAlert('Data demo berhasil dimuat!');
-  };
-
-  window.clearAllData = function() {
-    if (confirm('Apakah Anda yakin ingin menghapus semua data laporan demo?')) {
-      reportData = [];
-      Storage.remove('reports');
-      updateDashboardUI();
+  window.seedDemoData = async function() {
+    try {
+      var response = await fetch('/api/reports/seed', { method: 'POST' });
+      if (response.ok) {
+        showTopSystemAlert('Data demo berhasil dimuat!');
+        updateDashboardUI();
+      }
+    } catch (err) {
+      showTopSystemAlert('Gagal memuat data demo');
     }
   };
 
-  window.updateDashboardUI = function() {
+  window.clearAllData = async function() {
+    if (!confirm('Hapus semua data?')) return;
+    try {
+      var response = await fetch('/api/reports', { method: 'DELETE' });
+      if (response.ok) {
+        reportData = [];
+        updateDashboardUI();
+      }
+    } catch (err) {
+      showTopSystemAlert('Gagal menghapus data');
+    }
+  };
+
+  window.updateDashboardUI = async function() {
+    try {
+      var response = await fetch('/api/reports');
+      if (response.ok) {
+        var data = await response.json();
+        reportData = data.reports;
+      }
+    } catch (err) {}
+
     var total = reportData.length;
     var tinggi = reportData.filter(function(r) { return r.urg === 'Tinggi'; }).length;
     var selesai = reportData.filter(function(r) { return r.status === 'Selesai'; }).length;
@@ -128,21 +139,25 @@
     currentDetailId = null;
   };
 
-  window.saveReportStatus = function() {
+  window.saveReportStatus = async function() {
     if (!currentDetailId) return;
-    var report = reportData.find(function(r) { return r.id === currentDetailId; });
-    if (report) {
-      var newStatus = document.getElementById('updateStatusSelect').value;
-      var newAppt = sanitizeInput(document.getElementById('updateAppointment').value) || 'Menunggu pembaruan lanjutan...';
+    try {
+      var response = await fetch('/api/reports/' + currentDetailId + '/status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: document.getElementById('updateStatusSelect').value,
+          appointment: sanitizeInput(document.getElementById('updateAppointment').value)
+        })
+      });
 
-      report.status = newStatus;
-      report.appointment = newAppt;
-      Storage.save('reports', reportData);
-      updateDashboardUI();
-      updateUserDashboardUI();
-
-      closeReportDetailModal();
-      showTopSystemAlert('Berhasil! Status terupdate secara real-time.');
+      if (response.ok) {
+        closeReportDetailModal();
+        showTopSystemAlert('Status berhasil diupdate!');
+        updateDashboardUI();
+      }
+    } catch (err) {
+      showTopSystemAlert('Gagal update status');
     }
   };
 

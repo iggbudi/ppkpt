@@ -1,48 +1,41 @@
 (function() {
   window.currentViewedInvoiceId = null;
 
-  window.submitReport = function(event) {
+  window.submitReport = async function(event) {
     event.preventDefault();
     var resultBox = document.getElementById('reportResult');
     var btn = event.target.querySelector('button[type="submit"]');
 
-    btn.innerText = 'Mengirim Laporan (Demo)...';
+    btn.innerText = 'Mengirim Laporan...';
     btn.style.opacity = '0.7';
 
-    setTimeout(function() {
-      var trackingID = 'SSF-2026-' + Math.floor(1000 + Math.random() * 9000);
-      var evidenceInput = document.getElementById('evidence');
-      var evidenceName = 'Tidak ada lampiran';
-      if (evidenceInput.files.length > 0) {
-        evidenceName = sanitizeInput(evidenceInput.files[0].name);
+    try {
+      var response = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: document.getElementById('category').value,
+          location: sanitizeInput(document.getElementById('location').value),
+          urgency: document.getElementById('urgent').value,
+          incidentDate: document.getElementById('incidentDate').value,
+          description: sanitizeInput(document.getElementById('description').value),
+          evidence: document.getElementById('evidence').files.length > 0
+            ? sanitizeInput(document.getElementById('evidence').files[0].name)
+            : 'Tidak ada lampiran',
+          isAnonymous: document.getElementById('isAnonymous').checked
+        })
+      });
+
+      var data = await response.json();
+
+      if (!response.ok) {
+        resultBox.classList.remove('hidden');
+        resultBox.classList.add('error');
+        resultBox.innerText = data.error || 'Gagal mengirim laporan';
+        btn.innerText = 'Kirim Laporan (Demo)';
+        btn.style.opacity = '1';
+        return;
       }
-
-      var checkboxAnon = document.getElementById('isAnonymous');
-      var isAnon = checkboxAnon ? checkboxAnon.checked : true;
-
-      var originalName = currentUser ? currentUser.name : 'Anonim';
-      var maskedName = originalName !== 'Anonim' ? originalName.charAt(0).toUpperCase() + '***' : 'Anonim';
-
-      var newReport = {
-        id: trackingID,
-        cat: document.getElementById('category').value,
-        loc: sanitizeInput(document.getElementById('location').value),
-        urg: document.getElementById('urgent').value,
-        date: document.getElementById('incidentDate').value,
-        status: 'Baru Masuk',
-        desc: sanitizeInput(document.getElementById('description').value),
-        evidence: evidenceName,
-        appointment: 'Menunggu proses peninjauan awal dari tim Satgas.',
-        createdAt: Date.now(),
-        author: originalName,
-        displayName: isAnon ? maskedName : originalName
-      };
-
-      reportData.unshift(newReport);
-      Storage.save('reports', reportData);
-
-      if (window.location.hash === '#admin') updateDashboardUI();
-      if (window.location.hash === '#dashboard') updateUserDashboardUI();
 
       btn.innerText = 'Kirim Laporan (Demo)';
       btn.style.opacity = '1';
@@ -50,12 +43,17 @@
       resultBox.classList.remove('hidden');
       resultBox.classList.add('success');
       resultBox.innerHTML = '<strong>Laporan Demo Berhasil Dikirim!</strong><br><br>' +
-        'Nomor Pelacakan Anda: <b style="font-size:18px; color:var(--ink);">' + trackingID + '</b><br>' +
-        '<em>Simulasi: data disimpan di browser lokal.</em><br><br>' +
-        '<button class="btn secondary" type="button" onclick="viewInvoiceFromSubmit(\'' + trackingID + '\')" style="margin-top: 10px;">Lacak Status Laporan Ini</button>';
+        'Nomor Pelacakan: <b>' + data.report.id + '</b><br>' +
+        '<button class="btn secondary" type="button" onclick="viewInvoiceFromSubmit(\'' + data.report.id + '\')" style="margin-top: 10px;">Lacak Status</button>';
 
       event.target.reset();
-    }, 1500);
+    } catch (err) {
+      btn.innerText = 'Kirim Laporan (Demo)';
+      btn.style.opacity = '1';
+      resultBox.classList.remove('hidden');
+      resultBox.classList.add('error');
+      resultBox.innerText = 'Koneksi gagal. Coba lagi.';
+    }
   };
 
   window.viewInvoiceFromSubmit = function(id) {
