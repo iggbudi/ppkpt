@@ -1,0 +1,5 @@
+ftp.txt
+.env
+.env.*
+*.log
+node_modules/

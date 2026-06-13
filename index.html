@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SafeSphere - Pelaporan Anonim Anti-Perundungan</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
+
+  <div id="discreetOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 999999;">
+    <iframe src="https://id.wikipedia.org/wiki/Halaman_Utama" style="width: 100%; height: 100%; border: none;"></iframe>
+    
+    <button onclick="deactivateDiscreetMode()" style="position: absolute; top: 20px; right: 24px; width: 44px; height: 44px; background: #ffffff; color: #64748b; border: 1px solid #cbd5e1; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 18px; font-weight: bold; cursor: pointer; display: grid; place-items: center; z-index: 10; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'; this.style.color='#0f172a'" onmouseout="this.style.background='#ffffff'; this.style.color='#64748b'">
+      ✕
+    </button>
+  </div>
+
+  <button id="quickEscapeBtn" onclick="activateDiscreetMode()" style="position: fixed; bottom: 24px; right: 24px; z-index: 9999; background: #dc2626; color: white; border: none; border-radius: 50px; padding: 12px 20px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 10px 25px rgba(220, 38, 38, 0.4); transition: transform 0.2s; display: flex; align-items: center; gap: 8px;">
+    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+    </svg>
+    Tutup Cepat (Esc 2x)
+  </button>
+
+  <header class="topbar">
+    <a href="#beranda" class="brand">
+      <div class="logo">SS</div>
+      <strong>SafeSphere</strong>
+    </a>
+    
+    <nav class="main-nav">
+      <a href="#beranda" class="active">Beranda</a>
+      <a href="#lapor">Lapor Anonim</a>
+      <a href="#edukasi">Edukasi</a>
+      <a href="#kontak">Kontak Darurat</a>
+      <a href="#chat">Chat Ahli</a>
+    </nav>
+
+    <div class="auth-buttons" id="navGuest">
+      <a href="#login" class="btn outline">Masuk</a>
+      <a href="#register" class="btn primary">Daftar Baru</a>
+    </div>
+
+    <div class="auth-buttons hidden" id="navUser">
+      <a href="#dashboard" class="btn secondary">Dashboard Saya</a>
+      <button class="btn outline" onclick="handleLogout()">Keluar</button>
+    </div>
+
+    <div class="auth-buttons hidden" id="navAdmin">
+      <a href="#admin" class="btn danger" style="color:white; background:#dc2626;">Dashboard Admin</a>
+      <button class="btn outline" onclick="handleLogout()">Keluar</button>
+    </div>
+  </header>
+
+  <main>
+
+    <div id="page-beranda" class="page active">
+      <section class="hero section">
+        <div class="hero-text">
+          <h3 id="welcomeMessage" class="hidden" style="color: var(--primary); font-weight: 600; margin-top: 0; margin-bottom: 12px; font-size: 20px;">Selamat Datang, <span id="welcomeName"></span>!</h3>
+          <h1>Ruang Aman Kita, <span style="color: var(--primary);">Tanpa Perundungan</span></h1>
+          <p>SafeSphere membantu mahasiswa membuat laporan anonim, memantau status laporan, dan mendapatkan edukasi anti-perundungan secara interaktif.</p>
+          <div class="cta-row">
+            <a class="btn primary" href="#lapor">Laporkan Sekarang</a>
+            <a class="btn secondary" href="#edukasi">Mulai Belajar</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <h3>Keunggulan SafeSphere</h3>
+          <div class="feature-grid">
+            <div><b>Anonim</b><span>Identitas pelapor dilindungi.</span></div>
+            <div><b>Terenkripsi</b><span>Data sensitif disamarkan.</span></div>
+            <div><b>Edukasi Interaktif</b><span>Materi & Kuis kesadaran.</span></div>
+            <div><b>Tracking Cepat</b><span>Status laporan dipantau realtime.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sdg-section">
+        <div class="sdg-overline">Dukungan Global</div>
+        <h2>Selaras dengan Tujuan SDGs</h2>
+        <div class="sdg-grid">
+          
+          <div class="sdg-card">
+            <svg class="sdg-icon-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              <path d="M16 9h-3V6h-2v3H8v2h3v3h2v-3h3V9z" fill="#1e293b"/>
+            </svg>
+            <h3>SDG 3</h3>
+            <p>Kesehatan & Kesejahteraan</p>
+          </div>
+
+          <div class="sdg-card">
+            <svg class="sdg-icon-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="6" r="3" />
+              <path d="M4 10.5C4 10.5 8 9 12 11c4-2 8-.5 8-.5v9s-4-1.5-8 .5c-4-2-8-.5-8-.5v-9z" />
+            </svg>
+            <h3>SDG 4</h3>
+            <p>Pendidikan Berkualitas</p>
+          </div>
+
+          <div class="sdg-card">
+            <svg class="sdg-icon-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L11 4H4v2h16V4h-7L12 2z"/>
+              <path d="M3 7l-2 7h6L5 7H3zm14 0l-2 7h6l-2-7h-2z"/>
+              <path d="M11 7v10H8v2h8v-2h-3V7h-2z"/>
+            </svg>
+            <h3>SDG 16</h3>
+            <p>Perdamaian & Keadilan</p>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
+    <div id="page-lapor" class="page">
+      <section class="section card">
+        <div class="card-header">
+          <h2>Form Lapor Anonim</h2>
+          <p class="muted">Isi laporan secara jujur. Data Anda dilindungi dengan enkripsi end-to-end.</p>
+        </div>
+
+        <form id="reportForm" class="form-grid" onsubmit="submitReport(event)">
+          <label for="category">Jenis Kejadian
+            <select id="category" required>
+              <option value="">Pilih kategori perundungan</option>
+              <option value="Verbal">Verbal (Mengejek, Menghina)</option>
+              <option value="Sosial">Sosial (Mengucilkan, Fitnah)</option>
+              <option value="Cyberbullying">Cyberbullying (Media Sosial)</option>
+              <option value="Fisik">Fisik (Memukul, Mendorong)</option>
+              <option value="Seksual">Kekerasan/Pelecehan Seksual</option>
+            </select>
+          </label>
+
+          <label for="location">Lokasi Kejadian
+            <input id="location" type="text" placeholder="Contoh: Gedung Fakultas Vokasi, Grup WA Angkatan" required>
+          </label>
+
+          <label for="incidentDate">Waktu Kejadian
+            <input id="incidentDate" type="date" required>
+          </label>
+
+          <label for="urgent">Tingkat Urgensi
+            <select id="urgent" required>
+              <option value="Rendah">Rendah (Hanya Melapor)</option>
+              <option value="Sedang">Sedang (Butuh Konseling)</option>
+              <option value="Tinggi">Tinggi (Butuh Tindakan Cepat/Fisik)</option>
+            </select>
+          </label>
+
+          <label class="full" for="description">Ceritakan Kronologi Kejadian
+            <textarea id="description" placeholder="Ceritakan secara detail. Sistem kami mendeteksi kata kunci sensitif untuk memprioritaskan keamanan Anda..." required oninput="analyzeSentiment()"></textarea>
+            
+            <div id="sentimentContainer" style="margin-top: 10px; display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--line);">
+              <div style="flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                <div id="sentimentBar" style="height: 100%; width: 0%; background: var(--ok); transition: width 0.4s ease, background-color 0.4s ease;"></div>
+              </div>
+              <span id="sentimentText" style="font-size: 13px; font-weight: 600; color: var(--muted); min-width: 150px; text-align: right;">Menganalisis teks...</span>
+            </div>
+          </label>
+
+          <label class="full" for="evidence">Upload Bukti (Opsional)
+            <input id="evidence" type="file" accept="image/*,.pdf,.doc,.docx">
+            <small class="muted" style="display:block; margin-top:4px;">Format didukung: JPG, PNG, PDF. Maks 5MB.</small>
+          </label>
+
+          <label class="full" for="isAnonymous" style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 14px; border: 1px dashed var(--primary); border-radius: var(--radius-sm); cursor: pointer;">
+            <input type="checkbox" id="isAnonymous" checked style="width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--primary);">
+            <span style="font-weight: 600; font-size: 14px; color: var(--primary);">Kirim sebagai Anonim (Samarkan nama saya jadi 1 huruf)</span>
+          </label>
+
+          <div class="full" style="margin-top: 10px;">
+            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan Terenkripsi</button>
+          </div>
+        </form>
+
+        <div id="reportResult" class="result hidden"></div>
+      </section>
+    </div>
+
+    <div id="page-edukasi" class="page">
+      <section class="section card">
+        <div class="card-header">
+          <h2>Edukasi & Kuis Anti-Perundungan</h2>
+          <p class="muted">Tingkatkan pemahaman Anda untuk menciptakan kampus yang aman, nyaman, dan inklusif (SDG 4 & 16).</p>
+        </div>
+
+        <div class="edu-container">
+          <div class="edu-grid">
+            <article>
+              <h3>Kenali Jenis Perundungan</h3>
+              <p>Perundungan bukan hanya fisik. Hinaan verbal, pengucilan sosial, dan teror di media sosial (cyberbullying) juga merupakan tindak pidana perundungan yang berdampak fatal pada mental korban.</p>
+            </article>
+            <article>
+              <h3>Dampak Psikologis Korban</h3>
+              <p>Korban perundungan rentan mengalami kecemasan (anxiety), depresi, penurunan prestasi akademik, hingga trauma berkepanjangan. Empati Anda bisa menyelamatkan mereka.</p>
+            </article>
+            <article>
+              <h3>Tindakan Sebagai Saksi (Bystander)</h3>
+              <p>Jangan hanya diam. Simpan bukti, berikan dukungan moral kepada korban, dan laporkan secara anonim melalui sistem SafeSphere agar kampus bisa menindak tegas pelaku.</p>
+            </article>
+          </div>
+
+          <div class="quiz" id="gamificationContainer">
+            <div class="quiz-header">
+              <span class="quiz-badge">Simulasi Interaktif</span>
+              <h3>Skenario Saksi Mata (Bystander)</h3>
+            </div>
+            
+            <div id="gameScene" style="transition: opacity 0.3s ease;">
+              <p id="gameText" style="font-size: 16px; font-weight: 500; margin-bottom: 20px; line-height: 1.6;">Memuat simulasi...</p>
+              
+              <div id="gameOptions" class="quiz-options">
+                </div>
+              
+              <div id="gameFeedback" class="result hidden" style="margin-top: 16px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="page-kontak" class="page">
+      <section class="section card">
+        <div class="card-header">
+          <h2>Kontak Darurat Kampus</h2>
+          <p class="muted">Hubungi nomor berikut jika terjadi situasi perundungan atau kekerasan yang mengancam keselamatan fisik.</p>
+        </div>
+        <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+          <div><b>Satgas PPKS Kampus</b><span style="color:var(--primary); font-weight:bold;">0811-XXXX-XXXX</span></div>
+          <div><b>Keamanan / Satpam</b><span style="color:var(--primary); font-weight:bold;">021-XXXX-XXXX</span></div>
+          <div><b>Layanan Psikologi Mhs</b><span style="color:var(--primary); font-weight:bold;">0822-XXXX-XXXX</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div id="page-chat" class="page">
+      <section class="section card">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+          <div>
+            <h2>Chat Bersama Ahli</h2>
+            <p class="muted">Konsultasi secara anonim dengan psikolog atau konselor berlisensi dari pihak kampus.</p>
+          </div>
+          <button class="btn primary" onclick="alert('Membuka sesi Chat Aman...')">Mulai Sesi Chat</button>
+        </div>
+        <div style="text-align:center; padding: 40px 20px; background:#f8fafc; border-radius:12px; border:1px dashed var(--line);">
+          <p style="color:var(--muted); margin:0;">Silakan klik tombol "Mulai Sesi Chat" untuk terhubung dengan konselor yang sedang online. Identitas Anda akan tetap disamarkan (Anonim).</p>
+        </div>
+      </section>
+    </div>
+
+    <div id="page-register" class="page">
+      <section class="section card" style="max-width: 700px; margin-left: auto; margin-right: auto;">
+        <div class="card-header">
+          <h2>Buat Akun SafeSphere</h2>
+          <p class="muted">Daftar untuk mengakses fitur pelaporan dan konsultasi yang lebih terpersonalisasi.</p>
+        </div>
+
+        <form id="registerForm" class="form-grid" onsubmit="handleRegister(event)">
+          
+          <label class="full" for="regName">Nama Lengkap
+            <input id="regName" type="text" placeholder="Masukkan nama lengkap Anda" required>
+          </label>
+
+          <label class="full" for="regStatus">Status Pengguna
+            <select id="regStatus" onchange="toggleStatusFields()" required>
+              <option value="">Pilih Status Anda...</option>
+              <option value="Mahasiswa">Mahasiswa</option>
+              <option value="Umum">Umum / Pekerja</option>
+              <option value="Lainnya">Lain-lain</option>
+            </select>
+          </label>
+
+          <label class="full" id="containerInstansi" style="display:none;">
+            <span id="labelInstansi">Nama Universitas / Tempat Kerja</span>
+            <input id="regInstansi" type="text" placeholder="...">
+          </label>
+
+          <label class="full" id="containerPeran" style="display:none;">
+            <span id="labelPeran">Fakultas / Role Pekerjaan</span>
+            <input id="regPeran" type="text" placeholder="...">
+          </label>
+
+          <label class="full" for="regEmail">Email
+            <input id="regEmail" type="email" placeholder="email@contoh.com" required>
+          </label>
+
+          <label class="full" for="regPassword">Password
+            <input id="regPassword" type="password" placeholder="Buat password yang kuat" required oninput="checkPasswordStrength()">
+            <span id="pwHelper" class="form-helper">Minimal 6 karakter, 1 huruf kapital, 1 angka, dan 1 karakter spesial (@,#,$,dll).</span>
+          </label>
+
+          <label class="full" for="regConfirmPassword">Konfirmasi Password
+            <input id="regConfirmPassword" type="password" placeholder="Ketik ulang password" required>
+            <span id="pwMatchHelper" class="form-helper"></span>
+          </label>
+          <div id="registerError" class="result error hidden" style="margin-bottom: 20px; text-align: left;"></div>
+          <div class="full" style="margin-top: 10px;">
+            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Daftar Sekarang</button>
+          </div>
+        </form>
+
+        <div id="registerResult" class="result hidden"></div>
+      </section>
+    </div>
+
+    <div id="page-login" class="page">
+      <section class="section card" style="max-width: 500px; margin-left: auto; margin-right: auto; text-align: center;">
+        <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
+          <h2>Masuk ke Akun</h2>
+        </div>
+
+        <div style="display: flex; border-bottom: 1px solid var(--line); margin-bottom: 24px; margin-top: 16px;">
+          <button id="tabMahasiswa" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid var(--primary); color: var(--primary);" onclick="switchLoginTab('mahasiswa')">Mahasiswa / Umum</button>
+          <button id="tabAdmin" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid transparent; color: var(--muted);" onclick="switchLoginTab('admin')">Admin Kampus</button>
+        </div>
+
+        <p id="loginSubtitle" class="muted" style="margin-bottom: 24px;">Silakan masukkan email/nama dan password Anda untuk melanjutkan.</p>
+        <div id="loginError" class="result error hidden" style="margin-bottom: 20px; text-align: left;"></div>
+
+        <form class="form-grid" onsubmit="handleMainLogin(event)">
+          <label class="full" style="text-align: left;">Nama / Email
+            <input type="text" id="loginEmail" placeholder="Masukkan nama atau email" required>
+          </label>
+          <label class="full" style="text-align: left;">Password
+            <input type="password" id="loginPass" placeholder="Masukkan password" required>
+            <div style="text-align: right; margin-top: 8px;">
+              <a href="#" onclick="openForgotModal(event)" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600;">Lupa Password?</a>
+            </div>
+          </label>
+          <div class="full" style="margin-top: 10px;">
+            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Masuk</button>
+          </div>
+        </form>
+
+        <div class="divider">
+          <span>atau masuk dengan</span>
+        </div>
+
+        <div class="social-login">
+          <button class="btn-social btn-google" onclick="alert('Membuka Login Google...')">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Lanjutkan dengan Google
+          </button>
+          <button class="btn-social btn-instagram" onclick="alert('Membuka Login Instagram...')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+            Lanjutkan dengan Instagram
+          </button>
+          <button class="btn-social btn-email" onclick="alert('Kirim Magic Link ke Email...')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Masuk dengan Email / Link
+          </button>
+        </div>
+      </section>
+
+      <div id="forgotPasswordModal" class="modal">
+        <div class="modal-content">
+          <span class="close-modal" onclick="closeForgotModal()">&times;</span>
+          <h2 style="margin-top: 10px;">Lupa Password?</h2>
+          <p class="muted">Masukkan nomor HP atau Email yang terdaftar. Kami akan mengirimkan kode OTP untuk mereset password Anda.</p>
+          <div class="form-grid" style="display:block; text-align:left; margin-top: 20px;">
+            <label>No. HP / Email
+              <input type="text" id="otpTarget" placeholder="Contoh: 0812xxx atau email@contoh.com" required>
+            </label>
+            <button class="btn primary full" style="margin-top: 16px; padding: 12px;" onclick="sendOTP(event)">Kirim Kode OTP</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-admin" class="page">
+      <section class="section card">
+        <div class="card-header">
+          <h2>Dashboard Admin Kampus</h2>
+          <p class="muted">Akses khusus pengelola data pelaporan SafeSphere.</p>
+        </div>
+
+        <div id="adminDashboardArea">
+          
+          <div class="dash-actions">
+            <button class="btn-light-primary" onclick="seedDemoData()">Isi Data Demo</button>
+            <button class="btn-light-danger" onclick="clearAllData()">Reset Data</button>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric-card">
+              <strong id="m-total">0</strong>
+              <span>Total Laporan</span>
+            </div>
+            <div class="metric-card">
+              <strong id="m-tinggi">0</strong>
+              <span>Risiko Tinggi</span>
+            </div>
+            <div class="metric-card">
+              <strong id="m-selesai">0</strong>
+              <span>Selesai</span>
+            </div>
+            <div class="metric-card">
+              <strong id="m-dominan">-</strong>
+              <span>Kategori Dominan</span>
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <canvas id="categoryChart" height="80"></canvas>
+          </div>
+
+          <div class="card-header" style="margin-top: 32px; padding-bottom: 12px;">
+            <h2 style="font-size: 20px;">Daftar Laporan Terkini</h2>
+          </div>
+          
+          <div id="adminReportList" class="report-list">
+            <p class="muted" style="text-align:center; padding:20px;">Belum ada data laporan. Klik "Isi Data Demo".</p>
+          </div>
+
+        </div>
+      </section>
+
+      <div id="reportDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 600px; text-align: left;">
+          <span class="close-modal" onclick="closeReportDetailModal()">&times;</span>
+          <h2 style="margin-top: 10px; color: var(--primary);" id="detailTitle">Detail Laporan</h2>
+          
+          <div class="invoice-details" id="detailContent" style="margin-top: 20px;">
+            </div>
+
+          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line);">
+            <label style="font-weight: 600; display: block; margin-bottom: 8px; color: var(--ink);">Update Status Kasus</label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <select id="updateStatusSelect" style="padding: 12px; border-radius: 8px; border: 1px solid var(--line); flex: 1; outline: none; background: #f8fafc; font-size: 14px;">
+                <option value="Baru Masuk">Baru Masuk</option>
+                <option value="Direview">Tahap Review (Verifikasi)</option>
+                <option value="Diproses">Sedang Diproses</option>
+                <option value="Selesai">Selesai</option>
+              </select>
+            </div>
+            
+            <label style="font-weight: 600; display: block; margin-top: 16px; margin-bottom: 8px; color: var(--ink);">Jadwal Tindak Lanjut / Catatan Admin</label>
+            <input type="text" id="updateAppointment" placeholder="Contoh: Jadwal mediasi 15 Juni 2026..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--line); outline: none; background: #f8fafc; font-size: 14px;">
+            
+            <button class="btn primary full" onclick="saveReportStatus()" style="margin-top: 16px;">Simpan Perubahan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="page-dashboard" class="page">
+      <section class="section card" style="max-width: 900px; margin-left: auto; margin-right: auto;">
+        
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 id="userNameDisplay">Halo, Mahasiswa!</h2>
+            <p class="muted">Pantau status laporan yang pernah Anda buat di SafeSphere.</p>
+          </div>
+          <a href="#lapor" class="btn primary">Buat Laporan Baru</a>
+        </div>
+
+        <div style="background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 24px;">
+          <h3 style="margin-top: 0; color: var(--ink);">Riwayat Laporan Anda</h3>
+          <p class="muted" style="margin-bottom: 16px;">Daftar di bawah ini adalah laporan terenkripsi milik Anda. Klik pada salah satu laporan untuk melihat detail dan *invoice* pembaruan status secara real-time.</p>
+          
+          <div id="userReportList" class="report-list">
+            </div>
+        </div>
+
+        <div id="invoiceResult" class="invoice-box hidden">
+          </div>
+
+      </section>
+    </div>
+
+    <div id="a11yWidget" style="position: fixed; bottom: 24px; left: 24px; z-index: 9998;">
+    
+    <div id="a11yMenu" class="hidden" style="position: absolute; bottom: 60px; left: 0; background: white; padding: 16px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid var(--line); width: 220px; display: flex; flex-direction: column; gap: 10px;">
+      <h4 style="margin: 0 0 4px 0; font-size: 15px; color: var(--ink);">Aksesibilitas</h4>
+      <p style="margin: 0 0 12px 0; font-size: 12px; color: var(--muted); line-height: 1.4;">Sesuaikan tampilan untuk kenyamanan Anda.</p>
+      
+      <button onclick="toggleA11yFeature('high-contrast')" class="btn outline" style="justify-content: flex-start; font-size: 13px;">👁️ Kontras Tinggi</button>
+      <button onclick="toggleA11yFeature('large-text')" class="btn outline" style="justify-content: flex-start; font-size: 13px;">🔎 Perbesar Teks</button>
+      <button onclick="toggleA11yFeature('dyslexia')" class="btn outline" style="justify-content: flex-start; font-size: 13px;">📖 Ramah Disleksia</button>
+    </div>
+
+    <button onclick="toggleA11yMenu()" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); cursor: pointer; display: grid; place-items: center; transition: transform 0.2s;" aria-label="Buka Menu Aksesibilitas">
+      <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 2a8 8 0 100 16 8 8 0 000-16zm0 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-4 4h8v2h-3v6h-2v-6H8v-2z"/>
+      </svg>
+    </button>
+  </div>
+
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Tim Kompetisi Vokasi OLIVIA XI. Mengembangkan inovasi digital berkelanjutan.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
