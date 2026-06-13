@@ -28,75 +28,54 @@
     }
   };
 
-  window.handleMainLogin = function(event) {
+  window.handleMainLogin = async function(event) {
     event.preventDefault();
-    var user = sanitizeInput(document.getElementById('loginEmail').value);
+    var username = sanitizeInput(document.getElementById('loginEmail').value);
     var pass = document.getElementById('loginPass').value;
     var errorBox = document.getElementById('loginError');
 
     errorBox.classList.add('hidden');
     errorBox.innerText = '';
 
-    if (!user || !pass) {
+    if (!username || !pass) {
       errorBox.classList.remove('hidden');
-      errorBox.innerText = 'Nama/Email dan Password tidak boleh kosong!';
+      errorBox.innerText = 'Username dan Password tidak boleh kosong!';
       return;
     }
 
-    if (currentLoginMode === 'admin' || user === 'admin') {
-      if (user !== 'admin' || pass !== 'safesphere') {
+    try {
+      var response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: pass })
+      });
+
+      var data = await response.json();
+
+      if (!response.ok) {
         errorBox.classList.remove('hidden');
-        errorBox.innerHTML = '<strong>AKSES DITOLAK:</strong> Kredensial Admin salah.';
+        errorBox.innerText = data.error || 'Login gagal';
         return;
       }
 
-      currentUser = { role: 'admin', name: 'Admin PPKS' };
-      Storage.save('currentUser', currentUser);
+      currentUser = data.user;
+      updateNavForUser(currentUser);
+      window.location.hash = currentUser.role === 'admin' ? '#admin' : '#dashboard';
 
-      document.getElementById('sidebarGuest').classList.add('hidden');
-      document.getElementById('sidebarUser').classList.add('hidden');
-      document.getElementById('sidebarAdmin').classList.remove('hidden');
-      document.getElementById('welcomeMessage').classList.remove('hidden');
-      document.getElementById('welcomeName').innerText = currentUser.name;
-      var userAvatar = document.getElementById('userAvatar');
-      if (userAvatar) userAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
-      var navUserName = document.getElementById('navUserName');
-      if (navUserName) navUserName.innerText = currentUser.name;
-
-      window.location.hash = '#admin';
-    } else {
-      currentUser = { role: 'mahasiswa', name: user };
-      Storage.save('currentUser', currentUser);
-
-      document.getElementById('sidebarGuest').classList.add('hidden');
-      document.getElementById('sidebarAdmin').classList.add('hidden');
-      document.getElementById('sidebarUser').classList.remove('hidden');
-      document.getElementById('userNameDisplay').innerText = 'Halo, ' + user + '!';
-      document.getElementById('welcomeMessage').classList.remove('hidden');
-      document.getElementById('welcomeName').innerText = currentUser.name;
-      var userAvatar = document.getElementById('userAvatar');
-      if (userAvatar) userAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
-      var navUserName = document.getElementById('navUserName');
-      if (navUserName) navUserName.innerText = currentUser.name;
-
-      window.location.hash = '#dashboard';
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPass').value = '';
+    } catch (err) {
+      errorBox.classList.remove('hidden');
+      errorBox.innerText = 'Koneksi gagal. Coba lagi.';
     }
-
-    document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPass').value = '';
   };
 
-  window.handleLogout = function() {
+  window.handleLogout = async function() {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {}
     currentUser = null;
-    Storage.remove('currentUser');
-
-    document.getElementById('sidebarGuest').classList.remove('hidden');
-    document.getElementById('sidebarUser').classList.add('hidden');
-    document.getElementById('sidebarAdmin').classList.add('hidden');
-    document.getElementById('welcomeMessage').classList.add('hidden');
-    document.getElementById('invoiceResult').classList.add('hidden');
-    currentViewedInvoiceId = null;
-
+    updateNavForUser(null);
     window.location.hash = '#beranda';
   };
 

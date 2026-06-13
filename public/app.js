@@ -3,6 +3,36 @@ var currentUser = null;
 var reportData = [];
 var currentViewedInvoiceId = null;
 
+function updateNavForUser(user) {
+  if (!user) {
+    document.getElementById('sidebarGuest').classList.remove('hidden');
+    document.getElementById('sidebarUser').classList.add('hidden');
+    document.getElementById('sidebarAdmin').classList.add('hidden');
+    document.getElementById('welcomeMessage').classList.add('hidden');
+  } else if (user.role === 'admin') {
+    document.getElementById('sidebarGuest').classList.add('hidden');
+    document.getElementById('sidebarUser').classList.add('hidden');
+    document.getElementById('sidebarAdmin').classList.remove('hidden');
+    document.getElementById('welcomeMessage').classList.remove('hidden');
+    document.getElementById('welcomeName').innerText = user.name;
+    var userAvatar = document.getElementById('userAvatar');
+    if (userAvatar) userAvatar.innerText = user.name.charAt(0).toUpperCase();
+    var navUserName = document.getElementById('navUserName');
+    if (navUserName) navUserName.innerText = user.name;
+  } else {
+    document.getElementById('sidebarGuest').classList.add('hidden');
+    document.getElementById('sidebarAdmin').classList.add('hidden');
+    document.getElementById('sidebarUser').classList.remove('hidden');
+    document.getElementById('welcomeMessage').classList.remove('hidden');
+    document.getElementById('welcomeName').innerText = user.name;
+    document.getElementById('userNameDisplay').innerText = 'Halo, ' + user.name + '!';
+    var userAvatar2 = document.getElementById('userAvatar');
+    if (userAvatar2) userAvatar2.innerText = user.name.charAt(0).toUpperCase();
+    var navUserName2 = document.getElementById('navUserName');
+    if (navUserName2) navUserName2.innerText = user.name;
+  }
+}
+
 function handleRouting() {
   var hash = window.location.hash || '#beranda';
   var validPages = ['#beranda', '#lapor', '#edukasi', '#kontak', '#chat', '#register', '#login', '#admin', '#dashboard'];
@@ -228,27 +258,17 @@ function setupEventListeners() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  currentUser = Storage.load('currentUser', null);
+document.addEventListener('DOMContentLoaded', async function() {
   reportData = Storage.load('reports', []);
 
-  if (currentUser) {
-    if (currentUser.role === 'admin') {
-      document.getElementById('sidebarGuest').classList.add('hidden');
-      document.getElementById('sidebarUser').classList.add('hidden');
-      document.getElementById('sidebarAdmin').classList.remove('hidden');
-    } else {
-      document.getElementById('sidebarGuest').classList.add('hidden');
-      document.getElementById('sidebarAdmin').classList.add('hidden');
-      document.getElementById('sidebarUser').classList.remove('hidden');
+  try {
+    var meResponse = await fetch('/api/auth/me');
+    if (meResponse.ok) {
+      var meData = await meResponse.json();
+      currentUser = meData.user;
+      updateNavForUser(currentUser);
     }
-    document.getElementById('welcomeMessage').classList.remove('hidden');
-    document.getElementById('welcomeName').innerText = currentUser.name;
-    var userAvatar = document.getElementById('userAvatar');
-    if (userAvatar) userAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
-    var navUserName = document.getElementById('navUserName');
-    if (navUserName) navUserName.innerText = currentUser.name;
-  }
+  } catch (err) {}
 
   setupEventListeners();
   handleRouting();
