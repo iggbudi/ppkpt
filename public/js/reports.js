@@ -88,12 +88,12 @@
       '<p class="muted" style="margin:0;">No. Pelacakan: <strong>' + report.id + '</strong></p>' +
       '</div>' +
       '<div class="invoice-details">' +
-      '<div><span>Tanggal Kejadian:</span><br><strong>' + report.date + '</strong></div>' +
-      '<div><span>Kategori:</span><br><strong>' + report.cat + '</strong></div>' +
-      '<div><span>Lokasi:</span><br><strong>' + report.loc + '</strong></div>' +
-      '<div><span>Tingkat Urgensi:</span><br><strong>' + report.urg + '</strong></div>' +
+      '<div><span>Tanggal Kejadian:</span><br><strong>' + report.incidentDate + '</strong></div>' +
+      '<div><span>Kategori:</span><br><strong>' + report.category + '</strong></div>' +
+      '<div><span>Lokasi:</span><br><strong>' + report.location + '</strong></div>' +
+      '<div><span>Tingkat Urgensi:</span><br><strong>' + report.urgency + '</strong></div>' +
       '<div style="grid-column: 1 / -1;"><span>Lampiran Bukti:</span><br><strong style="color: var(--primary);">' + (report.evidence || 'Tidak ada lampiran') + '</strong></div>' +
-      '<div style="grid-column: 1 / -1;"><span>Kronologi Singkat:</span><br><strong style="font-weight: 500; font-size: 13px; line-height: 1.5; margin-top: 4px;">"' + report.desc + '"</strong></div>' +
+      '<div style="grid-column: 1 / -1;"><span>Kronologi Singkat:</span><br><strong style="font-weight: 500; font-size: 13px; line-height: 1.5; margin-top: 4px;">"' + report.description + '"</strong></div>' +
       '</div>' +
       '<div class="timeline-container">' +
       '<h4 style="margin: 0 0 16px 0;">Update Status Pelaporan</h4>' +
@@ -108,10 +108,22 @@
 
   window.renderInvoice = renderInvoice;
 
-  window.updateUserDashboardUI = function() {
-    if (!currentUser || (currentUser.role !== 'user' && currentUser.role !== 'mahasiswa')) return;
+  window.updateUserDashboardUI = async function() {
+    if (!currentUser) return;
     var listContainer = document.getElementById('userReportList');
-    var userReports = reportData.filter(function(r) { return r.author === currentUser.name; });
+    
+    try {
+      var response = await fetch('/api/reports');
+      if (!response.ok) {
+        listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Gagal memuat laporan.</p>';
+        return;
+      }
+      var data = await response.json();
+      var userReports = data.reports;
+    } catch (err) {
+      listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Gagal memuat laporan.</p>';
+      return;
+    }
 
     if (userReports.length === 0) {
       listContainer.innerHTML = '<p class="muted" style="text-align:center; padding:20px;">Anda belum pernah membuat laporan.</p>';
@@ -120,11 +132,11 @@
 
     listContainer.innerHTML = '';
     userReports.forEach(function(report) {
-      var riskClass = report.urg === 'Tinggi' ? 'risk-tinggi' : (report.urg === 'Sedang' ? 'risk-sedang' : 'risk-rendah');
+      var riskClass = report.urgency === 'Tinggi' ? 'risk-tinggi' : (report.urgency === 'Sedang' ? 'risk-sedang' : 'risk-rendah');
       var html = '<div class="report-item" onclick="viewInvoiceFromSubmit(\'' + report.id + '\')">' +
         '<div class="report-info">' +
-        '<h4>' + report.id + ' <span style="color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;">' + report.date + '</span></h4>' +
-        '<p><b>Kategori:</b> ' + report.cat + ' &bull; <b>Status Laporan:</b> <span style="color:var(--primary); font-weight:bold;">' + report.status + '</span></p>' +
+        '<h4>' + report.id + ' <span style="color:var(--muted); font-weight:normal; font-size:13px; margin-left:8px;">' + report.incidentDate + '</span></h4>' +
+        '<p><b>Kategori:</b> ' + report.category + ' &bull; <b>Status Laporan:</b> <span style="color:var(--primary); font-weight:bold;">' + report.status + '</span></p>' +
         '</div>' +
         '<div class="risk-badge ' + riskClass + '">Lihat Invoice &gt;</div>' +
         '</div>';
