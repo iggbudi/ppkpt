@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install root dependencies
+        run: npm install
+      
+      - name: Install server dependencies
+        run: cd server && npm install
+      
+      - name: Run tests
+        run: cd server && npm test
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+      
+      - name: Run server audit
+        run: cd server && npm audit --audit-level=high
+      
+      - name: Check for secrets
+        run: |
+          grep -r "sk-" --include="*.js" --include="*.html" . 2>/dev/null | grep -v node_modules | grep -v .env.example || echo "No secrets found"
