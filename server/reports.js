@@ -13,17 +13,18 @@ function setupReportRoutes(app, auditLog) {
     next();
   }
 
-  app.post('/api/reports', requireAuth, (req, res) => {
+  // Create report — auth optional (anonymous if no session)
+  app.post('/api/reports', (req, res) => {
     const { category, location, urgency, incidentDate, description, evidence, isAnonymous } = req.body;
     
     if (!category || !location || !urgency || !incidentDate || !description) {
       return res.status(400).json({ error: 'Semua field wajib diisi' });
     }
 
-    const user = req.session.user;
-    const maskedName = isAnonymous !== false 
-      ? user.name.charAt(0).toUpperCase() + '***'
-      : user.name;
+    const user = req.session.user || null;
+    const maskedName = user
+      ? (isAnonymous !== false ? user.name.charAt(0).toUpperCase() + '***' : user.name)
+      : 'Anonim';
 
     const report = {
       id: 'SSF-2026-' + Math.floor(1000 + Math.random() * 9000),
@@ -36,7 +37,7 @@ function setupReportRoutes(app, auditLog) {
       evidence: evidence || 'Tidak ada lampiran',
       appointment: 'Menunggu proses peninjauan awal dari tim Satgas.',
       createdAt: Date.now(),
-      authorId: user.id,
+      authorId: user ? user.id : null,
       authorName: maskedName,
       isAnonymous: isAnonymous !== false
     };
@@ -45,7 +46,7 @@ function setupReportRoutes(app, auditLog) {
 
     auditLog.push({
       timestamp: Date.now(),
-      userId: user.id,
+      userId: user ? user.id : null,
       action: 'report.create',
       targetId: report.id,
       ip: req.ip,
