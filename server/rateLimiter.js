@@ -3,12 +3,37 @@
  * Menyediakan rate limiting untuk berbagai endpoint
  */
 
+function normalizeIp(value) {
+  if (!value) return 'unknown';
+  return String(value).replace(/^::ffff:/, '');
+}
+
+function getRateLimitKey(req) {
+  const socketIp = normalizeIp(req.socket?.remoteAddress);
+  const trustProxy = req.app?.get('trust proxy');
+
+  if (!trustProxy) {
+    return socketIp;
+  }
+
+  const trustedProxies = new Set(['127.0.0.1', '::1']);
+  if (trustedProxies.has(socketIp)) {
+    const realIp = req.get('X-Real-IP');
+    if (realIp) {
+      return normalizeIp(realIp.trim());
+    }
+    return normalizeIp(req.ip) || socketIp;
+  }
+
+  return normalizeIp(req.ip) || socketIp;
+}
+
 class RateLimiter {
   constructor(options = {}) {
     this.windowMs = options.windowMs || 60_000;
     this.maxRequests = options.maxRequests || 10;
     this.message = options.message || 'Terlalu banyak request. Coba lagi nanti.';
-    this.keyGenerator = options.keyGenerator || ((req) => req.ip || 'unknown');
+    this.keyGenerator = options.keyGenerator || getRateLimitKey;
     this.store = new Map();
     
     // Cleanup expired entries setiap 5 menit
@@ -74,9 +99,7 @@ const reportRateLimiter = new RateLimiter({
   windowMs: 10 * 60 * 1000, // 10 menit
   maxRequests: 10,
   message: 'Terlalu banyak laporan dalam waktu singkat. Coba lagi dalam 10 menit.',
-  keyGenerator: (req) => {
-    return req.ip || 'unknown';
-  }
+  keyGenerator: getRateLimitKey
 });
 
 // Chat rate limiter: 60 pesan per menit per IP
@@ -84,7 +107,7 @@ const chatRateLimiter = new RateLimiter({
   windowMs: Number(process.env.CHAT_RATE_LIMIT_WINDOW_MS || 60 * 1000),
   maxRequests: Number(process.env.CHAT_RATE_LIMIT_MAX || 60),
   message: 'Terlalu banyak pesan dalam waktu singkat. Coba lagi sebentar lagi.',
-  keyGenerator: (req) => req.ip || 'unknown'
+  keyGenerator: getRateLimitKey
 });
 
 // Login rate limiter: 5 attempts per 5 menit per IP
@@ -92,7 +115,7 @@ const loginRateLimiter = new RateLimiter({
   windowMs: 5 * 60 * 1000, // 5 menit
   maxRequests: 5,
   message: 'Terlalu banyak percobaan login. Coba lagi dalam 5 menit.',
-  keyGenerator: (req) => req.ip || 'unknown'
+  keyGenerator: getRateLimitKey
 });
 
 // API rate limiter: 100 request per menit per IP
@@ -100,11 +123,12 @@ const apiRateLimiter = new RateLimiter({
   windowMs: 60 * 1000, // 1 menit
   maxRequests: 100,
   message: 'Terlalu banyak request API. Coba lagi sebentar lagi.',
-  keyGenerator: (req) => req.ip || 'unknown'
+  keyGenerator: getRateLimitKey
 });
 
 module.exports = {
   RateLimiter,
+  getRateLimitKey,
   reportRateLimiter,
   chatRateLimiter,
   loginRateLimiter,

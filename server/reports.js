@@ -10,7 +10,8 @@ const { uploadEvidence, scanEvidence, downloadEvidence, deleteEvidence, purgeEvi
 const { handleUpload, validateUploadedFile, calculateFileSHA256, moveToQuarantine, cleanupRequestFiles } = require('./uploadMiddleware');
 
 const NODE_ENV = process.env.NODE_ENV;
-const EVIDENCE_UPLOADS_ENABLED = NODE_ENV !== 'production' && process.env.EVIDENCE_UPLOADS_ENABLED !== 'false';
+const EVIDENCE_UPLOADS_ENABLED = NODE_ENV === 'test'
+  || (NODE_ENV !== 'production' && process.env.EVIDENCE_UPLOADS_ENABLED !== 'false');
 
 const reportSchema = z.object({
   category: z.enum(['Verbal', 'Sosial', 'Cyberbullying', 'Fisik', 'Seksual']),

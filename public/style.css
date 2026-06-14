@@ -1790,3 +1790,523 @@ button[type="submit"]:disabled {
   background: #fee2e2 !important;
   border-color: #f87171 !important;
 }
+/* ============================================================
+   RESPONSIVE NAVIGATION — Desktop Horizontal Nav
+   ============================================================ */
+
+/* --- Topbar Navigation (Desktop horizontal) --- */
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 40px;
+}
+
+.topbar-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  white-space: nowrap;
+}
+
+.topbar-link:hover {
+  color: var(--primary);
+  background: var(--soft);
+}
+
+.topbar-link.active {
+  color: var(--primary);
+  background: var(--soft);
+}
+
+.topbar-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 16px;
+  right: 16px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 3px 3px 0 0;
+}
+
+.topbar-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.topbar-link:hover .topbar-icon,
+.topbar-link.active .topbar-icon {
+  opacity: 1;
+}
+
+/* --- Auth Section (Desktop) --- */
+.topbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.topbar-auth-guest {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-auth-user,
+.topbar-auth-admin {
+  position: relative;
+}
+
+.topbar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.topbar-btn-outline {
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
+}
+
+.topbar-btn-outline:hover {
+  background: var(--soft);
+}
+
+.topbar-btn-primary {
+  background: var(--primary);
+  color: white;
+  border: 1px solid var(--primary);
+}
+
+.topbar-btn-primary:hover {
+  background: var(--primary2);
+}
+
+/* --- User/Admin Dropdown Trigger (Desktop) --- */
+.topbar-user-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.topbar-user-btn:hover {
+  background: var(--soft);
+  border-color: var(--primary);
+}
+
+.topbar-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.topbar-avatar-admin {
+  background: var(--danger);
+}
+
+.topbar-user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- Dropdown Menu --- */
+.topbar-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.topbar-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.topbar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.topbar-dropdown-item:first-child {
+  border-radius: 0;
+}
+
+.topbar-dropdown-item:last-child {
+  border-radius: 0;
+}
+
+.topbar-dropdown-item:hover {
+  background: var(--soft);
+  color: var(--primary);
+}
+
+.topbar-dropdown-item svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.topbar-dropdown-item:hover svg {
+  opacity: 1;
+}
+
+/* --- Responsive: Desktop (>950px) — hide mobile-only elements --- */
+@media (min-width: 951px) {
+  .hamburger {
+    display: none !important;
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* --- Responsive: Mobile (≤950px) — hide desktop nav --- */
+@media (max-width: 950px) {
+  .topbar-nav {
+    display: none !important;
+  }
+
+  .topbar-auth {
+    display: none !important;
+  }
+
+  .hamburger {
+    display: flex !important;
+  }
+}
+
+/* ============================================================
+   EDUKASI: Scenario Cards, Progress Bar, Achievements
+   ============================================================ */
+
+/* --- Progress Bar Container --- */
+.edu-progress-container {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 100%);
+  border: 1px solid #bae6fd;
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-top: 28px;
+}
+
+.edu-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.edu-progress-label {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.edu-progress-count {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--primary);
+}
+
+.edu-progress-bar-track {
+  width: 100%;
+  height: 12px;
+  background: #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.edu-progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #2563eb 0%, #16a34a 100%);
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+
+/* --- Champion Badge --- */
+.edu-champion-badge {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  font-size: 15px;
+  color: #92400e;
+  animation: championPulse 2s ease-in-out infinite;
+}
+
+.edu-champion-badge strong {
+  color: #78350f;
+}
+
+@keyframes championPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+}
+
+/* --- Scenario List Grid --- */
+.scenario-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.scenario-card {
+  background: white;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.scenario-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.12);
+  transform: translateY(-3px);
+}
+
+.scenario-card.completed {
+  border-color: #bbf7d0;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.scenario-card.completed:hover {
+  border-color: #16a34a;
+  box-shadow: 0 8px 25px rgba(22, 163, 74, 0.12);
+}
+
+.scenario-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.scenario-number {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.scenario-card.completed .scenario-number {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.scenario-status {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.status-new {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.status-done {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.scenario-card-title {
+  margin: 0 0 8px 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.scenario-card-desc {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.scenario-badge-earned {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fef9c3 100%);
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #92400e;
+  text-align: center;
+}
+
+/* --- Scenario Detail --- */
+.scenario-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.scenario-detail-badge {
+  background: #f97316;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.scenario-detail-title {
+  margin: 0 0 20px 0;
+  font-size: 22px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+/* --- Quiz Option Variants --- */
+.quiz-option-success {
+  width: 100%;
+  text-align: left;
+  padding: 14px 18px;
+  border: 2px solid #bbf7d0;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: #166534;
+  transition: all 0.2s;
+}
+
+.quiz-option-success:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+}
+
+.quiz-option-restart {
+  width: 100%;
+  text-align: left;
+  padding: 14px 18px;
+  border: 1px solid var(--line);
+  background: #f8fafc;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.quiz-option-restart:hover {
+  background: var(--soft);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* --- Responsive: Mobile (≤768px) --- */
+@media (max-width: 768px) {
+  .scenario-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .edu-progress-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .scenario-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .scenario-detail-title {
+    font-size: 18px;
+  }
+}

@@ -114,7 +114,7 @@ if (NODE_ENV !== 'test') {
     // Jalankan cleanup evidence setiap 6 jam
     const EVIDENCE_CLEANUP_INTERVAL = 6 * 60 * 60 * 1000; // 6 jam
     
-    setInterval(async () => {
+    const evidenceCleanupTimer = setInterval(async () => {
       try {
         const result = await cleanupEvidenceFiles();
         const totalCleaned = result.orphanFiles + result.tempFiles + result.rejectedFiles + result.deletedFiles + result.pendingFiles;
@@ -125,9 +125,10 @@ if (NODE_ENV !== 'test') {
         console.error('Evidence cleanup error:', err.message);
       }
     }, EVIDENCE_CLEANUP_INTERVAL);
-    
+    evidenceCleanupTimer.unref();
+
     // Jalankan cleanup pertama kali setelah 1 menit
-    setTimeout(async () => {
+    const initialCleanupTimer = setTimeout(async () => {
       try {
         const result = await cleanupEvidenceFiles();
         console.log('Initial evidence cleanup:', result);
@@ -135,6 +136,7 @@ if (NODE_ENV !== 'test') {
         console.error('Initial evidence cleanup error:', err.message);
       }
     }, 60 * 1000);
+    initialCleanupTimer.unref();
     
     console.log('Evidence cleanup scheduler started (interval: 6 hours)');
   } catch (err) {

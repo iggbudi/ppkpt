@@ -17,6 +17,77 @@ function closeModal(modalId) {
   }
 }
 
+/**
+ * Sinkronisasi active state antara desktop nav dan mobile sidebar
+ * @param {string} hash - Hash halaman aktif (e.g., '#beranda')
+ */
+function syncActiveNav(hash) {
+  // Update sidebar links (mobile)
+  document.querySelectorAll('.sidebar-link').forEach(function(link) {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === hash) {
+      link.classList.add('active');
+    }
+  });
+
+  // Update topbar links (desktop)
+  document.querySelectorAll('.topbar-link').forEach(function(link) {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === hash) {
+      link.classList.add('active');
+    }
+  });
+
+  // Update aria-current on both navs
+  document.querySelectorAll('.sidebar-link, .topbar-link').forEach(function(link) {
+    link.removeAttribute('aria-current');
+    if (link.getAttribute('href') === hash) {
+      link.setAttribute('aria-current', 'page');
+    }
+  });
+}
+
+/**
+ * Toggle dropdown menu untuk user/admin
+ * @param {string} dropdownId - ID dropdown element
+ * @param {string} btnId - ID button trigger
+ */
+function toggleDropdown(dropdownId, btnId) {
+  var dropdown = document.getElementById(dropdownId);
+  var btn = document.getElementById(btnId);
+  if (!dropdown || !btn) return;
+
+  var isOpen = dropdown.classList.contains('show');
+  closeAllDropdowns();
+
+  if (!isOpen) {
+    dropdown.classList.add('show');
+    btn.setAttribute('aria-expanded', 'true');
+  }
+}
+
+/**
+ * Tutup semua dropdown yang terbuka
+ */
+function closeAllDropdowns() {
+  document.querySelectorAll('.topbar-dropdown').forEach(function(dd) {
+    dd.classList.remove('show');
+  });
+  document.querySelectorAll('[aria-haspopup="true"]').forEach(function(btn) {
+    btn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+/**
+ * Handle klik di luar dropdown untuk menutup
+ */
+function handleOutsideClick(event) {
+  if (!event.target.closest('.topbar-auth-user') &&
+      !event.target.closest('.topbar-auth-admin')) {
+    closeAllDropdowns();
+  }
+}
+
 function updateNavForUser(user) {
   if (!user) {
     document.getElementById('sidebarGuest').classList.remove('hidden');
@@ -45,6 +116,32 @@ function updateNavForUser(user) {
     var navUserName2 = document.getElementById('navUserName');
     if (navUserName2) navUserName2.innerText = user.name;
   }
+
+  // Topbar (desktop) auth state sync
+  var topbarGuest = document.getElementById('topbarGuest');
+  var topbarUser = document.getElementById('topbarUser');
+  var topbarAdmin = document.getElementById('topbarAdmin');
+  if (topbarGuest && topbarUser && topbarAdmin) {
+    if (!user) {
+      topbarGuest.classList.remove('hidden');
+      topbarUser.classList.add('hidden');
+      topbarAdmin.classList.add('hidden');
+    } else if (user.role === 'admin') {
+      topbarGuest.classList.add('hidden');
+      topbarUser.classList.add('hidden');
+      topbarAdmin.classList.remove('hidden');
+      var tAdminAvatar = document.querySelector('#topbarAdmin .topbar-avatar');
+      if (tAdminAvatar) tAdminAvatar.innerText = user.name.charAt(0).toUpperCase();
+    } else {
+      topbarGuest.classList.add('hidden');
+      topbarAdmin.classList.add('hidden');
+      topbarUser.classList.remove('hidden');
+      var tUserAvatar = document.getElementById('topbarAvatar');
+      if (tUserAvatar) tUserAvatar.innerText = user.name.charAt(0).toUpperCase();
+      var tUserName = document.getElementById('topbarUserName');
+      if (tUserName) tUserName.innerText = user.name;
+    }
+  }
 }
 
 function handleRouting() {
@@ -67,14 +164,13 @@ function handleRouting() {
   }
 
   document.querySelectorAll('.page').forEach(function(page) { page.classList.remove('active'); });
-  document.querySelectorAll('.sidebar-link').forEach(function(link) { link.classList.remove('active'); });
+
+  // Sinkronisasi active state desktop + mobile
+  syncActiveNav(hash);
 
   var targetPageId = 'page-' + hash.substring(1);
   var targetElement = document.getElementById(targetPageId);
   if (targetElement) targetElement.classList.add('active');
-
-  var activeLink = document.querySelector('.sidebar-link[href="' + hash + '"]');
-  if (activeLink) activeLink.classList.add('active');
 
   // Update document title
   var pageTitles = {
@@ -98,12 +194,6 @@ function handleRouting() {
       heading.focus();
     }
   }
-
-  // aria-current on active nav link
-  document.querySelectorAll('.sidebar-link').forEach(function(link) {
-    link.removeAttribute('aria-current');
-  });
-  if (activeLink) activeLink.setAttribute('aria-current', 'page');
 
   if (hash === '#admin') {
     setTimeout(function() {
@@ -193,6 +283,49 @@ function setupEventListeners() {
   // Logout buttons (sidebar user and admin)
   document.querySelectorAll('#navUserLogoutBtn, #navAdminLogoutBtn').forEach(function(btn) {
     btn.addEventListener('click', handleLogout);
+  });
+
+  // Topbar dropdown triggers
+  var topbarUserBtn = document.getElementById('topbarUserBtn');
+  if (topbarUserBtn) {
+    topbarUserBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleDropdown('topbarUserDropdown', 'topbarUserBtn');
+    });
+  }
+  var topbarAdminBtn = document.getElementById('topbarAdminBtn');
+  if (topbarAdminBtn) {
+    topbarAdminBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleDropdown('topbarAdminDropdown', 'topbarAdminBtn');
+    });
+  }
+
+  // Close dropdown on outside click
+  document.addEventListener('click', handleOutsideClick);
+
+  // Close dropdown on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeAllDropdowns();
+    }
+  });
+
+  // Topbar logout buttons
+  var topbarLogoutBtn = document.getElementById('topbarLogoutBtn');
+  if (topbarLogoutBtn) {
+    topbarLogoutBtn.addEventListener('click', handleLogout);
+  }
+  var topbarAdminLogoutBtn = document.getElementById('topbarAdminLogoutBtn');
+  if (topbarAdminLogoutBtn) {
+    topbarAdminLogoutBtn.addEventListener('click', handleLogout);
+  }
+
+  // Close dropdown when clicking topbar nav links
+  document.querySelectorAll('.topbar-link').forEach(function(link) {
+    link.addEventListener('click', function() {
+      closeAllDropdowns();
+    });
   });
 
   // Quick escape button
