@@ -4,7 +4,8 @@
   "description": "SafeSphere - Pelaporan Anonim Anti-Perundungan",
   "scripts": {
     "start": "node server/start-development.js",
-    "test": "cd server && npm test"
+    "test": "cd server && npm test",
+    "test:e2e": "cd e2e && npm install && npx playwright install chromium && npm test"
   },
   "dependencies": {
     "express": "^4.18.0",

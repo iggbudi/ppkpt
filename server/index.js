@@ -6,6 +6,10 @@ const cors = require('cors');
 const helmet = require('helmet');
 const { callMimoChat } = require('./mimoClient');
 const { classifyRisk } = require('./risk');
+const { prepareMessageForLLM } = require('./piiRedaction');
+const { circuitBreaker } = require('./mimoCircuitBreaker');
+const { log } = require('./logger');
+const { getOperationalHealth } = require('./opsHealth');
 const db = require('./db');
 const { runMigrations, getCurrentVersion } = require('./migrations');
 const { chatRateLimiter, loginRateLimiter, apiRateLimiter } = require('./rateLimiter');
@@ -187,7 +191,8 @@ function highRiskActions() {
 }
 
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, service: 'safesphere-chat', model: process.env.MIMO_MODEL || 'mimo-v2.5' });
+  const health = getOperationalHealth();
+  res.status(health.ok ? 200 : 503).json(health);
 });
 
 // Admin endpoints untuk monitoring
@@ -280,51 +285,34 @@ function formatBytes(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-function redactPII(text) {
-  if (!text) return text;
-  
-  let redacted = text;
-  
-  // Email addresses
-  redacted = redacted.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[EMAIL]');
-  
-  // Phone numbers Indonesian patterns:
-  // - 08xx, +62 8xx, 62 8xx (with spaces/dashes)
-  // - 08xxxxxxxxxx, 08xx-xxxx-xxxx, 08xx xxxx xxxx
-  redacted = redacted.replace(/(\+?62[\s-]?|0)8[\d\s-]{8,13}/g, '[PHONE]');
-  
-  // Phone numbers with parentheses: (021) xxxxx, (08xx) xxxxx
-  redacted = redacted.replace(/\(\d{2,4}\)[\s-]?\d{3,4}[\s-]?\d{3,4}/g, '[PHONE]');
-  
-  // NIM / Student ID patterns (common Indonesian formats):
-  // - 10-15 digit numbers that look like NIM
-  // - Often starts with year: 2020xxxxx, 2021xxxxx, etc.
-  redacted = redacted.replace(/\b(20[12]\d{7,10})\b/g, '[NIM]');
-  
-  // Generic long number sequences (likely IDs, account numbers)
-  // But not years (4 digits) or short numbers
-  redacted = redacted.replace(/\b\d{10,16}\b/g, '[NUMBER]');
-  
-  // Indonesian ID card (NIK) - 16 digits
-  redacted = redacted.replace(/\b\d{16}\b/g, '[NIK]');
-  
-  // Common Indonesian name patterns in context:
-  // "nama saya [Name]", "saya [Name]", "teman saya [Name]"
-  // This is tricky - we'll do basic pattern matching
-  const namePatterns = [
-    /(?:nama\s+(?:saya|aku|ku)\s+(?:adalah\s+)?)\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/gi,
-    /(?:saya|aku)\s+(?:bernama|dipanggil)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/gi,
-    /(?:teman\s+saya\s+(?:bernama|adalah)\s+)\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3})/gi
-  ];
-  
-  for (const pattern of namePatterns) {
-    redacted = redacted.replace(pattern, (match, name) => {
-      return match.replace(name, '[NAMA]');
-    });
+app.get('/api/admin/chat/logs', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden' });
   }
-  
-  return redacted;
-}
+
+  const limit = Math.min(Number(req.query.limit) || 50, 200);
+  const logs = db.prepare(`
+    SELECT timestamp, userId, action, ip, details
+    FROM audit_log
+    WHERE action LIKE 'chat.%'
+    ORDER BY timestamp DESC
+    LIMIT ?
+  `).all(limit).map((row) => ({
+    timestamp: row.timestamp,
+    userId: row.userId,
+    action: row.action,
+    ip: row.ip,
+    details: (() => {
+      try {
+        return JSON.parse(row.details || '{}');
+      } catch {
+        return {};
+      }
+    })()
+  }));
+
+  res.json({ logs });
+});
 
 app.post('/api/chat', chatRateLimiter.middleware(), async (req, res) => {
   // Per-session rate limit
@@ -367,9 +355,25 @@ app.post('/api/chat', chatRateLimiter.middleware(), async (req, res) => {
     : null;
 
   const risk = classifyRisk(trimmedMessage);
+  const preparedMessage = prepareMessageForLLM(trimmedMessage);
+
+  insertAudit.run(
+    Date.now(),
+    req.session?.user?.id || null,
+    'chat.message',
+    null,
+    req.ip,
+    JSON.stringify({
+      risk: risk.level,
+      messageLength: trimmedMessage.length,
+      preparedLength: preparedMessage.length,
+      matchedKeywords: risk.matchedKeywords || []
+    })
+  );
 
   if (risk.level === 'high') {
     insertAudit.run(Date.now(), req.session?.user?.id || null, 'chat.high_risk_escalation', null, req.ip, JSON.stringify({ keywords: risk.matchedKeywords }));
+    log('info', 'chat.high_risk_template', { risk: risk.level });
     return res.json({
       reply: highRiskReply,
       risk: risk.level,
@@ -378,9 +382,20 @@ app.post('/api/chat', chatRateLimiter.middleware(), async (req, res) => {
     });
   }
 
+  if (circuitBreaker.shouldSkipProviderCall()) {
+    log('warn', 'chat.mimo_circuit_open', { risk: risk.level });
+    return res.json({
+      reply: modelFallbackReply,
+      risk: risk.level,
+      actions: risk.level === 'medium' ? mediumRiskActions() : [],
+      source: 'fallback'
+    });
+  }
+
   try {
-    const redactedMessage = redactPII(trimmedMessage);
-    const reply = await callMimoChat({ message: redactedMessage, user, risk });
+    const reply = await callMimoChat({ message: preparedMessage, user, risk });
+    circuitBreaker.recordSuccess();
+    log('info', 'chat.mimo_success', { risk: risk.level });
     return res.json({
       reply,
       risk: risk.level,
@@ -388,7 +403,8 @@ app.post('/api/chat', chatRateLimiter.middleware(), async (req, res) => {
       source: 'mimo'
     });
   } catch (error) {
-    console.error('MiMo chat fallback:', error.message);
+    circuitBreaker.recordFailure();
+    log('warn', 'chat.mimo_fallback', { error: error.message, risk: risk.level });
     return res.json({
       reply: modelFallbackReply,
       risk: risk.level,

@@ -1,0 +1,23 @@
+[Unit]
+Description=SafeSphere API Backend
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/safesphere.my.id/repo/server
+EnvironmentFile=/var/www/safesphere.my.id/repo/server/.env
+ExecStart=/usr/bin/node /var/www/safesphere.my.id/repo/server/index.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/safesphere.my.id/repo/data /var/www/safesphere.my.id/repo/server
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

@@ -4,6 +4,8 @@ ftp.txt
 !.env.example
 *.log
 node_modules/
+e2e/node_modules/
+e2e/test-results/
 data/
 
 # Evidence storage
