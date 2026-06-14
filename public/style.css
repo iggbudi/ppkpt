@@ -384,40 +384,7 @@ body {
   padding: 0 10px;
 }
 
-.social-login {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.btn-social {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: white;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  padding: 12px;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-social:hover {
-  background: var(--bg);
-}
-
-.btn-social svg {
-  width: 20px;
-  height: 20px;
-}
-
-.btn-instagram:hover { border-color: #e1306c; color: #e1306c; }
-.btn-google:hover { border-color: #db4437; color: #db4437; }
-
-/* --- Modal Styles (Forgot Password) --- */
+/* --- Modal Styles --- */
 .modal {
   border: none;
   border-radius: var(--radius);
@@ -615,6 +582,117 @@ main {
   text-align: center;
 }
 
+/* === ADMIN DASHBOARD REDESIGN (Phase 5–6) === */
+.admin-overview {
+  margin-bottom: 32px;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.metric-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.metric-card strong {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+  line-height: 1.1;
+}
+
+.situation-summary {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.admin-insight {
+  margin-bottom: 32px;
+}
+
+.admin-reports,
+.admin-users {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.admin-filters .input {
+  width: 260px;
+}
+
+.admin-report-list .report-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.admin-report-list .report-item:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(30, 58, 138, 0.08);
+}
+
+.admin-report-list .report-info h4 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.admin-report-list .report-info p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.admin-report-list .risk-badge {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.risk-tinggi { background: #fee2e2; color: #b91c1c; }
+.risk-sedang { background: #fef3c7; color: #c2410c; }
+.risk-rendah { background: #d1fae5; color: #0f766e; }
+
+.admin-user-list .report-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
 /* --- Cards ------------------------------------------------- */
 .hero-card,
 .card {
@@ -709,6 +787,251 @@ main {
   background: white;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* === NEW MODAL DETAIL (Phase 5/6) - Wider, more spacious, polished === */
+.modal-wide {
+  max-width: 1200px !important;
+  width: 92vw;
+}
+
+.modal-wide .modal-content {
+  max-width: 100%;
+  width: 100%;
+  padding: 32px 40px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.modal-two-column {
+  display: grid;
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 32px;
+}
+
+.modal-left,
+.modal-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-section {
+  margin-bottom: 28px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.reporter-box {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.reporter-box .label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reporter-box .value {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.detail-fields {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.detail-fields .field {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.detail-fields .label {
+  font-size: 13px;
+  color: var(--muted);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.detail-fields .value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.description-box {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px 20px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.evidence-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.evidence-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.evidence-list li:last-child {
+  border-bottom: none;
+}
+
+.evidence-list a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.evidence-list .scan {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #d1fae5;
+  color: #0f766e;
+}
+
+.status-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+}
+
+.timeline-content {
+  line-height: 1.4;
+}
+
+.timeline-content .time {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.action-form .form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  display: block;
+  margin-bottom: 6px;
+  margin-top: 8px;
+}
+
+.action-form .form-label:first-child {
+  margin-top: 0;
+}
+
+/* ========================================================
+   Base .input (admin search + Aksi Admin modal controls)
+   Matches the polished look of .form-grid inputs/selects.
+   Only 3 usages of .input class in the whole app (all admin),
+   so this is low-risk and also beautifies the filter input.
+   ======================================================== */
+.input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 14px;
+  background: #f8fafc;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Custom pretty select box (chevron only on .input selects) */
+select.input {
+  cursor: pointer;
+  appearance: none;
+  /* Inline SVG chevron using muted color (#667085) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 15px 15px;
+  padding-right: 38px;
+}
+
+/* Hover + focus states (consistent with form-grid) */
+.input:hover {
+  border-color: #c0d0f0;
+}
+
+.input:focus,
+select.input:focus {
+  background: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+/* Action form layout + button spacing (replaces previous inline style) */
+.action-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-form .input {
+  margin-bottom: 4px;
+}
+
+.action-form .btn,
+.action-form button {
+  margin-top: 16px;
 }
 
 .form-grid textarea {

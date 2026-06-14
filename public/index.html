@@ -471,6 +471,9 @@
               <span class="scenario-detail-badge">Skenario Interaktif</span>
             </div>
             <h3 id="scenarioDetailTitle" class="scenario-detail-title">Skenario</h3>
+            <div class="scenario-score" style="margin: 4px 0 8px; font-size: 13px; color: var(--primary); font-weight: 600;">
+              Skor skenario ini: <strong id="scenarioCurrentScore">0</strong>
+            </div>
             
             <div id="gameScene" class="game-scene">
               <p id="gameText" class="game-text">Memuat skenario...</p>
@@ -492,15 +495,15 @@
           <p class="muted">Hubungi nomor berikut jika terjadi situasi perundungan atau kekerasan yang mengancam keselamatan fisik.</p>
         </div>
         <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-          <div><b>Satgas PPKS Kampus</b><span style="color:var(--muted); font-weight:bold;">Hubungi bagian Kemahasiswaan kampus Anda</span></div>
-          <div><b>Keamanan / Satpam</b><span style="color:var(--muted); font-weight:bold;">Telepon keamanan kampus (lihat website kampus)</span></div>
-          <div><b>Layanan Psikologi Mhs</b><span style="color:var(--muted); font-weight:bold;">Biro Psikologi / Konseling kampus</span></div>
-          <div><b>Hotline Nasional</b><span style="color:var(--muted); font-weight:bold;">129 (Kementerian PPPA)</span></div>
-          <div><b>Polisi</b><span style="color:var(--muted); font-weight:bold;">110</span></div>
-          <div><b>PSC / Ambulans</b><span style="color:var(--muted); font-weight:bold;">119</span></div>
+          <div><b>Satgas PPKS Kampus</b><span style="color:var(--muted); font-weight:bold;">Hubungi bagian Kemahasiswaan kampus Anda (contoh pilot: portal internal fakultas atau email satgas@kampus.edu)</span></div>
+          <div><b>Keamanan / Satpam</b><span style="color:var(--muted); font-weight:bold;">Telepon keamanan kampus (lihat website resmi kampus)</span></div>
+          <div><b>Layanan Psikologi Mhs</b><span style="color:var(--muted); font-weight:bold;">Biro Psikologi / Konseling kampus (verifikasi Juni 2026)</span></div>
+          <div><b>Hotline Nasional</b><a href="tel:129" style="color:var(--primary); font-weight:bold; text-decoration: underline;">129</a> <span style="color:var(--muted);">(SAPA 129 - Kementerian PPPA, verifikasi Juni 2026)</span></div>
+          <div><b>Polisi</b><a href="tel:110" style="color:var(--primary); font-weight:bold; text-decoration: underline;">110</a> <span style="color:var(--muted);">(Polri, verifikasi Juni 2026)</span></div>
+          <div><b>PSC / Ambulans</b><a href="tel:119" style="color:var(--primary); font-weight:bold; text-decoration: underline;">119</a> <span style="color:var(--muted);">(Pusat Panggilan Darurat, verifikasi Juni 2026)</span></div>
         </div>
         <p class="muted" style="margin-top:1rem; font-size:0.85rem;">
-          <strong>Catatan:</strong> Kontak di atas adalah kontak umum nasional. Untuk kontak spesifik kampus Anda, silakan hubungi bagian Kemahasiswaan atau lihat website resmi kampus.
+          <strong>Catatan:</strong> Nomor nasional di atas sudah diverifikasi dan dapat ditelepon langsung (tautan <code>tel:</code>). Untuk kontak spesifik kampus/fakultas pilot, hubungi bagian Kemahasiswaan atau cek website resmi kampus. Contoh: Satgas PPKS Fakultas Pilot tersedia via portal internal atau (021) XXX-XXXX (periksa sumber resmi).
         </p>
       </section>
     </div>
@@ -628,89 +631,154 @@
     </div>
 
     <div id="page-admin" class="page">
-      <section class="section card">
-        <div class="card-header">
-          <h2>Dashboard Admin Kampus</h2>
-          <p class="muted">Akses khusus pengelola data pelaporan SafeSphere.</p>
+  <section class="section card">
+    <div class="card-header">
+      <h2>Dashboard Admin Kampus</h2>
+      <p class="muted">Akses khusus pengelola data pelaporan.</p>
+    </div>
+
+    <!-- 1. Situational Overview -->
+    <div class="admin-overview">
+      <div class="metric-grid">
+        <div class="metric-card">
+          <strong id="m-total">0</strong>
+          <span>Total Laporan</span>
+        </div>
+        <div class="metric-card">
+          <strong id="m-tinggi">0</strong>
+          <span>Risiko Tinggi</span>
+        </div>
+        <div class="metric-card">
+          <strong id="m-pending">0</strong>
+          <span>Belum Ditindaklanjuti</span>
+        </div>
+        <div class="metric-card">
+          <strong id="m-avg-time">-</strong>
+          <span>Rata-rata Penyelesaian (hari)</span>
+        </div>
+      </div>
+
+      <div class="situation-summary" id="situationSummary">
+        <!-- diisi oleh JS -->
+      </div>
+    </div>
+
+    <!-- 2. Insight Laporan -->
+    <div class="admin-insight">
+      <div class="section-header">
+        <h3>Insight Laporan</h3>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="categoryChart" height="80" aria-hidden="true"></canvas>
+        <div id="adminChartTable" class="admin-chart-table-wrap" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- 3. Laporan yang Perlu Perhatian -->
+    <div class="admin-reports">
+      <div class="section-header">
+        <h3>Laporan yang Perlu Perhatian</h3>
+        <div class="admin-filters">
+          <input type="text" id="adminSearch" placeholder="Cari ID atau kategori..." class="input">
+        </div>
+      </div>
+
+      <div id="adminReportList" class="admin-report-list">
+        <!-- di-render oleh JS -->
+      </div>
+    </div>
+
+    <!-- 4. Manajemen Pengguna (secondary) -->
+    <div class="admin-users">
+      <div class="section-header">
+        <h3>Manajemen Pengguna</h3>
+      </div>
+      <div id="adminUserList" class="admin-user-list">
+        <!-- masih menggunakan logic lama, tapi styling baru -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal detail baru - Phase 5/6: Dua kolom + Timeline untuk profesional & terpercaya -->
+  <dialog id="reportDetailModal" class="modal modal-wide">
+    <div class="modal-content">
+      <button type="button" class="close-modal" id="reportDetailModalCloseBtn" aria-label="Tutup">&times;</button>
+      
+      <div class="modal-header">
+        <h2 id="detailTitle">Detail Kasus</h2>
+        <div id="detailStatusBadge" class="status-badge"></div>
+      </div>
+
+      <div class="modal-two-column">
+        
+        <!-- Kolom Kiri: Informasi Kasus -->
+        <div class="modal-left">
+          <div class="modal-section">
+            <div class="section-header">
+              <h4>Informasi Pelapor</h4>
+            </div>
+            <div id="detailReporter" class="reporter-box"></div>
+          </div>
+
+          <div class="modal-section">
+            <div class="section-header">
+              <h4>Detail Kejadian</h4>
+            </div>
+            <div id="detailFields" class="detail-fields"></div>
+          </div>
+
+          <div class="modal-section">
+            <div class="section-header">
+              <h4>Kronologi Lengkap</h4>
+            </div>
+            <div id="detailDescription" class="description-box"></div>
+          </div>
+
+          <div class="modal-section">
+            <div class="section-header">
+              <h4>Lampiran Bukti</h4>
+            </div>
+            <div id="detailEvidence" class="evidence-list"></div>
+          </div>
         </div>
 
-        <div id="adminDashboardArea">
-          
-          <div class="dash-actions">
-            <button class="btn-light-primary" id="seedDemoBtn">Isi Data Demo</button>
-            <button class="btn-light-danger" id="clearDataBtn">Reset Data</button>
-          </div>
-
-          <div class="metric-grid">
-            <div class="metric-card">
-              <strong id="m-total">0</strong>
-              <span>Total Laporan</span>
+        <!-- Kolom Kanan: Aksi & Riwayat -->
+        <div class="modal-right">
+          <div class="modal-section">
+            <div class="section-header">
+              <h4>Aksi Admin</h4>
             </div>
-            <div class="metric-card">
-              <strong id="m-tinggi">0</strong>
-              <span>Risiko Tinggi</span>
-            </div>
-            <div class="metric-card">
-              <strong id="m-selesai">0</strong>
-              <span>Selesai</span>
-            </div>
-            <div class="metric-card">
-              <strong id="m-dominan">-</strong>
-              <span>Kategori Dominan</span>
-            </div>
-          </div>
-
-          <div class="chart-wrap">
-            <canvas id="categoryChart" height="80" aria-hidden="true"></canvas>
-            <div id="adminChartTable" class="admin-chart-table-wrap" aria-live="polite"></div>
-          </div>
-
-          <div class="card-header" style="margin-top: 32px; padding-bottom: 12px;">
-            <h2 style="font-size: 20px;">Daftar Laporan Terkini</h2>
-          </div>
-          
-          <div id="adminReportList" class="report-list">
-            <p class="muted" style="text-align:center; padding:20px;">Belum ada data laporan. Klik "Isi Data Demo".</p>
-          </div>
-
-          <div class="card-header" style="margin-top: 32px; padding-bottom: 12px;">
-            <h2 style="font-size: 20px;">Manajemen Pengguna</h2>
-          </div>
-
-          <div id="adminUserList" class="report-list">
-            <p class="muted" style="text-align:center; padding:20px;">Memuat daftar pengguna...</p>
-          </div>
-
-        </div>
-      </section>
-
-      <dialog id="reportDetailModal" class="modal">
-        <div class="modal-content" style="max-width: 600px; text-align: left;">
-          <button type="button" class="close-modal" id="reportDetailModalCloseBtn" aria-label="Tutup">&times;</button>
-          <h2 style="margin-top: 10px; color: var(--primary);" id="detailTitle">Detail Laporan</h2>
-          
-          <div class="invoice-details" id="detailContent" style="margin-top: 20px;">
-            </div>
-
-          <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line);">
-            <label style="font-weight: 600; display: block; margin-bottom: 8px; color: var(--ink);">Update Status Kasus</label>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <select id="updateStatusSelect" style="padding: 12px; border-radius: 8px; border: 1px solid var(--line); flex: 1; outline: none; background: #f8fafc; font-size: 14px;">
+            
+            <div class="action-form">
+              <label class="form-label" for="updateStatusSelect">Update Status Kasus</label>
+              <select id="updateStatusSelect" class="input">
                 <option value="Baru Masuk">Baru Masuk</option>
                 <option value="Direview">Tahap Review (Verifikasi)</option>
                 <option value="Diproses">Sedang Diproses</option>
                 <option value="Selesai">Selesai</option>
               </select>
+
+              <label class="form-label" for="updateAppointment">Jadwal Tindak Lanjut / Catatan</label>
+              <input type="text" id="updateAppointment" class="input" placeholder="Contoh: Jadwal mediasi 15 Juni 2026...">
+
+              <button class="btn primary full" id="saveStatusBtn">Simpan Perubahan</button>
             </div>
-            
-            <label style="font-weight: 600; display: block; margin-top: 16px; margin-bottom: 8px; color: var(--ink);">Jadwal Tindak Lanjut / Catatan Admin</label>
-            <input type="text" id="updateAppointment" placeholder="Contoh: Jadwal mediasi 15 Juni 2026..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--line); outline: none; background: #f8fafc; font-size: 14px;">
-            
-            <button class="btn primary full" id="saveStatusBtn" style="margin-top: 16px;">Simpan Perubahan</button>
+          </div>
+
+          <div class="modal-section">
+            <div class="section-header">
+              <h4>Riwayat Status</h4>
+            </div>
+            <div id="detailTimeline" class="status-timeline">
+              <!-- Diisi JS: timeline riwayat -->
+            </div>
           </div>
         </div>
-      </dialog>
+
+      </div>
     </div>
+  </dialog>
+</div>
 
     <div id="page-dashboard" class="page">
       <section class="section card" style="max-width: 900px; margin-left: auto; margin-right: auto;">
