@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "scenarios": [
+    {
+      "id": "bystander",
+      "title": "Skenario Saksi Mata (Bystander)",
+      "description": "Anda sedang duduk di kantin fakultas dan melihat seorang mahasiswa baru didorong dan diejek oleh sekelompok senior.",
+      "badge": "Bystander Aktif",
+      "nodes": {
+        "start": {
+          "text": "Anda sedang duduk di kantin fakultas dan melihat seorang mahasiswa baru didorong dan diejek oleh sekelompok senior. Mereka merekam kejadian tersebut sambil tertawa. Apa tindakan pertama Anda?",
+          "options": [
+            { "text": "A. Langsung menghampiri, marah, dan membentak para senior tersebut.", "nextNode": "agresif" },
+            { "text": "B. Pura-pura tidak melihat sambil melanjutkan makan agar tidak ikut terseret.", "nextNode": "pasif" },
+            { "text": "C. Menjauh ke titik aman, merekam diam-diam sebagai bukti, lalu melapor ke SafeSphere.", "nextNode": "pintar" }
+          ],
+          "feedback": null
+        },
+        "agresif": {
+          "text": "Anda mencoba melawan. Namun karena kalah jumlah, Anda kini malah ikut menjadi target intimidasi fisik dan verbal mereka. Bertindak heroik dengan emosi seringkali bukan solusi yang aman.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Berbahaya!", "message": "Menghadapi pelaku secara langsung tanpa perhitungan bisa membahayakan keselamatan diri Anda." }
+        },
+        "pasif": {
+          "text": "Korban semakin dipermalukan. Karena tidak ada mahasiswa lain yang berani bertindak, pelaku merasa perilaku mereka wajar dan kekerasan semakin dinormalisasi di kampus.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Efek Bystander (Pembiaran)", "message": "Diam berarti secara tidak langsung Anda membiarkan perundungan terus terjadi." }
+        },
+        "pintar": {
+          "text": "Tepat sekali! Anda berhasil mendapatkan bukti rekaman wajah pelaku tanpa membahayakan diri sendiri. Laporan anonim Anda di SafeSphere langsung diproses oleh Satgas PPKS, dan korban segera mendapatkan perlindungan.",
+          "options": [
+            { "text": "Selesai — Kembali ke Daftar", "nextNode": "_back", "isSuccess": true }
+          ],
+          "feedback": { "type": "success", "title": "Langkah Cerdas!", "message": "Mengamankan bukti dan melapor secara terenkripsi adalah tindakan paling efektif untuk memutus rantai perundungan." }
+        }
+      }
+    },
+    {
+      "id": "bystander-koridor",
+      "title": "Perundungan Verbal di Koridor",
+      "description": "Anda melihat sekelompok mahasiswa mengejek dan memanggil nama panggilan yang menghina seorang teman sekelas di koridor gedung.",
+      "badge": "Bystander Aktif",
+      "nodes": {
+        "start": {
+          "text": "Saat berjalan menuju kelas, Anda mendengar sekelompok mahasiswa mengejek teman sekelas dengan julukan menghina. Korban terlihat cemas dan berusaha cepat-cepat pergi. Apa yang Anda lakukan?",
+          "options": [
+            { "text": "A. Ikut tertawa agar tidak dianggap aneh.", "nextNode": "ikut" },
+            { "text": "B. Dekati korban setelah pelaku pergi, tawarkan dukungan, dan sarankan melapor.", "nextNode": "pintar" },
+            { "text": "C. Rekam lalu unggah ke story media sosial tanpa izin korban.", "nextNode": "viral" }
+          ],
+          "feedback": null
+        },
+        "ikut": {
+          "text": "Korban melihat Anda ikut tertawa. Ia merasa dikhianati dan semakin menarik diri dari lingkungan kampus.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Ikut Menertawakan", "message": "Menertawakan korban memperkuat rasa malu dan isolasi. Dukungan kecil bisa sangat berarti." }
+        },
+        "viral": {
+          "text": "Video tersebar luas. Korban malu dan diteror komentar netizen. Pelaku justru merasa terkenal, sementara korban trauma.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Viral Tanpa Izin", "message": "Mempublikasikan kejadian tanpa persetujuan korban bisa menambah trauma. Laporkan lewat jalur resmi, bukan viralkan." }
+        },
+        "pintar": {
+          "text": "Anda menghampiri korban dengan tenang: \"Aku lihat tadi. Kamu tidak sendirian. Kalau mau, kita bisa laporkan lewat SafeSphere.\" Korban merasa didengar dan bersedia melapor.",
+          "options": [
+            { "text": "Selesai — Kembali ke Daftar", "nextNode": "_back", "isSuccess": true }
+          ],
+          "feedback": { "type": "success", "title": "Dukungan Tepat!", "message": "Menawarkan dukungan pribadi dan jalur pelaporan aman adalah tindakan bystander yang efektif." }
+        }
+      }
+    },
+    {
+      "id": "bystander-transport",
+      "title": "Intimidasi di Shuttle Kampus",
+      "description": "Di shuttle kampus, seorang mahasiswa dipalak memberi uang jajanan oleh senior yang duduk di belakang.",
+      "badge": "Bystander Aktif",
+      "nodes": {
+        "start": {
+          "text": "Di shuttle kampus yang penuh, Anda melihat senior meminta uang paksa dari mahasiswa baru. Korban terlihat takut dan mulai membuka dompet. Apa tindakan Anda?",
+          "options": [
+            { "text": "A. Pura-pura tidur dan tidak melihat.", "nextNode": "pasif" },
+            { "text": "B. Catat waktu/rute, beri isyarat aman ke korban, lalu laporkan setelah turun.", "nextNode": "pintar" },
+            { "text": "C. Langsung bentak senior di depan penumpang.", "nextNode": "konfrontasi" }
+          ],
+          "feedback": null
+        },
+        "pasif": {
+          "text": "Korban menyerahkan uang dan merasa tidak punya tempat aman di kampus. Perundungan finansial berlanjut di hari-hari berikutnya.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Membiarkan", "message": "Diam di ruang publik membuat pelaku merasa kebal. Dokumentasi dan laporan tetap bisa dilakukan tanpa konfrontasi langsung." }
+        },
+        "konfrontasi": {
+          "text": "Situasi memanas di shuttle. Senior mengancam Anda dan korban malah diminta ikut turun di tengah jalan.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Konfrontasi Berisiko", "message": "Di ruang sempit, konfrontasi langsung bisa membahayakan semua pihak. Prioritaskan keselamatan dan laporkan setelah situasi aman." }
+        },
+        "pintar": {
+          "text": "Anda mencatat rute dan waktu, memberi isyarat ke korban bahwa Anda siap membantu, lalu melaporkan kejadian beserta detail shuttle lewat SafeSphere. Tim PPKS menindaklanjuti.",
+          "options": [
+            { "text": "Selesai — Kembali ke Daftar", "nextNode": "_back", "isSuccess": true }
+          ],
+          "feedback": { "type": "success", "title": "Langkah Aman!", "message": "Mendokumentasi detail kejadian dan melapor lewat jalur resmi melindungi korban tanpa memperburuk situasi." }
+        }
+      }
+    },
+    {
+      "id": "cyberbullying",
+      "title": "Cyberbullying di Grup WhatsApp",
+      "description": "Kamu melihat angkatanmu mengolok-olok mahasiswa baru di grup WA. Pesannya sudah 50+, banyak yang ikut menertawakan.",
+      "badge": "Pelapor Digital",
+      "nodes": {
+        "start": {
+          "text": "Kamu membuka grup WhatsApp angkatan dan melihat percakapan yang sudah berlangsung lama. Seorang mahasiswa baru sedang diolok-olok karena penampilannya. Pesan sudah lebih dari 50, banyak yang ikut menertawakan dengan sticker dan meme. Apa yang kamu lakukan?",
+          "options": [
+            { "text": "A. Ikut menertawakan agar tidak di-bully juga.", "nextNode": "ikut" },
+            { "text": "B. Diam saja, toh bukan urusanmu.", "nextNode": "diam" },
+            { "text": "C. Screenshot, DM korban untuk dukungan, lalu laporkan.", "nextNode": "pintar" }
+          ],
+          "feedback": null
+        },
+        "ikut": {
+          "text": "Korban melihat nama kamu di antara yang menertawakan. Ia merasa semakin terisolasi dan tidak memiliki siapapun. Keesokan harinya, ia tidak masuk kuliah.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Complicity", "message": "Mengikuti kerumunan yang merundung membuatmu bagian dari masalah. Dampak psikologis korban bisa bertahan bertahun-tahun." }
+        },
+        "diam": {
+          "text": "Karena tidak ada yang membela, pelaku semakin menjadi. Mereka mulai mengirim DM ancaman ke korban. Korban mulai mengalami kecemasan dan mempertimbangkan untuk berhenti kuliah.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Efek Bystander Digital", "message": "Diam di dunia digital sama dengan membiarkan. Setiap pesan yang tidak dilawan adalah kontribusi pada normalisasi perundungan." }
+        },
+        "pintar": {
+          "text": "Kamu mengambil screenshot seluruh percakapan sebagai bukti. Kamu mengirim DM pribadi ke korban: \"Hei, aku lihat apa yang terjadi. Kamu tidak sendirian. Kalau butuh bantuan, aku di sini.\" Kamu juga melaporkan kejadian ini melalui SafeSphere.",
+          "options": [
+            { "text": "Selesai — Kembali ke Daftar", "nextNode": "_back", "isSuccess": true }
+          ],
+          "feedback": { "type": "success", "title": "Langkah Cerdas!", "message": "Mengamankan bukti digital dan memberi dukungan langsung kepada korban adalah tindakan bystander yang paling efektif di era digital." }
+        }
+      }
+    },
+    {
+      "id": "senior",
+      "title": "Perundungan Senior terhadap Maba",
+      "description": "Kamu melihat senior memaksa maba melakukan hukuman fisik yang memalukan dengan alasan ospek.",
+      "badge": "Pelindung Maba",
+      "nodes": {
+        "start": {
+          "text": "Di area parkir kampus, kamu melihat sekelompok senior memaksa mahasiswa baru untuk push-up di genangan air sambil diteriaki. Mereka bilang ini tradisi ospek dan menyuruhmu ikut bergabung. Apa reaksimu?",
+          "options": [
+            { "text": "A. Ikut-ikutan karena dulu kamu juga pernah mengalaminya.", "nextNode": "ikut" },
+            { "text": "B. Rekam diam-diam, lalu cari bantuan petugas/PPKS.", "nextNode": "pintar" },
+            { "text": "C. Langsung konfrontasi fisik ke senior.", "nextNode": "konfrontasi" }
+          ],
+          "feedback": null
+        },
+        "ikut": {
+          "text": "Dengan ikut serta, kamu memperkuat budaya kekerasan yang seharusnya sudah ditinggalkan. Mahasiswa baru yang dipaksa mengalami trauma dan mempertanyakan keputusannya masuk kampus ini.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Normalisasi Kekerasan", "message": "Pengalaman masa lalu bukan pembenaran. Dulu saya juga mengalami justru harusnya membuatmu lebih empati, bukan ikut menyakiti." }
+        },
+        "pintar": {
+          "text": "Kamu merekam kejadian dari kejauhan, lalu segera menghubungi Satgas PPKS melalui tombol darurat di SafeSphere. Petugas keamanan datang dan menghentikan kejadian. Senior yang terlibat dipanggil untuk mediasi.",
+          "options": [
+            { "text": "Selesai — Kembali ke Daftar", "nextNode": "_back", "isSuccess": true }
+          ],
+          "feedback": { "type": "success", "title": "Tindakan Tepat!", "message": "Merekam bukti dan mencari otoritas yang berwenang adalah cara paling aman dan efektif untuk menghentikan perundungan sistemik." }
+        },
+        "konfrontasi": {
+          "text": "Kamu mendorong senior tersebut. Situasi langsung memanas. Kamu kini menjadi target intimidasi bersama mahasiswa baru. Kekerasan berlanjut hingga petugas keamanan datang terlambat.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Berbahaya!", "message": "Konfrontasi fisik bisa membahayakan dirimu dan membuat situasi semakin buruk. Gunakan jalur aman: rekam, laporkan, biarkan otoritas menangani." }
+        }
+      }
+    },
+    {
+      "id": "dosen",
+      "title": "Pelecehan Verbal dari Dosen",
+      "description": "Kamu mendengar dosen membuat komentar bernada seksual kepada mahasiswi di kelas.",
+      "badge": "Pembela Akademik",
+      "nodes": {
+        "start": {
+          "text": "Di tengah kuliah, dosen membuat komentar bernada seksual kepada seorang mahasiswi di depan kelas. Mahasiswi terlihat tidak nyaman dan menunduk. Tidak ada yang berbicara. Apa yang kamu lakukan?",
+          "options": [
+            { "text": "A. Diam, toh itu urusan dosen dan mahasiswi.", "nextNode": "diam" },
+            { "text": "B. Catat kejadian, tawarkan dukungan ke korban setelah kelas.", "nextNode": "pintar" },
+            { "text": "C. Langsung protes keras di depan kelas.", "nextNode": "protes" }
+          ],
+          "feedback": null
+        },
+        "diam": {
+          "text": "Dosen melanjutkan komentarnya di pertemuan berikutnya. Mahasiswi tersebut mulai menghindari kelas dan prestasinya menurun. Ia merasa tidak punya siapapun yang bisa ia ajak bicara.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Pelecehan Akademik", "message": "Pelecehan di lingkungan akademik adalah pelanggaran serius. Diam berarti membiarkan penyalahgunaan kekuasaan terus berlanjut." }
+        },
+        "pintar": {
+          "text": "Kamu mencatat tanggal, waktu, dan kata-kata yang diucapkan dosen. Setelah kelas, kamu menghampiri mahasiswi tersebut dengan lembut: \"Aku dengar tadi. Kamu tidak sendirian. Kalau mau, kita bisa laporkan bersama.\" Kamu juga mengirim laporan melalui SafeSphere.",
+          "options": [
+            { "text": "Selesai — Kembali ke Daftar", "nextNode": "_back", "isSuccess": true }
+          ],
+          "feedback": { "type": "success", "title": "Langkah Tepat!", "message": "Memberi dukungan dan mendokumentasi adalah langkah penting. Kamu memberdayakan korban untuk mengambil keputusan sendiri sambil memastikan ada catatan resmi." }
+        },
+        "protes": {
+          "text": "Kamu berdiri dan memprotes dosen di depan kelas. Dosen merasa terpojok dan memberimu nilai buruk. Mahasiswi yang kamu bela justru merasa lebih malu karena perhatian tertuju padanya.",
+          "options": [
+            { "text": "Ulangi Skenario", "nextNode": "start", "isRestart": true }
+          ],
+          "feedback": { "type": "error", "title": "Risiko Konfrontasi Langsung", "message": "Meski niat baik, konfrontasi langsung di depan pelaku bisa membuat situasi lebih buruk bagi korban. Pendekatan diam-diam seringkali lebih efektif." }
+        }
+      }
+    }
+  ]
+}

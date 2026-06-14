@@ -79,34 +79,6 @@
     window.location.hash = '#beranda';
   };
 
-  window.openForgotModal = function(event) {
-    event.preventDefault();
-    openModal('forgotPasswordModal');
-  };
-
-  window.closeForgotModal = function() {
-    closeModal('forgotPasswordModal');
-  };
-
-  window.sendOTP = function(event) {
-    event.preventDefault();
-    var target = sanitizeInput(document.getElementById('otpTarget').value);
-    if (!target) {
-      showTopSystemAlert('Mohon masukkan No. HP atau Email terlebih dahulu.');
-      return;
-    }
-    var btn = event.target;
-    btn.innerText = 'Mengirim OTP...';
-    btn.style.opacity = '0.7';
-
-    setTimeout(function() {
-      btn.innerText = 'Kirim Kode OTP';
-      btn.style.opacity = '1';
-      showTopSystemAlert('Simulasi: OTP tidak benar-benar dikirim (demo)');
-      closeForgotModal();
-    }, 1500);
-  };
-
   window.toggleStatusFields = function() {
     var status = document.getElementById('regStatus').value;
     var contInstansi = document.getElementById('containerInstansi');
@@ -143,7 +115,7 @@
     }
   };
 
-  window.handleRegister = function(event) {
+  window.handleRegister = async function(event) {
     event.preventDefault();
 
     var errorBox = document.getElementById('registerError');
@@ -193,23 +165,49 @@
     }
 
     var btn = event.target.querySelector('button[type="submit"]');
-    btn.innerText = 'Mendaftarkan (Simulasi)...';
+    btn.innerText = 'Mendaftarkan...';
     btn.style.opacity = '0.7';
+    btn.disabled = true;
 
-    setTimeout(function() {
-      btn.innerText = 'Daftar Sekarang';
-      btn.style.opacity = '1';
+    try {
+      var response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          password: pw,
+          status: status,
+          instansi: instansi || undefined,
+          peran: peran || undefined
+        })
+      });
+
+      var data = await response.json();
+
+      if (!response.ok) {
+        errorBox.classList.remove('hidden');
+        errorBox.innerText = data.error || 'Registrasi gagal. Coba lagi.';
+        return;
+      }
 
       resultBox.classList.remove('hidden');
       resultBox.classList.add('success');
       clearElement(resultBox);
-      resultBox.appendChild(createEl('strong', { text: 'Registrasi Demo Berhasil! (Simulasi)' }));
-      resultBox.appendChild(document.createTextNode(' Akun Anda terverifikasi. Silakan menuju '));
+      resultBox.appendChild(createEl('strong', { text: 'Registrasi Berhasil!' }));
+      resultBox.appendChild(document.createTextNode(' Akun Anda telah dibuat. Silakan menuju '));
       resultBox.appendChild(createEl('a', { href: '#login', text: 'Login' }));
       resultBox.appendChild(document.createTextNode('.'));
       event.target.reset();
       document.getElementById('pwHelper').className = 'form-helper';
       document.getElementById('pwHelper').innerText = 'Minimal 6 karakter, 1 huruf kapital, 1 angka, dan 1 karakter spesial.';
-    }, 1500);
+    } catch (err) {
+      errorBox.classList.remove('hidden');
+      errorBox.innerText = 'Koneksi gagal. Coba lagi.';
+    } finally {
+      btn.innerText = 'Daftar Sekarang';
+      btn.style.opacity = '1';
+      btn.disabled = false;
+    }
   };
 })();

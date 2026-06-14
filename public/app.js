@@ -196,6 +196,9 @@ function handleRouting() {
   }
 
   if (hash === '#admin') {
+    if (typeof updateUsersUI === 'function') {
+      updateUsersUI();
+    }
     setTimeout(function() {
       if (typeof initChart === 'function' && !document.getElementById('categoryChart').dataset.initialized) {
         initChart();
@@ -304,10 +307,50 @@ function setupEventListeners() {
   // Close dropdown on outside click
   document.addEventListener('click', handleOutsideClick);
 
-  // Close dropdown on Escape
+  function getOpenDropdown() {
+    return document.querySelector('.topbar-dropdown.show');
+  }
+
+  function focusDropdownItem(items, index) {
+    if (!items.length) return;
+    var nextIndex = Math.max(0, Math.min(index, items.length - 1));
+    items[nextIndex].focus();
+  }
+
   document.addEventListener('keydown', function(e) {
+    var openDropdown = getOpenDropdown();
+    if (!openDropdown) {
+      if (e.key === 'Escape') closeAllDropdowns();
+      return;
+    }
+
+    var items = Array.prototype.slice.call(
+      openDropdown.querySelectorAll('.topbar-dropdown-item[role="menuitem"]')
+    );
+
     if (e.key === 'Escape') {
+      e.preventDefault();
+      var trigger = document.querySelector('[aria-expanded="true"][aria-haspopup="true"]');
       closeAllDropdowns();
+      if (trigger) trigger.focus();
+      return;
+    }
+
+    if (!items.length) return;
+    var currentIndex = items.indexOf(document.activeElement);
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      focusDropdownItem(items, currentIndex < 0 ? 0 : currentIndex + 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      focusDropdownItem(items, currentIndex <= 0 ? items.length - 1 : currentIndex - 1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      focusDropdownItem(items, 0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      focusDropdownItem(items, items.length - 1);
     }
   });
 
@@ -338,18 +381,6 @@ function setupEventListeners() {
   var discreetClose = document.querySelector('#discreetOverlay button');
   if (discreetClose) {
     discreetClose.addEventListener('click', deactivateDiscreetMode);
-  }
-
-  // Forgot password link
-  var forgotLink = document.querySelector('#page-login a[href="#"]');
-  if (forgotLink) {
-    forgotLink.addEventListener('click', openForgotModal);
-  }
-
-  // OTP send button
-  var otpBtn = document.querySelector('#forgotPasswordModal .btn.primary');
-  if (otpBtn) {
-    otpBtn.addEventListener('click', sendOTP);
   }
 
   // Admin buttons
@@ -392,22 +423,15 @@ function setupEventListeners() {
     });
   }
 
-  // Social login buttons (placeholder)
-  document.querySelectorAll('.btn-social').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      showTopSystemAlert('Simulasi: fitur ini belum aktif');
-    });
-  });
-
-  // Demo banner dismiss
-  var demoBanner = document.getElementById('demoBanner');
+  // Pilot banner dismiss
+  var pilotBanner = document.getElementById('pilotBanner');
   var dismissBanner = document.getElementById('dismissBanner');
-  if (demoBanner && dismissBanner) {
+  if (pilotBanner && dismissBanner) {
     if (sessionStorage.getItem('bannerDismissed')) {
-      demoBanner.style.display = 'none';
+      pilotBanner.classList.add('is-hidden');
     }
     dismissBanner.addEventListener('click', function() {
-      demoBanner.style.display = 'none';
+      pilotBanner.classList.add('is-hidden');
       sessionStorage.setItem('bannerDismissed', 'true');
     });
   }
@@ -441,22 +465,69 @@ function setupEventListeners() {
     if (currentSection) currentSection.classList.remove('hidden');
   }
 
+  function setFieldError(field, message) {
+    if (!field) return;
+    var errorId = field.id + '-error';
+    var errorEl = document.getElementById(errorId);
+    if (!errorEl) {
+      errorEl = document.createElement('span');
+      errorEl.id = errorId;
+      errorEl.className = 'field-error';
+      errorEl.setAttribute('role', 'alert');
+      field.parentNode.appendChild(errorEl);
+    }
+    if (message) {
+      errorEl.textContent = message;
+      field.classList.add('is-invalid');
+      field.setAttribute('aria-invalid', 'true');
+      field.setAttribute('aria-describedby', errorId);
+    } else {
+      errorEl.textContent = '';
+      field.classList.remove('is-invalid');
+      field.removeAttribute('aria-invalid');
+      field.removeAttribute('aria-describedby');
+    }
+  }
+
   function validateStep(step) {
     var section = document.getElementById('formStep' + step);
     if (!section) return true;
     var requiredFields = section.querySelectorAll('[required]');
     var firstInvalid = null;
+    var labels = {
+      category: 'Pilih kategori perundungan',
+      location: 'Isi lokasi kejadian',
+      incidentDate: 'Pilih tanggal kejadian',
+      urgent: 'Pilih tingkat urgensi',
+      description: 'Ceritakan kronologi kejadian'
+    };
+
     requiredFields.forEach(function(field) {
-      if (!field.value || (field.value.trim && field.value.trim() === '')) {
-        field.style.borderColor = 'var(--danger)';
+      var empty = !field.value || (field.value.trim && field.value.trim() === '');
+      if (empty) {
+        setFieldError(field, labels[field.id] || 'Field ini wajib diisi');
         if (!firstInvalid) firstInvalid = field;
       } else {
-        field.style.borderColor = '';
+        setFieldError(field, '');
       }
     });
+
+    if (step === 1) {
+      var dateField = document.getElementById('incidentDate');
+      if (dateField && dateField.value) {
+        var selected = new Date(dateField.value + 'T00:00:00');
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selected > today) {
+          setFieldError(dateField, 'Tanggal kejadian tidak boleh di masa depan');
+          if (!firstInvalid) firstInvalid = dateField;
+        }
+      }
+    }
+
     if (firstInvalid) {
       firstInvalid.focus();
-      showTopSystemAlert('Harap isi semua field yang wajib diisi.');
+      showTopSystemAlert('Harap perbaiki field yang ditandai sebelum melanjutkan.');
       return false;
     }
     return true;
@@ -604,8 +675,6 @@ function setupEventListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-  reportData = Storage.load('reports', []);
-
   try {
     var meResponse = await fetch('/api/auth/me');
     if (meResponse.ok) {

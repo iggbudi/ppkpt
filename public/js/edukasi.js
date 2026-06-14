@@ -1,174 +1,14 @@
 (function() {
-  // ============================================================
-  // SafeSphere Edukasi — Multi-Scenario Decision Tree + Progress
-  // ============================================================
+  var scenarios = [];
+  var scenariosLoaded = false;
 
-  // --- Data Skema Skenario ---
-  var scenarios = [
-    {
-      id: 'bystander',
-      title: 'Skenario Saksi Mata (Bystander)',
-      description: 'Anda sedang duduk di kantin fakultas dan melihat seorang mahasiswa baru didorong dan diejek oleh sekelompok senior.',
-      badge: '🛡️ Bystander Aktif',
-      nodes: {
-        start: {
-          text: 'Anda sedang duduk di kantin fakultas dan melihat seorang mahasiswa baru didorong dan diejek oleh sekelompok senior. Mereka merekam kejadian tersebut sambil tertawa. Apa tindakan pertama Anda?',
-          options: [
-            { text: 'A. Langsung menghampiri, marah, dan membentak para senior tersebut.', nextNode: 'agresif' },
-            { text: 'B. Pura-pura tidak melihat sambil melanjutkan makan agar tidak ikut terseret.', nextNode: 'pasif' },
-            { text: 'C. Menjauh ke titik aman, merekam diam-diam sebagai bukti, lalu melapor ke SafeSphere.', nextNode: 'pintar' }
-          ],
-          feedback: null
-        },
-        agresif: {
-          text: 'Anda mencoba melawan. Namun karena kalah jumlah, Anda kini malah ikut menjadi target intimidasi fisik dan verbal mereka. Bertindak heroik dengan emosi seringkali bukan solusi yang aman.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Berbahaya!</strong> Menghadapi pelaku secara langsung tanpa perhitungan bisa membahayakan keselamatan diri Anda.' }
-        },
-        pasif: {
-          text: 'Korban semakin dipermalukan. Karena tidak ada mahasiswa lain yang berani bertindak, pelaku merasa perilaku mereka wajar dan kekerasan semakin dinormalisasi di kampus.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Efek Bystander (Pembiaran):</strong> Diam berarti secara tidak langsung Anda membiarkan perundungan terus terjadi.' }
-        },
-        pintar: {
-          text: 'Tepat sekali! Anda berhasil mendapatkan bukti rekaman wajah pelaku tanpa membahayakan diri sendiri. Laporan anonim Anda di SafeSphere langsung diproses oleh Satgas PPKS, dan korban segera mendapatkan perlindungan.',
-          options: [
-            { text: '🏆 Selesai — Kembali ke Daftar', nextNode: '_back', isSuccess: true }
-          ],
-          feedback: { type: 'success', message: '<strong>Langkah Cerdas!</strong> Mengamankan bukti dan melapor secara terenkripsi adalah tindakan paling efektif untuk memutus rantai perundungan.' }
-        }
-      }
-    },
-    {
-      id: 'cyberbullying',
-      title: 'Cyberbullying di Grup WhatsApp',
-      description: 'Kamu melihat angkatanmu mengolok-olok mahasiswa baru di grup WA. Pesannya sudah 50+, banyak yang ikut menertawakan.',
-      badge: '🛡️ Pelapor Digital',
-      nodes: {
-        start: {
-          text: 'Kamu membuka grup WhatsApp angkatan dan melihat percakapan yang sudah berlangsung lama. Seorang mahasiswa baru sedang diolok-olok karena penampilannya. Pesan sudah lebih dari 50, banyak yang ikut menertawakan dengan sticker dan meme. Apa yang kamu lakukan?',
-          options: [
-            { text: 'A. Ikut menertawakan agar tidak di-bully juga.', nextNode: 'ikut' },
-            { text: 'B. Diam saja, toh bukan urusanmu.', nextNode: 'diam' },
-            { text: 'C. Screenshot, DM korban untuk dukungan, lalu laporkan.', nextNode: 'pintar' }
-          ],
-          feedback: null
-        },
-        ikut: {
-          text: 'Korban melihat nama kamu di antara yang menertawakan. Ia merasa semakin terisolasi dan tidak memiliki siapapun. Keesokan harinya, ia tidak masuk kuliah.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Complicity:</strong> Mengikuti kerumunan yang merundung membuatmu bagian dari masalah. Dampak psikologis korban bisa bertahan bertahun-tahun.' }
-        },
-        diam: {
-          text: 'Karena tidak ada yang membela, pelaku semakin menjadi. Mereka mulai mengirim DM ancaman ke korban. Korban mulai mengalami kecemasan dan mempertimbangkan untuk berhenti kuliah.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Efek Bystander Digital:</strong> Diam di dunia digital sama dengan membiarkan. Setiap pesan yang tidak dilawan adalah kontribusi pada normalisasi perundungan.' }
-        },
-        pintar: {
-          text: 'Kamu mengambil screenshot seluruh percakapan sebagai bukti. Kamu mengirim DM pribadi ke korban: "Hei, aku lihat apa yang terjadi. Kamu tidak sendirian. Kalau butuh bantuan, aku di sini." Kamu juga melaporkan kejadian ini melalui SafeSphere.',
-          options: [
-            { text: '🏆 Selesai — Kembali ke Daftar', nextNode: '_back', isSuccess: true }
-          ],
-          feedback: { type: 'success', message: '<strong>Langkah Cerdas!</strong> Mengamankan bukti digital dan memberi dukungan langsung kepada korban adalah tindakan bystander yang paling efektif di era digital.' }
-        }
-      }
-    },
-    {
-      id: 'senior',
-      title: 'Perundungan Senior terhadap Maba',
-      description: 'Kamu melihat senior memaksa maba melakukan hukuman fisik yang memalukan dengan alasan "ospek".',
-      badge: '🛡️ Pelindung Maba',
-      nodes: {
-        start: {
-          text: 'Di area parkir kampus, kamu melihat sekelompok senior memaksa mahasiswa baru untuk push-up di genangan air sambil diteriaki. Mereka bilang ini "tradisi ospek" dan menyuruhmu ikut bergabung. Apa reaksimu?',
-          options: [
-            { text: 'A. Ikut-ikutan karena dulu kamu juga pernah mengalaminya.', nextNode: 'ikut' },
-            { text: 'B. Rekam diam-diam, lalu cari bantuan petugas/PPKS.', nextNode: 'pintar' },
-            { text: 'C. Langsung konfrontasi fisik ke senior.', nextNode: 'konfrontasi' }
-          ],
-          feedback: null
-        },
-        ikut: {
-          text: 'Dengan ikut serta, kamu memperkuat budaya kekerasan yang seharusnya sudah ditinggalkan. Mahasiswa baru yang dipaksa mengalami trauma dan mempertanyakan keputusannya masuk kampus ini.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Normalisasi Kekerasan:</strong> Pengalaman masa lalu bukan pembenaran. "Dulu saya juga mengalami" justru harusnya membuatmu lebih empati, bukan ikut menyakiti.' }
-        },
-        pintar: {
-          text: 'Kamu merekam kejadian dari kejauhan, lalu segera menghubungi Satgas PPKS melalui tombol darurat di SafeSphere. Petugas keamanan datang dan menghentikan kejadian. Senior yang terlibat dipanggil untuk mediasi.',
-          options: [
-            { text: '🏆 Selesai — Kembali ke Daftar', nextNode: '_back', isSuccess: true }
-          ],
-          feedback: { type: 'success', message: '<strong>Tindakan Tepat!</strong> Merekam bukti dan mencari otoritas yang berwenang adalah cara paling aman dan efektif untuk menghentikan perundungan sistemik.' }
-        },
-        konfrontasi: {
-          text: 'Kamu mendorong senior tersebut. Situasi langsung memanas. Kamu kini menjadi target intimidasi bersama mahasiswa baru. Kekerasan berlanjut hingga petugas keamanan datang terlambat.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Berbahaya!</strong> Konfrontasi fisik bisa membahayakan dirimu dan membuat situasi semakin buruk. Gunakan jalur aman: rekam, laporkan, biarkan otoritas menangani.' }
-        }
-      }
-    },
-    {
-      id: 'dosen',
-      title: 'Pelecehan Verbal dari Dosen',
-      description: 'Kamu mendengar dosen membuat komentar bernada seksual kepada mahasiswi di kelas.',
-      badge: '🛡️ Pembela Akademik',
-      nodes: {
-        start: {
-          text: 'Di tengah kuliah, dosen membuat komentar bernada seksual kepada seorang mahasiswi di depan kelas. "Kamu cantik begini, ngapain serius kuliah?" Mahasiswi terlihat tidak nyaman dan menunduk. Tidak ada yang berbicara. Apa yang kamu lakukan?',
-          options: [
-            { text: 'A. Diam, toh itu urusan dosen dan mahasiswi.', nextNode: 'diam' },
-            { text: 'B. Catat kejadian, tawarkan dukungan ke korban setelah kelas.', nextNode: 'pintar' },
-            { text: 'C. Langsung protes keras di depan kelas.', nextNode: 'protes' }
-          ],
-          feedback: null
-        },
-        diam: {
-          text: 'Dosen melanjutkan komentarnya di pertemuan berikutnya. Mahasiswi tersebut mulai menghindari kelas dan prestasinya menurun. Ia merasa tidak punya siapapun yang bisa ia ajak bicara.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Pelecehan Akademik:</strong> Pelecehan di lingkungan akademik adalah pelanggaran serius. Diam berarti membiarkan penyalahgunaan kekuasaan terus berlanjut.' }
-        },
-        pintar: {
-          text: 'Kamu mencatat tanggal, waktu, dan kata-kata yang diucapkan dosen. Setelah kelas, kamu menghampiri mahasiswi tersebut dengan lembut: "Aku dengar tadi. Kamu tidak sendirian. Kalau mau, kita bisa laporkan bersama." Kamu juga mengirim laporan melalui SafeSphere.',
-          options: [
-            { text: '🏆 Selesai — Kembali ke Daftar', nextNode: '_back', isSuccess: true }
-          ],
-          feedback: { type: 'success', message: '<strong>Langkah Tepat!</strong> Memberi dukungan dan mendokumentasi adalah langkah penting. Kamu memberdayakan korban untuk mengambil keputusan sendiri sambil memastikan ada catatan resmi.' }
-        },
-        protes: {
-          text: 'Kamu berdiri dan memprotes dosen di depan kelas. Dosen merasa terpojok dan memberimu nilai buruk. Mahasiswi yang kamu bela justru merasa lebih malu karena perhatian tertuju padanya.',
-          options: [
-            { text: '↩ Ulangi Skenario', nextNode: 'start', isRestart: true }
-          ],
-          feedback: { type: 'error', message: '<strong>Risiko Konfrontasi Langsung:</strong> Meski niat baik, konfrontasi langsung di depan pelaku bisa membuat situasi lebih buruk bagi korban. Pendekatan diam-diam seringkali lebih efektif.' }
-        }
-      }
-    }
-  ];
-
-  // --- Progress Tracking (localStorage) ---
   var STORAGE_KEY = 'safesphere_edu_progress';
 
   function getProgress() {
     try {
       var data = localStorage.getItem(STORAGE_KEY);
-      if (data) {
-        return JSON.parse(data);
-      }
-    } catch (e) { /* ignore */ }
+      if (data) return JSON.parse(data);
+    } catch (e) {}
     return { completed: [], totalXP: 0 };
   }
 
@@ -179,21 +19,18 @@
       progress.totalXP += 20;
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-      } catch (e) { /* ignore */ }
+      } catch (e) {}
     }
     return progress;
   }
 
   function isScenarioCompleted(scenarioId) {
-    var progress = getProgress();
-    return progress.completed.indexOf(scenarioId) !== -1;
+    return getProgress().completed.indexOf(scenarioId) !== -1;
   }
 
   function getCompletedCount() {
     return getProgress().completed.length;
   }
-
-  // --- UI Rendering ---
 
   function renderProgressBar() {
     var bar = document.getElementById('eduProgressBar');
@@ -209,22 +46,31 @@
     text.textContent = completed + '/' + total + ' skenario selesai';
 
     if (badge) {
-      if (completed >= total) {
-        badge.classList.remove('hidden');
-      } else {
-        badge.classList.add('hidden');
-      }
+      if (total > 0 && completed >= total) badge.classList.remove('hidden');
+      else badge.classList.add('hidden');
     }
   }
 
-  function renderTrustedFeedback(element, message) {
+  function renderTrustedFeedback(element, feedback) {
     clearElement(element);
-    var match = String(message).match(/^<strong>(.*?)<\/strong>\s*(.*)$/);
-    if (match) {
-      element.appendChild(createEl('strong', { text: match[1] }));
-      if (match[2]) element.appendChild(document.createTextNode(' ' + match[2]));
-    } else {
-      element.textContent = String(message).replace(/<[^>]+>/g, '');
+    if (!feedback) return;
+
+    if (typeof feedback === 'string') {
+      var legacy = String(feedback).match(/^<strong>(.*?)<\/strong>\s*(.*)$/);
+      if (legacy) {
+        element.appendChild(createEl('strong', { text: legacy[1] }));
+        if (legacy[2]) element.appendChild(document.createTextNode(' ' + legacy[2]));
+      } else {
+        element.textContent = String(feedback).replace(/<[^>]+>/g, '');
+      }
+      return;
+    }
+
+    if (feedback.title) {
+      element.appendChild(createEl('strong', { text: feedback.title }));
+      if (feedback.message) element.appendChild(document.createTextNode(' ' + feedback.message));
+    } else if (feedback.message) {
+      element.textContent = feedback.message;
     }
   }
 
@@ -235,20 +81,37 @@
 
     listEl.classList.remove('hidden');
     detailEl.classList.add('hidden');
-
     clearElement(listEl);
+
+    if (!scenariosLoaded) {
+      listEl.appendChild(createEl('p', {
+        className: 'muted',
+        style: 'text-align:center; padding:20px;',
+        text: 'Memuat skenario edukasi...'
+      }));
+      return;
+    }
+
+    if (scenarios.length === 0) {
+      listEl.appendChild(createEl('p', {
+        className: 'muted',
+        style: 'text-align:center; padding:20px;',
+        text: 'Skenario edukasi belum tersedia.'
+      }));
+      return;
+    }
+
     scenarios.forEach(function(scenario, index) {
       var completed = isScenarioCompleted(scenario.id);
       var card = createEl('div', { className: 'scenario-card' + (completed ? ' completed' : '') });
 
-      var header = createEl('div', { className: 'scenario-card-header' }, [
+      card.appendChild(createEl('div', { className: 'scenario-card-header' }, [
         createEl('span', { className: 'scenario-number', text: String(index + 1) }),
         createEl('span', {
           className: 'scenario-status ' + (completed ? 'status-done' : 'status-new'),
-          text: completed ? '✓ Selesai' : 'Baru'
+          text: completed ? 'Selesai' : 'Belum'
         })
-      ]);
-      card.appendChild(header);
+      ]));
       card.appendChild(createEl('h4', { className: 'scenario-card-title', text: scenario.title }));
       card.appendChild(createEl('p', { className: 'scenario-card-desc', text: scenario.description }));
       if (completed) {
@@ -260,14 +123,15 @@
     });
   }
 
-  function loadScenario(scenarioId) {
-    var scenario = null;
+  function findScenario(scenarioId) {
     for (var i = 0; i < scenarios.length; i++) {
-      if (scenarios[i].id === scenarioId) {
-        scenario = scenarios[i];
-        break;
-      }
+      if (scenarios[i].id === scenarioId) return scenarios[i];
     }
+    return null;
+  }
+
+  function loadScenario(scenarioId) {
+    var scenario = findScenario(scenarioId);
     if (!scenario) return;
 
     var listEl = document.getElementById('scenarioList');
@@ -279,7 +143,6 @@
     if (detailEl) detailEl.classList.remove('hidden');
     if (detailTitle) detailTitle.textContent = scenario.title;
     if (backBtn) backBtn.onclick = function() { renderScenarioList(); renderProgressBar(); };
-
     if (detailEl) detailEl.setAttribute('data-scenario-id', scenarioId);
 
     renderStoryNode(scenarioId, 'start');
@@ -292,13 +155,7 @@
       return;
     }
 
-    var scenario = null;
-    for (var i = 0; i < scenarios.length; i++) {
-      if (scenarios[i].id === scenarioId) {
-        scenario = scenarios[i];
-        break;
-      }
-    }
+    var scenario = findScenario(scenarioId);
     if (!scenario) return;
 
     var node = scenario.nodes[nodeId];
@@ -308,32 +165,25 @@
     var optionsEl = document.getElementById('gameOptions');
     var feedbackEl = document.getElementById('gameFeedback');
     var sceneEl = document.getElementById('gameScene');
-
     if (!textEl || !optionsEl || !feedbackEl || !sceneEl) return;
 
-    // Simpan progress otomatis saat user mencapai ending success.
-    // Ini membuat progress bar langsung bergerak setelah memilih jawaban benar,
-    // tanpa bergantung pada klik tombol selesai.
     if (node.feedback && node.feedback.type === 'success') {
       saveProgress(scenarioId);
       renderProgressBar();
     }
 
-    sceneEl.style.opacity = '0';
+    sceneEl.classList.add('is-fading');
 
     setTimeout(function() {
-      textEl.innerText = node.text;
+      textEl.textContent = node.text;
       clearElement(optionsEl);
 
       node.options.forEach(function(opt) {
         var btn = document.createElement('button');
-        btn.innerText = opt.text;
-        if (opt.isSuccess === true) {
-          btn.className = 'quiz-option-success';
-        }
-        if (opt.isRestart) {
-          btn.className = 'quiz-option-restart';
-        }
+        btn.type = 'button';
+        btn.textContent = opt.text;
+        if (opt.isSuccess === true) btn.className = 'quiz-option-success';
+        if (opt.isRestart) btn.className = 'quiz-option-restart';
         btn.onclick = function() {
           if (opt.isSuccess === true) {
             saveProgress(scenarioId);
@@ -346,28 +196,45 @@
 
       if (node.feedback) {
         feedbackEl.className = 'result ' + node.feedback.type;
-        renderTrustedFeedback(feedbackEl, node.feedback.message);
+        renderTrustedFeedback(feedbackEl, node.feedback);
         feedbackEl.classList.remove('hidden');
       } else {
         feedbackEl.className = 'result hidden';
         clearElement(feedbackEl);
       }
 
-      sceneEl.style.opacity = '1';
+      sceneEl.classList.remove('is-fading');
     }, 300);
   }
 
-  // --- Public API ---
+  function loadScenarios() {
+    return fetch('/edukasi/scenarios.json')
+      .then(function(response) {
+        if (!response.ok) throw new Error('Gagal memuat skenario');
+        return response.json();
+      })
+      .then(function(data) {
+        scenarios = Array.isArray(data.scenarios) ? data.scenarios : [];
+        scenariosLoaded = true;
+        renderProgressBar();
+        renderScenarioList();
+      })
+      .catch(function() {
+        scenarios = [];
+        scenariosLoaded = true;
+        renderProgressBar();
+        renderScenarioList();
+      });
+  }
+
   window.renderStoryNode = renderStoryNode;
   window.loadScenario = loadScenario;
   window.renderScenarioList = renderScenarioList;
   window.renderProgressBar = renderProgressBar;
 
-  // --- Init ---
   document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('scenarioList') || document.getElementById('gamificationContainer')) {
-      renderProgressBar();
-      renderScenarioList();
+      loadScenarios();
     }
   });
 })();

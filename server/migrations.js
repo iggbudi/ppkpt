@@ -130,6 +130,30 @@ const SCHEMA_VERSIONS = [
       INSERT OR IGNORE INTO retention_policy (table_name, days_to_keep, date_column, status_column, status_value)
       VALUES ('evidence_files', 90, 'uploaded_at', 'scan_status', 'clean');
     `
+  },
+  {
+    name: '006_users',
+    up: `
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        email TEXT UNIQUE,
+        password_hash TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'user',
+        name TEXT NOT NULL,
+        status TEXT,
+        instansi TEXT,
+        peran TEXT,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at INTEGER NOT NULL,
+        deactivated_at INTEGER
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+      CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+      CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
+      CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
+    `
   }
 ];
 

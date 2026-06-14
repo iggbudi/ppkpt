@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; frame-src https://id.wikipedia.org; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; frame-src https://id.wikipedia.org; object-src 'none'; base-uri 'self'; form-action 'self';">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SafeSphere - Pelaporan Anonim Anti-Perundungan</title>
   
@@ -11,17 +11,14 @@
 </head>
 <body>
   <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
-  <div id="demoBanner" class="demo-banner">
-    <span>MODE DEMO — SafeSphere adalah purwarupa kompetisi. Jangan masukkan data nyata atau pribadi.</span>
-    <button id="dismissBanner" class="demo-banner-close" type="button" aria-label="Tutup banner">&times;</button>
+  <div id="pilotBanner" class="pilot-banner">
+    <span>Pilot SafeSphere — Platform pelaporan anti-perundungan kampus. Gunakan dengan bijak.</span>
+    <button id="dismissBanner" class="pilot-banner-close" type="button" aria-label="Tutup banner">&times;</button>
   </div>
 
-  <div id="discreetOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 999999;">
-    <iframe src="https://id.wikipedia.org/wiki/Halaman_Utama" style="width: 100%; height: 100%; border: none;"></iframe>
-    
-    <button id="discreetCloseBtn" style="position: absolute; top: 20px; right: 24px; width: 44px; height: 44px; background: #ffffff; color: #64748b; border: 1px solid #cbd5e1; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 18px; font-weight: bold; cursor: pointer; display: grid; place-items: center; z-index: 10; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'; this.style.color='#0f172a'" onmouseout="this.style.background='#ffffff'; this.style.color='#64748b'">
-      ✕
-    </button>
+  <div id="discreetOverlay" class="discreet-overlay" aria-hidden="true">
+    <iframe src="https://id.wikipedia.org/wiki/Halaman_Utama" title="Halaman samaran Wikipedia" class="discreet-overlay-frame"></iframe>
+    <button id="discreetCloseBtn" class="discreet-close-btn" type="button" aria-label="Keluar dari mode samaran">✕</button>
   </div>
 
   <!-- Sidebar Overlay -->
@@ -273,7 +270,7 @@
         <div class="report-choice-grid">
           <div class="report-choice-card" id="choiceAnonim">
             <h3>Lapor Anonim</h3>
-            <p>Identitas Anda tidak akan disimpan. Cocok jika Anda hanya ingin melaporkan kejadian tanpa melacak status.</p>
+            <p>Identitas akun tidak dicatat pada laporan atau audit pembuatan. Cocok jika Anda ingin melaporkan tanpa melacak status.</p>
             <ul>
               <li>Tidak perlu login</li>
               <li>Identitas tidak disimpan</li>
@@ -298,7 +295,7 @@
       <section class="section card hidden" id="reportFormSection">
         <div class="card-header">
           <h2 id="reportFormTitle">Form Lapor Anonim</h2>
-          <p class="muted" id="reportFormSubtitle">Isi laporan secara jujur. Data disimpan di server demo.</p>
+          <p class="muted" id="reportFormSubtitle">Isi laporan secara jujur. Data disimpan aman di server SafeSphere.</p>
           <button class="btn outline" id="backToChoice" type="button" style="margin-top: 8px;">Kembali</button>
         </div>
 
@@ -416,7 +413,7 @@
             <div id="reviewSummary" style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px;"></div>
             <div class="form-nav">
               <button class="btn outline" type="button" id="prevStep4">Kembali</button>
-              <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan (Demo)</button>
+              <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan</button>
             </div>
           </div>
         </form>
@@ -451,8 +448,8 @@
           <!-- Progress Bar -->
           <div class="edu-progress-container">
             <div class="edu-progress-header">
-              <span class="edu-progress-label">📊 Progress Simulasi</span>
-              <span id="eduProgressText" class="edu-progress-count">0/4 skenario selesai</span>
+              <span class="edu-progress-label">Progress Edukasi</span>
+              <span id="eduProgressText" class="edu-progress-count">0/6 skenario selesai</span>
             </div>
             <div class="edu-progress-bar-track">
               <div id="eduProgressBar" class="edu-progress-bar-fill"></div>
@@ -471,12 +468,12 @@
           <div id="scenarioDetail" class="scenario-detail hidden" data-scenario-id="">
             <div class="scenario-detail-header">
               <button id="scenarioBackBtn" class="btn outline btn-sm" type="button">← Kembali ke Daftar</button>
-              <span class="scenario-detail-badge">Simulasi Interaktif</span>
+              <span class="scenario-detail-badge">Skenario Interaktif</span>
             </div>
             <h3 id="scenarioDetailTitle" class="scenario-detail-title">Skenario</h3>
             
-            <div id="gameScene" style="transition: opacity 0.3s ease;">
-              <p id="gameText" style="font-size: 16px; font-weight: 500; margin-bottom: 20px; line-height: 1.6;">Memuat simulasi...</p>
+            <div id="gameScene" class="game-scene">
+              <p id="gameText" class="game-text">Memuat skenario...</p>
               
               <div id="gameOptions" class="quiz-options">
                 <!-- Rendered dynamically -->
@@ -552,10 +549,6 @@
           <p class="muted">Daftar untuk mengakses fitur pelaporan dan konsultasi yang lebih terpersonalisasi.</p>
         </div>
         
-        <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; text-align: center;">
-          <strong>Mode Demo</strong> - Form registrasi ini adalah simulasi. Akun tidak benar-benar dibuat. Gunakan akun demo untuk login (demo/demo123).
-        </div>
-
         <form id="registerForm" class="form-grid">
           
           <label class="full" for="regName">Nama Lengkap
@@ -624,63 +617,14 @@
           </label>
           <label class="full" style="text-align: left;">Password
             <input type="password" id="loginPass" placeholder="Masukkan password" required>
-            <div style="text-align: right; margin-top: 8px;">
-              <a href="#" id="forgotPasswordLink" style="font-size: 13px; color: var(--primary); text-decoration: none; font-weight: 600;">Lupa Password?</a>
-            </div>
+
           </label>
           <div class="full" style="margin-top: 10px;">
             <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Masuk</button>
           </div>
         </form>
 
-        <div class="divider">
-          <span>atau masuk dengan</span>
-        </div>
-
-        <div class="social-login">
-          <button class="btn-social btn-google">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Lanjutkan dengan Google
-          </button>
-          <button class="btn-social btn-instagram">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-            </svg>
-            Lanjutkan dengan Instagram
-          </button>
-          <button class="btn-social btn-email">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-              <polyline points="22,6 12,13 2,6"></polyline>
-            </svg>
-            Masuk dengan Email / Link
-          </button>
-        </div>
       </section>
-
-      <dialog id="forgotPasswordModal" class="modal">
-        <div class="modal-content">
-          <button type="button" class="close-modal" id="forgotModalCloseBtn" aria-label="Tutup">&times;</button>
-          <h2 style="margin-top: 10px;">Lupa Password?</h2>
-          <div style="background: #fff3cd; border: 1px solid #ffc107; padding: 10px; border-radius: var(--radius-sm); margin-bottom: 16px; text-align: center; font-size: 14px;">
-            <strong>Mode Demo</strong> - Fitur OTP belum tersedia. Gunakan akun demo (demo/demo123) untuk login.
-          </div>
-          <p class="muted">Fitur reset password dengan OTP akan tersedia pada versi production.</p>
-          <div class="form-grid" style="display:block; text-align:left; margin-top: 20px;">
-            <label>No. HP / Email
-              <input type="text" id="otpTarget" placeholder="Contoh: 0812xxx atau email@contoh.com" disabled>
-            </label>
-            <button class="btn primary full" id="sendOtpBtn" style="margin-top: 16px; padding: 12px; opacity: 0.6;" disabled>Kirim Kode OTP (Belum Tersedia)</button>
-          </div>
-        </div>
-      </dialog>
     </div>
 
     <div id="page-admin" class="page">
@@ -717,7 +661,8 @@
           </div>
 
           <div class="chart-wrap">
-            <canvas id="categoryChart" height="80"></canvas>
+            <canvas id="categoryChart" height="80" aria-hidden="true"></canvas>
+            <div id="adminChartTable" class="admin-chart-table-wrap" aria-live="polite"></div>
           </div>
 
           <div class="card-header" style="margin-top: 32px; padding-bottom: 12px;">
@@ -726,6 +671,14 @@
           
           <div id="adminReportList" class="report-list">
             <p class="muted" style="text-align:center; padding:20px;">Belum ada data laporan. Klik "Isi Data Demo".</p>
+          </div>
+
+          <div class="card-header" style="margin-top: 32px; padding-bottom: 12px;">
+            <h2 style="font-size: 20px;">Manajemen Pengguna</h2>
+          </div>
+
+          <div id="adminUserList" class="report-list">
+            <p class="muted" style="text-align:center; padding:20px;">Memuat daftar pengguna...</p>
           </div>
 
         </div>
@@ -808,7 +761,7 @@
     <p>&copy; 2026 Tim Kompetisi Vokasi OLIVIA XI. Mengembangkan inovasi digital berkelanjutan.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="vendor/chart.umd.min.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>

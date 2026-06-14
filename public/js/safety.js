@@ -10,16 +10,36 @@
       var input = document.getElementById(id);
       if (input) input.value = '';
     });
-    history.replaceState(null, '', window.location.pathname + '#beranda');
-    document.getElementById('discreetOverlay').style.display = 'block';
-    document.getElementById('quickEscapeBtn').style.display = 'none';
+
+    if (window.location.hash && window.location.hash !== '#beranda') {
+      history.replaceState({ discreet: true }, '', window.location.pathname + '#beranda');
+    }
+    history.pushState({ discreet: true }, '', window.location.pathname + '#beranda');
+
+    var overlay = document.getElementById('discreetOverlay');
+    var escapeBtn = document.getElementById('quickEscapeBtn');
+    var closeBtn = document.getElementById('discreetCloseBtn');
+    if (overlay) {
+      overlay.classList.add('is-active');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    if (escapeBtn) escapeBtn.classList.add('is-hidden');
+    document.body.classList.add('discreet-mode');
     document.title = 'Wikipedia bahasa Indonesia';
+    if (closeBtn) closeBtn.focus();
   };
 
   window.deactivateDiscreetMode = function() {
-    document.getElementById('discreetOverlay').style.display = 'none';
-    document.getElementById('quickEscapeBtn').style.display = 'flex';
+    var overlay = document.getElementById('discreetOverlay');
+    var escapeBtn = document.getElementById('quickEscapeBtn');
+    if (overlay) {
+      overlay.classList.remove('is-active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    if (escapeBtn) escapeBtn.classList.remove('is-hidden');
+    document.body.classList.remove('discreet-mode');
     document.title = originalTitle;
+    if (escapeBtn) escapeBtn.focus();
   };
 
   window.addEventListener('keydown', function(e) {

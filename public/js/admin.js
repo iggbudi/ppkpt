@@ -48,6 +48,37 @@
     }
   };
 
+  function renderAdminChartTable(categories, values, total) {
+    var tableWrap = document.getElementById('adminChartTable');
+    if (!tableWrap) return;
+
+    clearElement(tableWrap);
+    var caption = createEl('caption', { text: 'Ringkasan laporan per kategori untuk pembaca layar' });
+    var table = createEl('table', { className: 'admin-chart-table' });
+    table.appendChild(caption);
+
+    var thead = createEl('thead');
+    var headRow = createEl('tr');
+    headRow.appendChild(createEl('th', { scope: 'col', text: 'Kategori' }));
+    headRow.appendChild(createEl('th', { scope: 'col', text: 'Jumlah' }));
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    var tbody = createEl('tbody');
+    categories.forEach(function(category, index) {
+      var row = createEl('tr');
+      row.appendChild(createEl('th', { scope: 'row', text: category }));
+      row.appendChild(createEl('td', { text: String(values[index] || 0) }));
+      tbody.appendChild(row);
+    });
+    var totalRow = createEl('tr');
+    totalRow.appendChild(createEl('th', { scope: 'row', text: 'Total' }));
+    totalRow.appendChild(createEl('td', { text: String(total) }));
+    tbody.appendChild(totalRow);
+    table.appendChild(tbody);
+    tableWrap.appendChild(table);
+  }
+
   window.updateDashboardUI = async function() {
     try {
       var response = await fetch('/api/reports');
@@ -74,12 +105,15 @@
     document.getElementById('m-selesai').innerText = selesai;
     document.getElementById('m-dominan').innerText = dominant;
 
+    var categories = ['Verbal', 'Sosial', 'Cyberbullying', 'Fisik', 'Seksual'];
+    var chartValues = categories.map(function(cat) { return catCounts[cat] || 0; });
+
     if (chartInstance) {
-      chartInstance.data.datasets[0].data = [
-        catCounts['Verbal'] || 0, catCounts['Sosial'] || 0, catCounts['Cyberbullying'] || 0, catCounts['Fisik'] || 0, catCounts['Seksual'] || 0
-      ];
+      chartInstance.data.datasets[0].data = chartValues;
       chartInstance.update();
     }
+
+    renderAdminChartTable(categories, chartValues, total);
 
     var listContainer = document.getElementById('adminReportList');
     clearElement(listContainer);
@@ -177,6 +211,93 @@
     currentDetailId = null;
   };
 
+  window.updateUsersUI = async function() {
+    var listContainer = document.getElementById('adminUserList');
+    if (!listContainer) return;
+
+    try {
+      var response = await fetch('/api/admin/users');
+      if (!response.ok) {
+        clearElement(listContainer);
+        listContainer.appendChild(createEl('p', {
+          className: 'muted',
+          style: 'text-align:center; padding:20px;',
+          text: 'Gagal memuat daftar pengguna.'
+        }));
+        return;
+      }
+
+      var data = await response.json();
+      clearElement(listContainer);
+
+      if (!data.users || data.users.length === 0) {
+        listContainer.appendChild(createEl('p', {
+          className: 'muted',
+          style: 'text-align:center; padding:20px;',
+          text: 'Belum ada pengguna terdaftar.'
+        }));
+        return;
+      }
+
+      data.users.forEach(function(user) {
+        var item = createEl('div', { className: 'report-item', style: 'cursor:default;' });
+        var info = createEl('div', { className: 'report-info' });
+        info.appendChild(createEl('h4', { text: user.name + ' (' + user.email + ')' }));
+        var p = createEl('p');
+        p.appendChild(document.createTextNode('Role: '));
+        p.appendChild(createEl('b', { text: user.role }));
+        p.appendChild(document.createTextNode(' • Status: '));
+        p.appendChild(createEl('span', {
+          text: user.active ? 'Aktif' : 'Nonaktif',
+          style: 'color:' + (user.active ? 'var(--ok)' : 'var(--warn)') + '; font-weight:bold;'
+        }));
+        if (user.status) {
+          p.appendChild(document.createTextNode(' • ' + user.status));
+        }
+        info.appendChild(p);
+        item.appendChild(info);
+
+        if (user.active && user.role !== 'admin') {
+          var deactivateBtn = createEl('button', {
+            className: 'btn-light-danger',
+            type: 'button',
+            text: 'Nonaktifkan'
+          });
+          deactivateBtn.addEventListener('click', function() {
+            deactivateUserAccount(user.id, user.name);
+          });
+          item.appendChild(deactivateBtn);
+        }
+
+        listContainer.appendChild(item);
+      });
+    } catch (err) {
+      clearElement(listContainer);
+      listContainer.appendChild(createEl('p', {
+        className: 'muted',
+        style: 'text-align:center; padding:20px;',
+        text: 'Gagal memuat daftar pengguna.'
+      }));
+    }
+  };
+
+  async function deactivateUserAccount(userId, userName) {
+    if (!confirm('Nonaktifkan akun ' + userName + '?')) return;
+
+    try {
+      var response = await fetch('/api/admin/users/' + userId + '/deactivate', { method: 'PATCH' });
+      if (response.ok) {
+        showTopSystemAlert('Akun berhasil dinonaktifkan.');
+        updateUsersUI();
+      } else {
+        var data = await response.json();
+        showTopSystemAlert(data.error || 'Gagal menonaktifkan akun');
+      }
+    } catch (err) {
+      showTopSystemAlert('Gagal menonaktifkan akun');
+    }
+  }
+
   window.saveReportStatus = async function() {
     if (!currentDetailId) return;
     try {
@@ -201,8 +322,6 @@
 
   window.addEventListener('click', function(event) {
     var modal1 = document.getElementById('reportDetailModal');
-    var modal2 = document.getElementById('forgotPasswordModal');
     if (event.target === modal1) closeReportDetailModal();
-    if (event.target === modal2) closeForgotModal();
   });
 })();

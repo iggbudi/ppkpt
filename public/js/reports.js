@@ -78,7 +78,7 @@
         }
 
         if (reportData.report.isAnonymous) {
-          resultBox.appendChild(createEl('p', { text: 'Laporan anonim tidak dapat dilacak.', style: 'color:var(--muted); font-size:13px;' }));
+          resultBox.appendChild(createEl('p', { text: 'Identitas akun tidak dicatat pada laporan anonim. Laporan ini tidak dapat dilacak dari dashboard.', style: 'color:var(--muted); font-size:13px;' }));
         } else {
           var trackBtn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
           trackBtn.addEventListener('click', function() { viewInvoiceFromSubmit(reportId); });
@@ -109,14 +109,14 @@
         resultBox.classList.remove('hidden');
         resultBox.classList.add('success');
         clearElement(resultBox);
-        resultBox.appendChild(createEl('strong', { text: 'Laporan Demo Berhasil Dikirim!' }));
+        resultBox.appendChild(createEl('strong', { text: 'Laporan Berhasil Dikirim!' }));
         resultBox.appendChild(document.createElement('br'));
         resultBox.appendChild(document.createElement('br'));
         resultBox.appendChild(document.createTextNode('Nomor Referensi: '));
         resultBox.appendChild(createEl('b', { text: data.report.id }));
         resultBox.appendChild(document.createElement('br'));
         if (data.report.isAnonymous) {
-          resultBox.appendChild(createEl('p', { text: 'Laporan anonim tidak dapat dilacak.', style: 'color:var(--muted); font-size:13px;' }));
+          resultBox.appendChild(createEl('p', { text: 'Identitas akun tidak dicatat pada laporan anonim. Laporan ini tidak dapat dilacak dari dashboard.', style: 'color:var(--muted); font-size:13px;' }));
         } else {
           var trackBtn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
           trackBtn.addEventListener('click', function() { viewInvoiceFromSubmit(data.report.id); });
@@ -131,22 +131,25 @@
       resultBox.innerText = err.name === 'AbortError' ? 'Pengiriman dibatalkan.' : (err.message || 'Koneksi gagal. Coba lagi.');
     } finally {
       window.activeEvidenceUploadAbort = null;
-      btn.innerText = 'Kirim Laporan (Demo)';
+      btn.innerText = 'Kirim Laporan';
       btn.style.opacity = '1';
       btn.disabled = false;
     }
   };
 
-  window.viewInvoiceFromSubmit = function(id) {
+  window.viewInvoiceFromSubmit = async function(id) {
     window.location.hash = '#dashboard';
-    setTimeout(function() {
-      var report = reportData.find(function(r) { return r.id === id; });
-      if (report) {
-        document.getElementById('invoiceResult').classList.remove('hidden');
-        renderInvoice(report);
-        document.getElementById('invoiceResult').scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 100);
+
+    try {
+      var response = await fetch('/api/reports/' + encodeURIComponent(id));
+      if (!response.ok) return;
+      var data = await response.json();
+      if (!data.report) return;
+
+      document.getElementById('invoiceResult').classList.remove('hidden');
+      renderInvoice(data.report);
+      document.getElementById('invoiceResult').scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {}
   };
 
   function renderInvoice(report) {
@@ -207,7 +210,7 @@
     var ul = createEl('ul', { className: 'timeline' });
 
     var timelineSteps = [
-      { cls: t1 || 'done', title: 'Laporan Diterima', desc: 'Laporan disimpan di server demo.' },
+      { cls: t1 || 'done', title: 'Laporan Diterima', desc: 'Laporan tersimpan di server SafeSphere.' },
       { cls: t2, title: 'Tahap Review (Verifikasi)', desc: 'Tim admin memverifikasi kelayakan berkas.' },
       { cls: t3, title: 'Sedang Diproses', desc: 'Kasus ditangani unit kemahasiswaan/Satgas PPKS.' }
     ];
