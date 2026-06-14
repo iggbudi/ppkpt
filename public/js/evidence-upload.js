@@ -175,7 +175,7 @@
     }
 
     fileList.style.display = 'block';
-    fileListItems.innerHTML = '';
+    clearElement(fileListItems);
 
     selectedFiles.forEach((item, index) => {
       const fileEl = createFileItemElement(item, index);
@@ -251,7 +251,7 @@
     // Remove button
     const removeBtn = document.createElement('button');
     removeBtn.className = 'file-remove';
-    removeBtn.innerHTML = '×';
+    removeBtn.textContent = '×';
     removeBtn.title = 'Hapus file';
     removeBtn.setAttribute('aria-label', `Hapus ${item.name}`);
     removeBtn.disabled = item.status === 'uploading';

@@ -9,24 +9,29 @@ const { classifyRisk } = require('./risk');
 const db = require('./db');
 const { runMigrations, getCurrentVersion } = require('./migrations');
 const { chatRateLimiter, loginRateLimiter, apiRateLimiter } = require('./rateLimiter');
+const { SqliteSessionStore } = require('./sessionStore');
 
 const NODE_ENV = process.env.NODE_ENV;
 if (!['development', 'test', 'production'].includes(NODE_ENV)) {
   throw new Error('NODE_ENV wajib diisi: development, test, atau production');
 }
 
+function hasMinimumEntropy(value, minUnique = 8) {
+  if (!value) return false;
+  const unique = new Set(String(value)).size;
+  return unique >= minUnique;
+}
+
 // Production safety check
 if (NODE_ENV === 'production') {
-  // Tolak startup jika SESSION_SECRET masih default
   const sessionSecret = process.env.SESSION_SECRET;
-  if (!sessionSecret || sessionSecret.length < 32) {
-    console.error('FATAL: SESSION_SECRET harus diset untuk production!');
+  if (!sessionSecret || sessionSecret.length < 32 || !hasMinimumEntropy(sessionSecret, 10)) {
+    console.error('FATAL: SESSION_SECRET harus diset untuk production (min 32 karakter, entropi memadai)!');
     process.exit(1);
   }
 
-  // Tolak startup jika ADMIN_USERNAME/ADMIN_PASSWORD tidak diset
-  if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD.length < 12) {
-    console.error('FATAL: ADMIN_USERNAME dan ADMIN_PASSWORD harus diset untuk production!');
+  if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD.length < 12 || !hasMinimumEntropy(process.env.ADMIN_PASSWORD, 8)) {
+    console.error('FATAL: ADMIN_USERNAME dan ADMIN_PASSWORD harus diset untuk production (password min 12 karakter, entropi memadai)!');
     process.exit(1);
   }
   if (process.env.EVIDENCE_UPLOADS_ENABLED === 'true') {
@@ -72,9 +77,15 @@ app.use(['/api/restore', '/api/import'], express.json({ limit: '50mb' }));
 app.use(express.json({ limit: '20kb' }));
 
 const session = require('express-session');
+const sessionStore = new SqliteSessionStore();
+
+if (NODE_ENV !== 'test') {
+  setInterval(() => sessionStore.purgeExpired(), 60 * 60 * 1000).unref();
+}
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'dev-only-session-secret',
+  store: sessionStore,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -396,7 +407,8 @@ if (require.main === module) {
 
 module.exports = app;
 module.exports.app = app;
-module.exports.chatRateLimitStore = chatRateLimiter.store;
+module.exports.chatRateLimitStore = chatRateLimiter;
+module.exports.sessionStore = sessionStore;
 
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err.message);

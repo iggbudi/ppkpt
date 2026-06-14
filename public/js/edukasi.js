@@ -217,6 +217,17 @@
     }
   }
 
+  function renderTrustedFeedback(element, message) {
+    clearElement(element);
+    var match = String(message).match(/^<strong>(.*?)<\/strong>\s*(.*)$/);
+    if (match) {
+      element.appendChild(createEl('strong', { text: match[1] }));
+      if (match[2]) element.appendChild(document.createTextNode(' ' + match[2]));
+    } else {
+      element.textContent = String(message).replace(/<[^>]+>/g, '');
+    }
+  }
+
   function renderScenarioList() {
     var listEl = document.getElementById('scenarioList');
     var detailEl = document.getElementById('scenarioDetail');
@@ -225,24 +236,24 @@
     listEl.classList.remove('hidden');
     detailEl.classList.add('hidden');
 
-    listEl.innerHTML = '';
+    clearElement(listEl);
     scenarios.forEach(function(scenario, index) {
       var completed = isScenarioCompleted(scenario.id);
-      var card = document.createElement('div');
-      card.className = 'scenario-card' + (completed ? ' completed' : '');
+      var card = createEl('div', { className: 'scenario-card' + (completed ? ' completed' : '') });
 
-      var statusBadge = completed
-        ? '<span class="scenario-status status-done">✓ Selesai</span>'
-        : '<span class="scenario-status status-new">Baru</span>';
-
-      card.innerHTML =
-        '<div class="scenario-card-header">' +
-          '<span class="scenario-number">' + (index + 1) + '</span>' +
-          statusBadge +
-        '</div>' +
-        '<h4 class="scenario-card-title">' + scenario.title + '</h4>' +
-        '<p class="scenario-card-desc">' + scenario.description + '</p>' +
-        (completed ? '<div class="scenario-badge-earned">' + scenario.badge + '</div>' : '');
+      var header = createEl('div', { className: 'scenario-card-header' }, [
+        createEl('span', { className: 'scenario-number', text: String(index + 1) }),
+        createEl('span', {
+          className: 'scenario-status ' + (completed ? 'status-done' : 'status-new'),
+          text: completed ? '✓ Selesai' : 'Baru'
+        })
+      ]);
+      card.appendChild(header);
+      card.appendChild(createEl('h4', { className: 'scenario-card-title', text: scenario.title }));
+      card.appendChild(createEl('p', { className: 'scenario-card-desc', text: scenario.description }));
+      if (completed) {
+        card.appendChild(createEl('div', { className: 'scenario-badge-earned', text: scenario.badge }));
+      }
 
       card.onclick = function() { loadScenario(scenario.id); };
       listEl.appendChild(card);
@@ -312,7 +323,7 @@
 
     setTimeout(function() {
       textEl.innerText = node.text;
-      optionsEl.innerHTML = '';
+      clearElement(optionsEl);
 
       node.options.forEach(function(opt) {
         var btn = document.createElement('button');
@@ -335,10 +346,11 @@
 
       if (node.feedback) {
         feedbackEl.className = 'result ' + node.feedback.type;
-        feedbackEl.innerHTML = node.feedback.message;
+        renderTrustedFeedback(feedbackEl, node.feedback.message);
         feedbackEl.classList.remove('hidden');
       } else {
         feedbackEl.className = 'result hidden';
+        clearElement(feedbackEl);
       }
 
       sceneEl.style.opacity = '1';

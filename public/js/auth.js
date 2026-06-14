@@ -16,7 +16,7 @@
       tabM.style.color = 'var(--muted)';
       tabA.style.borderBottomColor = 'var(--primary)';
       tabA.style.color = 'var(--primary)';
-      subtitle.innerHTML = 'Gunakan kredensial admin Anda.';
+      subtitle.textContent = 'Gunakan kredensial admin Anda.';
       emailInput.placeholder = 'Username admin';
     } else {
       tabA.style.borderBottomColor = 'transparent';
@@ -202,7 +202,11 @@
 
       resultBox.classList.remove('hidden');
       resultBox.classList.add('success');
-      resultBox.innerHTML = '<strong>Registrasi Demo Berhasil! (Simulasi)</strong> Akun Anda terverifikasi. Silakan menuju <a href="#login">Login</a>.';
+      clearElement(resultBox);
+      resultBox.appendChild(createEl('strong', { text: 'Registrasi Demo Berhasil! (Simulasi)' }));
+      resultBox.appendChild(document.createTextNode(' Akun Anda terverifikasi. Silakan menuju '));
+      resultBox.appendChild(createEl('a', { href: '#login', text: 'Login' }));
+      resultBox.appendChild(document.createTextNode('.'));
       event.target.reset();
       document.getElementById('pwHelper').className = 'form-helper';
       document.getElementById('pwHelper').innerText = 'Minimal 6 karakter, 1 huruf kapital, 1 angka, dan 1 karakter spesial.';

@@ -401,6 +401,15 @@ function setupReportRoutes(app) {
     }
     if (!dryRun && !confirmRestore) return res.status(400).json({ error: 'Restore aktual memerlukan confirmRestore=true' });
 
+    let preRestoreSnapshot = null;
+    if (!dryRun) {
+      try {
+        preRestoreSnapshot = createBackup({ includeAudit: true });
+      } catch (err) {
+        return res.status(500).json({ error: 'Gagal membuat snapshot sebelum restore: ' + err.message });
+      }
+    }
+
     const result = restoreFromBackup(backupData, { decrypt, decryptionKey, dryRun });
 
     if (!result.success) {
@@ -410,8 +419,13 @@ function setupReportRoutes(app) {
     insertAudit.run(Date.now(), req.session.user.id, dryRun ? 'backup.validate' : 'backup.restore', null, req.ip, JSON.stringify({
       dryRun,
       restoredReports: result.restoredReports || 0,
-      restoredAudit: result.restoredAudit || 0
+      restoredAudit: result.restoredAudit || 0,
+      preRestoreChecksum: preRestoreSnapshot?.checksum || null
     }));
+
+    if (!dryRun && preRestoreSnapshot) {
+      result.preRestoreChecksum = preRestoreSnapshot.checksum;
+    }
 
     res.json(result);
   });

@@ -6,7 +6,7 @@ process.env.MIMO_MODEL = 'mimo-v2.5';
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { app, chatRateLimitStore } = require('../index');
+const { app, chatRateLimitStore: chatRateLimiter } = require('../index');
 const { classifyRisk } = require('../risk');
 
 function startServer() {
@@ -44,7 +44,7 @@ test('risk classifier detects high risk', () => {
 });
 
 test('chat API returns high-risk template without model dependency', async () => {
-  chatRateLimitStore.clear();
+  chatRateLimiter.clear();
   const { server, baseUrl } = await startServer();
   try {
     const response = await postChat(baseUrl, 'saya diancam dan dipukul', '10.0.0.1');
@@ -60,7 +60,7 @@ test('chat API returns high-risk template without model dependency', async () =>
 });
 
 test('chat API validates message body', async () => {
-  chatRateLimitStore.clear();
+  chatRateLimiter.clear();
   const { server, baseUrl } = await startServer();
   try {
     const response = await fetch(`${baseUrl}/api/chat`, {
@@ -77,7 +77,7 @@ test('chat API validates message body', async () => {
 });
 
 test('chat API rate limits repeated requests per client', async () => {
-  chatRateLimitStore.clear();
+  chatRateLimiter.clear();
   const { server, baseUrl } = await startServer();
   try {
     const ip = '10.0.0.3';
@@ -141,7 +141,7 @@ test('static file exposure: .env is not served as raw file', async () => {
 });
 
 test('chat API does not allow X-Forwarded-For rotation to bypass rate limit', async () => {
-  chatRateLimitStore.clear();
+  chatRateLimiter.clear();
   const { server, baseUrl } = await startServer();
   try {
     for (let i = 0; i < 3; i += 1) {
