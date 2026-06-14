@@ -35,7 +35,9 @@ if (NODE_ENV === 'production') {
     process.exit(1);
   }
   if (process.env.EVIDENCE_UPLOADS_ENABLED === 'true') {
-    throw new Error('Evidence upload production dinonaktifkan sampai scanner malware dan private object storage nyata dikonfigurasi');
+    const { validateEvidenceProductionConfig } = require('./evidenceConfig');
+    validateEvidenceProductionConfig();
+    console.log('Evidence upload production: konfigurasi valid');
   }
 }
 
@@ -104,6 +106,17 @@ setupAuthRoutes(app, loginRateLimiter.middleware());
 
 const { setupReportRoutes } = require('./reports');
 setupReportRoutes(app);
+
+if (NODE_ENV !== 'test') {
+  try {
+    const { startScanQueue } = require('./scanQueue');
+    const { scanEvidence } = require('./evidence');
+    startScanQueue(scanEvidence);
+    console.log('Evidence scan queue started');
+  } catch (err) {
+    console.error('Evidence scan queue failed:', err.message);
+  }
+}
 
 // Retention cleanup hanya untuk production/development, bukan test
 if (NODE_ENV !== 'test') {

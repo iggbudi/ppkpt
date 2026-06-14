@@ -8,6 +8,7 @@ const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
 const { StorageInterface, STORAGE_CONFIG } = require('./storage');
+const { encryptBuffer, decryptBuffer, isEncryptionEnabled } = require('./fileEncryption');
 
 class LocalStorageAdapter extends StorageInterface {
   constructor(options = {}) {
@@ -15,7 +16,36 @@ class LocalStorageAdapter extends StorageInterface {
     this.basePath = options.basePath || STORAGE_CONFIG.localStoragePath;
     this.quarantinePath = options.quarantinePath || STORAGE_CONFIG.quarantinePath;
     this.tempPath = options.tempPath || STORAGE_CONFIG.tempPath;
+    this.encryptAtRest = options.encryptAtRest ?? isEncryptionEnabled();
     this.initialized = false;
+  }
+
+  async writeEncryptedPayload(filePath, buffer) {
+    if (!this.encryptAtRest) {
+      await fsp.writeFile(filePath, buffer);
+      return;
+    }
+
+    const encrypted = encryptBuffer(buffer);
+    await fsp.writeFile(filePath, encrypted.data);
+    await fsp.writeFile(`${filePath}.enc.json`, JSON.stringify({
+      iv: encrypted.iv,
+      salt: encrypted.salt,
+      authTag: encrypted.authTag
+    }));
+  }
+
+  async readEncryptedPayload(filePath) {
+    const raw = await fsp.readFile(filePath);
+    const encMetaPath = `${filePath}.enc.json`;
+
+    try {
+      await fsp.access(encMetaPath);
+      const meta = JSON.parse(await fsp.readFile(encMetaPath, 'utf8'));
+      return decryptBuffer(raw, meta.iv, meta.salt, meta.authTag);
+    } catch {
+      return raw;
+    }
   }
 
   /**
@@ -63,7 +93,7 @@ class LocalStorageAdapter extends StorageInterface {
 
     try {
       if (Buffer.isBuffer(data)) {
-        await fsp.writeFile(filePath, data);
+        await this.writeEncryptedPayload(filePath, data);
       } else if (data && typeof data.pipe === 'function') {
         // Stream
         const writeStream = fs.createWriteStream(filePath);
@@ -105,7 +135,9 @@ class LocalStorageAdapter extends StorageInterface {
       }
       
       const stat = await fsp.stat(filePath);
-      const stream = fs.createReadStream(filePath);
+      const decrypted = await this.readEncryptedPayload(filePath);
+      const { Readable } = require('stream');
+      const stream = Readable.from(decrypted);
       
       // Baca metadata jika ada
       let metadata = {};
@@ -122,7 +154,7 @@ class LocalStorageAdapter extends StorageInterface {
         stream,
         metadata: {
           ...metadata,
-          size: stat.size,
+          size: decrypted.length,
           createdAt: stat.birthtime,
           modifiedAt: stat.mtime
         }
@@ -159,15 +191,12 @@ class LocalStorageAdapter extends StorageInterface {
       }
 
       // Hapus metadata
-      try {
-        await fsp.unlink(filePath + '.meta.json');
-      } catch {
-        // Metadata tidak ada
-      }
-      try {
-        await fsp.unlink(quarantineFilePath + '.meta.json');
-      } catch {
-        // Metadata quarantine tidak ada
+      for (const target of [filePath, quarantineFilePath]) {
+        for (const suffix of ['.meta.json', '.enc.json']) {
+          try {
+            await fsp.unlink(target + suffix);
+          } catch {}
+        }
       }
 
       return { success: true };

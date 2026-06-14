@@ -16,9 +16,7 @@ function generateBackupChecksum(data) {
 
 function createBackup(options = {}) {
   const { includeAudit = true, includeEvidence = false, encrypt = false, encryptionKey = null } = options;
-  if (includeEvidence) {
-    throw new Error('Backup evidence belum tersedia karena artifact file belum disertakan secara konsisten');
-  }
+  // Artifact file evidence ditangani terpisah via evidenceArtifacts.js
 
   // Ambil data
   const reports = db.prepare('SELECT * FROM reports WHERE deleted_at IS NULL').all();
@@ -166,8 +164,8 @@ function restoreFromBackup(backupData, options = {}) {
   if (!validation.valid) {
     return { success: false, error: 'Backup tidak valid', errors: validation.errors };
   }
-  if (backupData.data.evidenceFiles && backupData.data.evidenceFiles.length > 0) {
-    return { success: false, error: 'Restore evidence ditolak karena backup tidak menyertakan artifact file' };
+  if (backupData.data.evidenceFiles && backupData.data.evidenceFiles.length > 0 && !backupData.evidenceArtifacts) {
+    return { success: false, error: 'Restore evidence memerlukan evidenceArtifacts pada backup' };
   }
 
   if (dryRun) {

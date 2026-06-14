@@ -18,13 +18,12 @@ const {
   isSuspiciousExtension,
   calculateSHA256
 } = require('./storage');
-const LocalStorageAdapter = require('./storageLocal');
+const { getStorageAdapter } = require('./storageFactory');
 const { stripImageMetadata, validateImageDimensions } = require('./metadataStripper');
 const { scanFileWithCache } = require('./scanner');
 const { monitor } = require('./monitoring');
 
-// Inisialisasi storage adapter
-const storageAdapter = new LocalStorageAdapter();
+const storageAdapter = getStorageAdapter();
 
 // Prepared statements
 const insertEvidence = db.prepare(`
@@ -575,9 +574,14 @@ async function getEvidenceStats() {
   };
 }
 
+function getStorageAdapterRef() {
+  return storageAdapter;
+}
+
 module.exports = {
   uploadEvidence,
   scanEvidence,
+  getStorageAdapterRef,
   downloadEvidence,
   deleteEvidence,
   getEvidenceByReport,

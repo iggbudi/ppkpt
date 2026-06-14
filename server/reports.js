@@ -8,10 +8,11 @@ const { createBackup, restoreFromBackup, validateBackup } = require('./backup');
 const { requestDeletion, approveDeletion, rejectDeletion, placeLegalHold, releaseLegalHold, getPendingDeletions, getLegalHolds } = require('./deletion');
 const { uploadEvidence, scanEvidence, downloadEvidence, deleteEvidence, purgeEvidence, getEvidenceByReport, cleanupEvidenceFiles, getEvidenceStats, UPLOAD_LIMITS, ALLOWED_MIME_TYPES } = require('./evidence');
 const { handleUpload, validateUploadedFile, calculateFileSHA256, moveToQuarantine, cleanupRequestFiles } = require('./uploadMiddleware');
+const { isEvidenceUploadsEnabled } = require('./evidenceConfig');
+const { backupEvidenceArtifacts, restoreEvidenceArtifacts } = require('./evidenceArtifacts');
 
 const NODE_ENV = process.env.NODE_ENV;
-const EVIDENCE_UPLOADS_ENABLED = NODE_ENV === 'test'
-  || (NODE_ENV !== 'production' && process.env.EVIDENCE_UPLOADS_ENABLED !== 'false');
+const EVIDENCE_UPLOADS_ENABLED = isEvidenceUploadsEnabled(NODE_ENV);
 
 const reportSchema = z.object({
   category: z.enum(['Verbal', 'Sosial', 'Cyberbullying', 'Fisik', 'Seksual']),
@@ -350,7 +351,7 @@ function setupReportRoutes(app) {
   });
 
   // Backup endpoint (admin only)
-  app.get('/api/backup', requireAuth, requireAdmin, (req, res) => {
+  app.get('/api/backup', requireAuth, requireAdmin, async (req, res) => {
     const includeAudit = req.query.includeAudit !== 'false';
     const includeEvidence = req.query.includeEvidence === 'true';
     const encrypt = req.query.encrypt === 'true';
@@ -358,6 +359,14 @@ function setupReportRoutes(app) {
     let backup;
     try {
       backup = createBackup({ includeAudit, includeEvidence });
+      if (includeEvidence) {
+        const artifacts = await backupEvidenceArtifacts(String(backup.exportedAt));
+        backup.evidenceArtifacts = {
+          backupId: artifacts.backupId,
+          fileCount: artifacts.fileCount,
+          manifest: artifacts.manifest
+        };
+      }
     } catch (err) {
       return res.status(400).json({ error: err.message });
     }
@@ -366,7 +375,8 @@ function setupReportRoutes(app) {
       includeAudit,
       includeEvidence,
       encrypted: encrypt,
-      counts: backup.counts
+      counts: backup.counts,
+      evidenceArtifacts: backup.evidenceArtifacts?.backupId || null
     }));
 
     res.setHeader('Content-Type', 'application/json');
@@ -374,12 +384,20 @@ function setupReportRoutes(app) {
     res.json(backup);
   });
 
-  app.post('/api/backup', requireAuth, requireAdmin, (req, res) => {
+  app.post('/api/backup', requireAuth, requireAdmin, async (req, res) => {
     const { includeAudit = true, includeEvidence = false, encrypt = false, encryptionKey = null } = req.body;
     if (encrypt && !encryptionKey) return res.status(400).json({ error: 'Encryption key diperlukan' });
     let backup;
     try {
       backup = createBackup({ includeAudit, includeEvidence, encrypt, encryptionKey });
+      if (includeEvidence) {
+        const artifacts = await backupEvidenceArtifacts(String(backup.exportedAt));
+        backup.evidenceArtifacts = {
+          backupId: artifacts.backupId,
+          fileCount: artifacts.fileCount,
+          manifest: artifacts.manifest
+        };
+      }
     } catch (err) {
       return res.status(400).json({ error: err.message });
     }
@@ -387,13 +405,14 @@ function setupReportRoutes(app) {
       includeAudit, 
       includeEvidence,
       encrypted: encrypt, 
-      counts: backup.counts 
+      counts: backup.counts,
+      evidenceArtifacts: backup.evidenceArtifacts?.backupId || null
     }));
     res.json(backup);
   });
 
   // Restore endpoint (admin only)
-  app.post('/api/restore', requireAuth, requireAdmin, express.json({ limit: '50mb' }), (req, res) => {
+  app.post('/api/restore', requireAuth, requireAdmin, express.json({ limit: '50mb' }), async (req, res) => {
     const { backup: backupData, dryRun = true, decrypt = false, decryptionKey = null, confirmRestore = false } = req.body;
 
     if (!backupData) {
@@ -414,6 +433,15 @@ function setupReportRoutes(app) {
 
     if (!result.success) {
       return res.status(400).json({ error: result.error, errors: result.errors });
+    }
+
+    if (!dryRun && backupData.evidenceArtifacts?.backupId) {
+      try {
+        const artifactRestore = await restoreEvidenceArtifacts(backupData.evidenceArtifacts.backupId);
+        result.evidenceArtifactsRestored = artifactRestore.restored;
+      } catch (err) {
+        return res.status(400).json({ error: 'Restore metadata berhasil tetapi artifact evidence gagal: ' + err.message });
+      }
     }
 
     insertAudit.run(Date.now(), req.session.user.id, dryRun ? 'backup.validate' : 'backup.restore', null, req.ip, JSON.stringify({

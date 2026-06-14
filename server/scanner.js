@@ -1,12 +1,13 @@
 /**
  * Malware Scanner Module
- * Placeholder untuk integrasi dengan ClamAV atau service lain
- * Production: ganti dengan implementasi sesungguhnya
+ * Signature scanner + optional ClamAV integration
  */
 
 const fs = require('fs');
-const path = require('path');
+const net = require('net');
 const crypto = require('crypto');
+
+const SCANNER_MODE = process.env.EVIDENCE_SCANNER_MODE || 'standard';
 
 // Known malicious file signatures (untuk testing)
 const MALICIOUS_SIGNATURES = {
@@ -66,11 +67,62 @@ const FILE_TYPE_CHECKS = {
  * @param {string} fileName - Nama file
  * @returns {Promise<{clean: boolean, result: string, details?: object}>}
  */
-async function scanFile(fileBuffer, mimeType, fileName) {
-  // Simulate scan delay (100-500ms)
-  await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 400));
+async function scanWithClamAv(fileBuffer) {
+  const host = process.env.CLAMAV_HOST;
+  const port = Number(process.env.CLAMAV_PORT || 3310);
+  if (!host) return null;
 
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host, port }, () => {
+      socket.write('zINSTREAM\0');
+      const chunkSize = Buffer.alloc(4);
+      chunkSize.writeUInt32BE(fileBuffer.length, 0);
+      socket.write(chunkSize);
+      socket.write(fileBuffer);
+      const end = Buffer.alloc(4);
+      end.writeUInt32BE(0, 0);
+      socket.write(end);
+    });
+
+    let response = '';
+    socket.on('data', (chunk) => { response += chunk.toString('utf8'); });
+    socket.on('error', () => resolve({ available: true, clean: false, error: 'ClamAV connection failed' }));
+    socket.on('end', () => {
+      const clean = response.includes('OK') && !response.includes('FOUND');
+      resolve({ available: true, clean, result: clean ? 'ClamAV: clean' : 'ClamAV: malware detected' });
+    });
+    socket.setTimeout(5000, () => {
+      socket.destroy();
+      resolve({ available: true, clean: false, error: 'ClamAV timeout' });
+    });
+  });
+}
+
+function validateScannerForProduction() {
+  if (process.env.EVIDENCE_SCANNER_MODE !== 'strict') {
+    throw new Error('EVIDENCE_SCANNER_MODE=strict wajib untuk production evidence');
+  }
+}
+
+async function scanFile(fileBuffer, mimeType, fileName) {
   const findings = [];
+
+  const clamResult = await scanWithClamAv(fileBuffer);
+  if (clamResult) {
+    if (!clamResult.clean) {
+      return {
+        clean: false,
+        result: clamResult.result || clamResult.error || 'ClamAV mendeteksi ancaman',
+        details: { engine: 'clamav' }
+      };
+    }
+  } else if (SCANNER_MODE === 'strict' && process.env.CLAMAV_HOST) {
+    return {
+      clean: false,
+      result: 'Scanner tidak tersedia (fail-closed)',
+      details: { engine: 'clamav', failClosed: true }
+    };
+  }
 
   // 1. Check EICAR test file
   if (fileBuffer.toString('ascii').includes(MALICIOUS_SIGNATURES.eicar)) {
@@ -313,5 +365,6 @@ module.exports = {
   generateFileHash,
   getScannerStats,
   clearScanCache,
+  validateScannerForProduction,
   MALICIOUS_SIGNATURES
 };
