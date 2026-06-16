@@ -7,7 +7,7 @@ SafeSphere adalah aplikasi web untuk purwarupa pelaporan anonim anti-perundungan
 - **Pelaporan anonim** dengan nomor pelacakan laporan.
 - **Dashboard mahasiswa** untuk melihat riwayat dan status laporan.
 - **Dashboard admin** untuk melihat metrik, daftar laporan, detail kasus, dan mengubah status laporan.
-- **SafeBot chat** yang tersambung ke backend dan model Xiaomi `mimo-v2.5`.
+- **SafeBot chat** yang tersambung ke backend dan model LLM`.
 - **Risk classifier backend** untuk mendeteksi pesan risiko tinggi tanpa bergantung penuh pada LLM.
 - **Edukasi anti-perundungan** dan simulasi bystander.
 - **Quick escape / discreet mode** ke Wikipedia.
@@ -29,10 +29,10 @@ Node.js Backend
   └─ repo/server
         ├─ Express API
         ├─ Risk classifier
-        └─ Xiaomi MiMo client
+        └─ LLM Provider client
         │
         ▼
-Xiaomi MiMo v2.5 API
+     LLM API
 ```
 
 ### Frontend
@@ -64,8 +64,8 @@ Alur `POST /api/chat`:
 2. Terapkan rate limit sederhana berbasis memori.
 3. Jalankan risk classifier.
 4. Jika risiko tinggi, langsung balas template darurat tanpa memanggil LLM.
-5. Jika risiko rendah/sedang, panggil Xiaomi MiMo `mimo-v2.5`.
-6. Jika MiMo gagal, balas fallback aman.
+5. Jika risiko rendah/sedang, panggil LLM.
+6. Jika LLM gagal, balas fallback aman.
 
 ## Struktur Direktori
 
@@ -123,10 +123,10 @@ Isi `.env`:
 ```env
 PORT=3000
 HOST=127.0.0.1
-MIMO_API_KEY=isi_api_key_xiaomi_mimo
-MIMO_BASE_URL=https://base-url-api-mimo.example/v1
-MIMO_MODEL=mimo-v2.5
-MIMO_TIMEOUT_MS=20000
+API_KEY=isi_api_key_llm openAI Compatible
+BASE_URL=https://base-url-open-ai-compatible/v1
+MODEL=tuliskan_model_disini
+TIMEOUT_MS=20000
 CHAT_RATE_LIMIT_WINDOW_MS=60000
 CHAT_RATE_LIMIT_MAX=60
 ```
