@@ -2,8 +2,38 @@
   var escPressCount = 0;
   var escTimer = null;
   var originalTitle = document.title;
+  var discreetModeActive = false;
+  var hiddenApplicationElements = [];
+  var focusBeforeDiscreetMode = null;
+
+  function hideApplicationFromInteraction(overlay) {
+    hiddenApplicationElements = [];
+    Array.prototype.forEach.call(document.body.children, function(element) {
+      if (element === overlay || element.tagName === 'SCRIPT') return;
+      hiddenApplicationElements.push({
+        element: element,
+        ariaHidden: element.getAttribute('aria-hidden'),
+        wasInert: element.hasAttribute('inert')
+      });
+      element.setAttribute('inert', '');
+      element.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  function restoreApplicationInteraction() {
+    hiddenApplicationElements.forEach(function(item) {
+      if (!item.wasInert) item.element.removeAttribute('inert');
+      if (item.ariaHidden === null) item.element.removeAttribute('aria-hidden');
+      else item.element.setAttribute('aria-hidden', item.ariaHidden);
+    });
+    hiddenApplicationElements = [];
+  }
 
   window.activateDiscreetMode = function() {
+    focusBeforeDiscreetMode = document.activeElement && document.activeElement !== document.body
+      ? document.activeElement
+      : null;
+
     if (window.activeEvidenceUploadAbort) window.activeEvidenceUploadAbort.abort();
     if (window.evidenceUpload) window.evidenceUpload.quickEscape();
     ['description', 'evidence', 'location', 'chatInput'].forEach(function(id) {
@@ -19,7 +49,9 @@
     var overlay = document.getElementById('discreetOverlay');
     var escapeBtn = document.getElementById('quickEscapeBtn');
     var closeBtn = document.getElementById('discreetCloseBtn');
+    discreetModeActive = true;
     if (overlay) {
+      hideApplicationFromInteraction(overlay);
       overlay.classList.add('is-active');
       overlay.setAttribute('aria-hidden', 'false');
     }
@@ -32,17 +64,34 @@
   window.deactivateDiscreetMode = function() {
     var overlay = document.getElementById('discreetOverlay');
     var escapeBtn = document.getElementById('quickEscapeBtn');
+    discreetModeActive = false;
     if (overlay) {
       overlay.classList.remove('is-active');
       overlay.setAttribute('aria-hidden', 'true');
     }
+    restoreApplicationInteraction();
     if (escapeBtn) escapeBtn.classList.remove('is-hidden');
     document.body.classList.remove('discreet-mode');
     document.title = originalTitle;
-    if (escapeBtn) escapeBtn.focus();
+
+    var focusTarget = focusBeforeDiscreetMode;
+    if (!focusTarget || !document.contains(focusTarget) || focusTarget.closest('[inert]') || focusTarget.offsetParent === null) {
+      focusTarget = document.getElementById('heroAnonymousCta') || document.getElementById('hamburgerBtn');
+    }
+    focusBeforeDiscreetMode = null;
+    if (focusTarget) focusTarget.focus();
   };
 
   window.addEventListener('keydown', function(e) {
+    if (discreetModeActive) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var closeButton = document.getElementById('discreetCloseBtn');
+        if (closeButton) closeButton.focus();
+      }
+      return;
+    }
+
     if (e.key === 'Escape') {
       escPressCount++;
 

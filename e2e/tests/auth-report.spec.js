@@ -23,7 +23,7 @@ test('login and secret report flow', async ({ page, request }) => {
   await page.waitForFunction(() => window.location.hash === '#dashboard');
 
   await page.goto('/#lapor');
-  await page.locator('#choiceRahasia').click();
+  await page.locator('#chooseRahasiaBtn').click();
   await page.locator('#safetySafe').click();
   await page.selectOption('#category', 'Verbal');
   await page.fill('#location', 'Ruang E2E');
@@ -39,7 +39,7 @@ test('login and secret report flow', async ({ page, request }) => {
 
 test('anonymous report flow', async ({ page }) => {
   await page.goto('/#lapor');
-  await page.locator('#choiceAnonim').click();
+  await page.locator('#chooseAnonimBtn').click();
   await page.locator('#safetySafe').click();
   await page.selectOption('#category', 'Verbal');
   await page.fill('#location', 'Koridor E2E');

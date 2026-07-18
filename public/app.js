@@ -2,6 +2,8 @@
 var currentUser = null;
 var reportData = [];
 var currentViewedInvoiceId = null;
+var authStateResolved = false;
+var authStateReady = Promise.resolve();
 
 function openModal(modalId) {
   var modal = document.getElementById(modalId);
@@ -152,6 +154,11 @@ function handleRouting() {
     hash = '#beranda';
   }
 
+  if ((hash === '#admin' || hash === '#dashboard') && !authStateResolved) {
+    authStateReady.then(handleRouting);
+    return;
+  }
+
   if (hash === '#admin' && (!currentUser || currentUser.role !== 'admin')) {
     showTopSystemAlert('Akses Ditolak. Anda tidak memiliki otoritas Admin.');
     window.location.hash = '#login';
@@ -172,13 +179,17 @@ function handleRouting() {
   var targetElement = document.getElementById(targetPageId);
   if (targetElement) targetElement.classList.add('active');
 
+  if (hash === '#lapor' && typeof window.prepareReportEntryForRoute === 'function') {
+    window.prepareReportEntryForRoute();
+  }
+
   // Update document title
   var pageTitles = {
     '#beranda': 'Beranda - SafeSphere',
     '#lapor': 'Lapor Anonim - SafeSphere',
     '#edukasi': 'Edukasi - SafeSphere',
     '#kontak': 'Kontak Darurat - SafeSphere',
-    '#chat': 'Chat Ahli - SafeSphere',
+    '#chat': 'SafeBot - SafeSphere',
     '#login': 'Masuk - SafeSphere',
     '#register': 'Daftar - SafeSphere',
     '#admin': 'Dashboard Admin - SafeSphere',
@@ -224,16 +235,27 @@ function setupEventListeners() {
   var sidebarClose = document.getElementById('sidebarClose');
 
   function openSidebar() {
-    if (sidebar) sidebar.classList.add('open');
+    if (sidebar) {
+      sidebar.classList.add('open');
+      sidebar.removeAttribute('inert');
+      sidebar.setAttribute('aria-hidden', 'false');
+    }
     if (sidebarOverlay) sidebarOverlay.classList.add('active');
+    if (hamburger) hamburger.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
+    if (sidebarClose) sidebarClose.focus();
   }
 
-  function closeSidebar() {
-    if (sidebar) sidebar.classList.remove('open');
+  function closeSidebar(restoreFocus) {
+    if (sidebar) {
+      sidebar.classList.remove('open');
+      sidebar.setAttribute('inert', '');
+      sidebar.setAttribute('aria-hidden', 'true');
+    }
     if (sidebarOverlay) sidebarOverlay.classList.remove('active');
     if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = '';
+    if (restoreFocus !== false && hamburger) hamburger.focus();
   }
 
   if (hamburger) {
@@ -248,16 +270,24 @@ function setupEventListeners() {
     });
   }
   if (sidebarClose) {
-    sidebarClose.addEventListener('click', closeSidebar);
+    sidebarClose.addEventListener('click', function() { closeSidebar(true); });
   }
   if (sidebarOverlay) {
-    sidebarOverlay.addEventListener('click', closeSidebar);
+    sidebarOverlay.addEventListener('click', function() { closeSidebar(true); });
   }
 
-  // Close sidebar when clicking a nav link
+  window.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeSidebar(true);
+    }
+  }, true);
+
+  // Close sidebar when clicking a nav link without stealing focus from routed content.
   var sidebarLinks = document.querySelectorAll('.sidebar-link[href]');
   sidebarLinks.forEach(function(link) {
-    link.addEventListener('click', closeSidebar);
+    link.addEventListener('click', function() { closeSidebar(false); });
   });
 
   var loginForm = document.querySelector('#page-login form');
@@ -437,8 +467,8 @@ function setupEventListeners() {
   }
 
   // Report choice flow
-  var choiceAnonim = document.getElementById('choiceAnonim');
-  var choiceRahasia = document.getElementById('choiceRahasia');
+  var chooseAnonimBtn = document.getElementById('chooseAnonimBtn');
+  var chooseRahasiaBtn = document.getElementById('chooseRahasiaBtn');
   var reportChoiceScreen = document.getElementById('reportChoiceScreen');
   var reportFormSection = document.getElementById('reportFormSection');
   var backToChoice = document.getElementById('backToChoice');
@@ -589,48 +619,97 @@ function setupEventListeners() {
   var prevStep4 = document.getElementById('prevStep4');
   if (prevStep4) prevStep4.addEventListener('click', function() { goToStep(3); });
 
-  if (choiceAnonim) {
-    choiceAnonim.addEventListener('click', function() {
-      reportChoiceScreen.classList.add('hidden');
-      reportFormSection.classList.remove('hidden');
-      document.getElementById('reportFormTitle').innerText = 'Form Lapor Anonim';
-      document.getElementById('reportFormSubtitle').innerText = 'Identitas akun tidak disimpan pada laporan atau audit pembuatan laporan anonim.';
-      var anonCheckbox = document.getElementById('isAnonymous');
-      if (anonCheckbox) {
-        anonCheckbox.checked = true;
-        anonCheckbox.disabled = true;
-      }
+  var requestedReportMode = null;
+  var pendingConfidentialMode = false;
+
+  function showReportChoice() {
+    reportFormSection.classList.add('hidden');
+    reportChoiceScreen.classList.remove('hidden');
+    if (safetyCheck) safetyCheck.classList.remove('hidden');
+    if (reportForm) reportForm.classList.add('hidden');
+    var resultBox = document.getElementById('reportResult');
+    if (resultBox) resultBox.classList.add('hidden');
+  }
+
+  function applyReportMode(mode) {
+    if (mode === 'confidential' && !authStateResolved) {
+      pendingConfidentialMode = true;
+      authStateReady.then(function() {
+        if (!pendingConfidentialMode || window.location.hash !== '#lapor') return;
+        pendingConfidentialMode = false;
+        applyReportMode(mode);
+      });
+      return;
+    }
+
+    if (mode === 'confidential' && !currentUser) {
+      showTopSystemAlert('Masuk diperlukan agar kamu dapat melacak laporan rahasia.');
+      window.location.hash = '#login';
+      return;
+    }
+
+    reportChoiceScreen.classList.add('hidden');
+    reportFormSection.classList.remove('hidden');
+    if (safetyCheck) safetyCheck.classList.remove('hidden');
+    if (reportForm) reportForm.classList.add('hidden');
+
+    var isAnonymousMode = mode === 'anonymous';
+    document.getElementById('reportFormTitle').innerText = isAnonymousMode ? 'Laporan tanpa identitas akun' : 'Laporan rahasia';
+    document.getElementById('reportFormSubtitle').innerText = isAnonymousMode
+      ? 'Identitas akun tidak dicatat pada laporan atau audit pembuatannya.'
+      : 'Identitas akun disimpan dengan akses terbatas agar kamu dapat melacak status.';
+
+    var anonCheckbox = document.getElementById('isAnonymous');
+    if (anonCheckbox) {
+      anonCheckbox.checked = isAnonymousMode;
+      anonCheckbox.disabled = isAnonymousMode;
+    }
+
+    window.requestAnimationFrame(function() {
+      var safetyHeading = document.getElementById('safetyCheckHeading');
+      if (safetyHeading) safetyHeading.focus();
     });
   }
 
-  if (choiceRahasia) {
-    choiceRahasia.addEventListener('click', function() {
-      if (!currentUser) {
-        showTopSystemAlert('Silakan login terlebih dahulu untuk melapor secara rahasia.');
-        window.location.hash = '#login';
-        return;
-      }
-      reportChoiceScreen.classList.add('hidden');
-      reportFormSection.classList.remove('hidden');
-      document.getElementById('reportFormTitle').innerText = 'Form Lapor Rahasia';
-      document.getElementById('reportFormSubtitle').innerText = 'Identitas Anda disimpan dengan akses terbatas.';
-      var anonCheckbox2 = document.getElementById('isAnonymous');
-      if (anonCheckbox2) {
-        anonCheckbox2.checked = false;
-        anonCheckbox2.disabled = false;
-      }
+  function startReportMode(mode) {
+    pendingConfidentialMode = false;
+    requestedReportMode = mode;
+    if (window.location.hash !== '#lapor') {
+      window.location.hash = '#lapor';
+    } else {
+      applyReportMode(requestedReportMode);
+      requestedReportMode = null;
+    }
+  }
+
+  window.startReportMode = startReportMode;
+  window.prepareReportEntryForRoute = function() {
+    if (requestedReportMode) {
+      applyReportMode(requestedReportMode);
+      requestedReportMode = null;
+    } else {
+      showReportChoice();
+    }
+  };
+
+  var heroAnonymousCta = document.getElementById('heroAnonymousCta');
+  if (heroAnonymousCta) {
+    heroAnonymousCta.addEventListener('click', function(event) {
+      event.preventDefault();
+      startReportMode('anonymous');
     });
+  }
+
+  if (chooseAnonimBtn) {
+    chooseAnonimBtn.addEventListener('click', function() { startReportMode('anonymous'); });
+  }
+
+  if (chooseRahasiaBtn) {
+    chooseRahasiaBtn.addEventListener('click', function() { startReportMode('confidential'); });
   }
 
   if (backToChoice) {
-    backToChoice.addEventListener('click', function() {
-      reportFormSection.classList.add('hidden');
-      reportChoiceScreen.classList.remove('hidden');
-      if (safetyCheck) safetyCheck.classList.remove('hidden');
-      if (reportForm) reportForm.classList.add('hidden');
-      var resultBox = document.getElementById('reportResult');
-      if (resultBox) resultBox.classList.add('hidden');
-    });
+    backToChoice.addEventListener('click', showReportChoice);
   }
 
   if (safetyDanger) {
@@ -645,6 +724,8 @@ function setupEventListeners() {
       reportForm.classList.remove('hidden');
       currentFormStep = 1;
       updateFormSteps();
+      var firstField = document.getElementById('category');
+      if (firstField) firstField.focus();
     });
   }
 
@@ -674,17 +755,27 @@ function setupEventListeners() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-  try {
-    var meResponse = await fetch('/api/auth/me');
-    if (meResponse.ok) {
-      var meData = await meResponse.json();
-      currentUser = meData.user;
-      updateNavForUser(currentUser);
-    }
-  } catch (err) {}
-
+document.addEventListener('DOMContentLoaded', function() {
+  // Safety-critical public actions bind before auth lookup completes.
   setupEventListeners();
+
+  authStateReady = fetch('/api/auth/me')
+    .then(function(meResponse) {
+      if (!meResponse.ok) return null;
+      return meResponse.json();
+    })
+    .then(function(meData) {
+      currentUser = meData ? meData.user : null;
+      updateNavForUser(currentUser);
+    })
+    .catch(function() {
+      currentUser = null;
+      updateNavForUser(null);
+    })
+    .finally(function() {
+      authStateResolved = true;
+    });
+
   handleRouting();
 });
 

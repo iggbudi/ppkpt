@@ -1,9 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
-test('beranda loads and pilot banner visible', async ({ page }) => {
+test('beranda loads with protective entry message', async ({ page }) => {
   await page.goto('/#beranda');
-  await expect(page.locator('h1, h2').first()).toBeVisible();
-  await expect(page.locator('#pilotBanner')).toContainText('Pilot SafeSphere');
+  await expect(page.locator('#homeHeading')).toHaveText('Kamu tidak harus menghadapi ini sendirian.');
+  await expect(page.locator('#pilotBanner')).toContainText('Kamu berhak merasa aman');
 });
 
 test('health endpoint returns operational checks', async ({ request }) => {

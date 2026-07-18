@@ -12,12 +12,12 @@
 <body>
   <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
   <div id="pilotBanner" class="pilot-banner">
-    <span>Pilot SafeSphere — Platform pelaporan anti-perundungan kampus. Gunakan dengan bijak.</span>
+    <span>Kamu berhak merasa aman. Jika situasi mendesak, gunakan bantuan darurat yang tersedia.</span>
     <button id="dismissBanner" class="pilot-banner-close" type="button" aria-label="Tutup banner">&times;</button>
   </div>
 
-  <div id="discreetOverlay" class="discreet-overlay" aria-hidden="true">
-    <iframe src="https://id.wikipedia.org/wiki/Halaman_Utama" title="Halaman samaran Wikipedia" class="discreet-overlay-frame"></iframe>
+  <div id="discreetOverlay" class="discreet-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Mode samaran">
+    <iframe src="https://id.wikipedia.org/wiki/Halaman_Utama" title="Halaman samaran Wikipedia" class="discreet-overlay-frame" tabindex="-1"></iframe>
     <button id="discreetCloseBtn" class="discreet-close-btn" type="button" aria-label="Keluar dari mode samaran">✕</button>
   </div>
 
@@ -25,7 +25,7 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- Sidebar Navigation -->
-  <aside class="sidebar" id="sidebar">
+  <aside class="sidebar" id="sidebar" aria-hidden="true" inert>
     <div class="sidebar-header">
       <a href="#beranda" class="sidebar-brand">
         <img src="image/logo2a.png" alt="Logo SafeSphere" class="sidebar-logo">
@@ -43,7 +43,7 @@
       </a>
       <a href="#lapor" class="sidebar-link">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        Lapor Anonim
+        Buat Laporan
       </a>
       <a href="#edukasi" class="sidebar-link">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -55,7 +55,7 @@
       </a>
       <a href="#chat" class="sidebar-link nav-link-with-badge">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Chat Ahli<span class="nav-badge hidden" id="chatBadge">1</span>
+        SafeBot<span class="nav-badge hidden" id="chatBadge">1</span>
       </a>
     </nav>
 
@@ -133,7 +133,7 @@
       </a>
       <a href="#lapor" class="topbar-link">
         <svg class="topbar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        <span>Lapor Anonim</span>
+        <span>Buat Laporan</span>
       </a>
       <a href="#edukasi" class="topbar-link">
         <svg class="topbar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
@@ -145,7 +145,7 @@
       </a>
       <a href="#chat" class="topbar-link nav-link-with-badge">
         <svg class="topbar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        <span>Chat Ahli</span>
+        <span>SafeBot</span>
         <span class="nav-badge hidden" id="topbarChatBadge">1</span>
       </a>
     </nav>
@@ -202,61 +202,51 @@
   <main id="main-content">
 
     <div id="page-beranda" class="page active">
-      <section class="hero section">
+      <section class="hero section" aria-labelledby="homeHeading">
         <div class="hero-text">
-          <h3 id="welcomeMessage" class="hidden" style="color: var(--primary); font-weight: 600; margin-top: 0; margin-bottom: 12px; font-size: 20px;">Selamat Datang, <span id="welcomeName"></span>!</h3>
-          <h1>Ruang Aman Kita, <span style="color: var(--primary);">Tanpa Perundungan</span></h1>
-          <p>SafeSphere membantu mahasiswa membuat laporan anonim, memantau status laporan, dan mendapatkan edukasi anti-perundungan secara interaktif.</p>
-          <div class="cta-row">
-            <a class="btn primary" href="#lapor">Laporkan Sekarang</a>
-            <a class="btn secondary" href="#edukasi">Mulai Belajar</a>
+          <p class="hero-eyebrow">Ruang dukungan untuk mahasiswa</p>
+          <h3 id="welcomeMessage" class="hidden">Selamat datang, <span id="welcomeName"></span>.</h3>
+          <h1 id="homeHeading">Kamu tidak harus menghadapi ini sendirian.</h1>
+          <p class="hero-lead">Ceritakan perundungan atau kekerasan dengan cara yang paling aman untukmu. Kamu dapat memulai laporan anonim tanpa membuat akun.</p>
+          <div class="cta-row" aria-label="Tindakan utama">
+            <a class="btn primary" id="heroAnonymousCta" href="#lapor">Lapor tanpa identitas</a>
+            <a class="btn emergency-link" id="heroEmergencyCta" href="#kontak">Saya butuh bantuan segera</a>
           </div>
+          <p class="hero-privacy-note">Pada laporan anonim, identitas akun dan alamat IP tidak dicatat dalam audit pembuatannya. Sistem tetap memakai cookie sesi dan pembatasan permintaan untuk menjaga layanan.</p>
         </div>
-        <div class="hero-card">
-          <h3>Keunggulan SafeSphere</h3>
-          <div class="feature-grid">
-            <div><b>Anonim</b><span>Identitas pelapor dilindungi.</span></div>
-            <div><b>Terenkripsi</b><span>Data sensitif disamarkan.</span></div>
-            <div><b>Edukasi Interaktif</b><span>Materi & Kuis kesadaran.</span></div>
-            <div><b>Tracking Cepat</b><span>Status laporan dapat dipantau.</span></div>
-          </div>
-        </div>
+
+        <aside class="trust-panel" aria-labelledby="trustHeading">
+          <p class="trust-kicker">Sebelum kamu mulai</p>
+          <h2 id="trustHeading">Kamu tetap memegang kendali.</h2>
+          <ul class="trust-list">
+            <li><strong>Tanpa akun</strong><span>Laporan anonim dapat dimulai tanpa login.</span></li>
+            <li><strong>Identitas akun tidak dicatat</strong><span>Pada laporan anonim dan audit pembuatannya.</span></li>
+            <li><strong>Keluar cepat tersedia</strong><span>Tekan Esc dua kali atau gunakan tombol Tutup Cepat.</span></li>
+            <li><strong>Bukti diperiksa</strong><span>File dibatasi, diperiksa, dan disimpan di area privat.</span></li>
+          </ul>
+        </aside>
       </section>
 
-      <section class="sdg-section">
-        <div class="sdg-overline">Dukungan Global</div>
-        <h2>Selaras dengan Tujuan SDGs</h2>
-        <div class="sdg-grid">
-          
-          <div class="sdg-card">
-            <svg class="sdg-icon-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-              <path d="M16 9h-3V6h-2v3H8v2h3v3h2v-3h3V9z" fill="#1e293b"/>
-            </svg>
-            <h3>SDG 3</h3>
-            <p>Kesehatan & Kesejahteraan</p>
-          </div>
-
-          <div class="sdg-card">
-            <svg class="sdg-icon-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="12" cy="6" r="3" />
-              <path d="M4 10.5C4 10.5 8 9 12 11c4-2 8-.5 8-.5v9s-4-1.5-8 .5c-4-2-8-.5-8-.5v-9z" />
-            </svg>
-            <h3>SDG 4</h3>
-            <p>Pendidikan Berkualitas</p>
-          </div>
-
-          <div class="sdg-card">
-            <svg class="sdg-icon-16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L11 4H4v2h16V4h-7L12 2z"/>
-              <path d="M3 7l-2 7h6L5 7H3zm14 0l-2 7h6l-2-7h-2z"/>
-              <path d="M11 7v10H8v2h8v-2h-3V7h-2z"/>
-            </svg>
-            <h3>SDG 16</h3>
-            <p>Perdamaian & Keadilan</p>
-          </div>
-
+      <section class="report-process section" aria-labelledby="processHeading">
+        <div class="section-intro">
+          <p class="section-overline">Proses yang jelas</p>
+          <h2 id="processHeading">Apa yang terjadi setelah kamu melapor?</h2>
+          <p>Kamu dapat berhenti kapan saja sebelum mengirim. Setelah terkirim, tim berwenang meninjau laporan sesuai prosedur kampus.</p>
         </div>
+        <ol class="process-list">
+          <li><span>1</span><div><strong>Pilih cara melapor</strong><p>Anonim tanpa akun atau rahasia dengan akses terbatas.</p></div></li>
+          <li><span>2</span><div><strong>Ceritakan kejadian</strong><p>Isi yang kamu ketahui. Bukti bersifat opsional.</p></div></li>
+          <li><span>3</span><div><strong>Laporan ditinjau</strong><p>Tim berwenang memeriksa informasi dan bukti yang tersedia.</p></div></li>
+          <li><span>4</span><div><strong>Pantau bila menggunakan akun</strong><p>Laporan rahasia dapat dilihat perkembangannya dari dashboard.</p></div></li>
+        </ol>
+      </section>
+
+      <section class="sdg-section" aria-labelledby="sdgHeading">
+        <div>
+          <p class="sdg-overline">Konteks program</p>
+          <h2 id="sdgHeading">Mendukung kampus yang sehat, inklusif, dan berkeadilan.</h2>
+        </div>
+        <p>SafeSphere berkontribusi pada SDG 3, SDG 4, dan SDG 16 melalui akses dukungan, edukasi, serta proses pelaporan yang dapat dipertanggungjawabkan.</p>
       </section>
     </div>
 
@@ -265,29 +255,31 @@
       <section class="section card" id="reportChoiceScreen">
         <div class="card-header">
           <h2>Buat Laporan</h2>
-          <p class="muted">Pilih cara melapor sesuai kenyamanan Anda.</p>
+          <p class="muted">Pilih cara yang terasa paling aman untukmu. Kamu dapat kembali atau keluar kapan saja.</p>
         </div>
         <div class="report-choice-grid">
-          <div class="report-choice-card" id="choiceAnonim">
-            <h3>Lapor Anonim</h3>
-            <p>Identitas akun tidak dicatat pada laporan atau audit pembuatan. Cocok jika Anda ingin melaporkan tanpa melacak status.</p>
+          <article class="report-choice-card report-choice-primary" id="choiceAnonim">
+            <p class="choice-label">Pilihan utama</p>
+            <h3>Lapor tanpa identitas akun</h3>
+            <p>Identitas akun tidak dicatat pada laporan atau audit pembuatannya. Pilih ini jika kamu tidak perlu melacak status.</p>
             <ul>
               <li>Tidak perlu login</li>
-              <li>Identitas tidak disimpan</li>
-              <li>Tidak bisa melacak status</li>
+              <li>Identitas akun tidak dicatat</li>
+              <li>Status tidak dapat dilacak</li>
             </ul>
-            <button class="btn primary full" type="button">Pilih Anonim</button>
-          </div>
-          <div class="report-choice-card" id="choiceRahasia">
-            <h3>Lapor Rahasia</h3>
-            <p>Identitas Anda disimpan dengan akses terbatas. Anda bisa melacak status laporan.</p>
+            <button class="btn primary full" id="chooseAnonimBtn" type="button">Mulai laporan anonim</button>
+          </article>
+          <article class="report-choice-card" id="choiceRahasia">
+            <p class="choice-label">Dengan akun</p>
+            <h3>Lapor rahasia</h3>
+            <p>Identitas akun disimpan dengan akses terbatas agar kamu dapat melihat perkembangan laporan.</p>
             <ul>
               <li>Perlu login</li>
-              <li>Identitas hanya bisa dilihat admin</li>
-              <li>Bisa melacak status laporan</li>
+              <li>Akses identitas dibatasi</li>
+              <li>Status dapat dilacak</li>
             </ul>
-            <button class="btn secondary full" type="button">Pilih Rahasia</button>
-          </div>
+            <button class="btn secondary full" id="chooseRahasiaBtn" type="button">Pilih laporan rahasia</button>
+          </article>
         </div>
       </section>
 
@@ -295,17 +287,18 @@
       <section class="section card hidden" id="reportFormSection">
         <div class="card-header">
           <h2 id="reportFormTitle">Form Lapor Anonim</h2>
-          <p class="muted" id="reportFormSubtitle">Isi laporan secara jujur. Data disimpan aman di server SafeSphere.</p>
+          <p class="muted" id="reportFormSubtitle">Isi sesuai yang kamu ketahui. Kamu dapat berhenti sebelum laporan dikirim.</p>
           <button class="btn outline" id="backToChoice" type="button" style="margin-top: 8px;">Kembali</button>
         </div>
 
         <!-- Safety check -->
-        <div id="safetyCheck" class="safety-check">
-          <h3>Apakah Anda dalam bahaya sekarang?</h3>
-          <p class="muted">Jika Anda atau orang lain dalam bahaya langsung, hubungi kontak darurat terlebih dahulu.</p>
+        <div id="safetyCheck" class="safety-check" aria-labelledby="safetyCheckHeading">
+          <p class="safety-kicker">Periksa keselamatanmu terlebih dahulu</p>
+          <h3 id="safetyCheckHeading" tabindex="-1">Apakah kamu dalam bahaya sekarang?</h3>
+          <p>SafeSphere bukan layanan respons darurat. Jika ada ancaman langsung, cari tempat aman dan hubungi bantuan. Kamu boleh keluar dari halaman ini kapan saja.</p>
           <div class="safety-options">
-            <button class="btn danger full" id="safetyDanger" type="button">Ya, saya dalam bahaya langsung</button>
-            <button class="btn primary full" id="safetySafe" type="button">Tidak, saya aman untuk melapor</button>
+            <button class="btn danger full" id="safetyDanger" type="button">Saya dalam bahaya sekarang</button>
+            <button class="btn primary full" id="safetySafe" type="button">Saya aman untuk melanjutkan</button>
           </div>
         </div>
 
@@ -489,30 +482,41 @@
       </section>
     </div>
     <div id="page-kontak" class="page">
-      <section class="section card">
+      <section class="section card emergency-section" aria-labelledby="emergencyHeading">
         <div class="card-header">
-          <h2>Kontak Darurat Kampus</h2>
-          <p class="muted">Hubungi nomor berikut jika terjadi situasi perundungan atau kekerasan yang mengancam keselamatan fisik.</p>
+          <p class="safety-kicker">Bantuan yang dapat dihubungi sekarang</p>
+          <h2 id="emergencyHeading">Jika ada ancaman langsung, hubungi layanan darurat.</h2>
+          <p class="muted">Cari tempat yang lebih aman jika memungkinkan. Pilih layanan sesuai kebutuhanmu.</p>
         </div>
-        <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-          <div><b>Satgas PPKS Kampus</b><span style="color:var(--muted); font-weight:bold;">Hubungi bagian Kemahasiswaan kampus Anda (contoh pilot: portal internal fakultas atau email satgas@kampus.edu)</span></div>
-          <div><b>Keamanan / Satpam</b><span style="color:var(--muted); font-weight:bold;">Telepon keamanan kampus (lihat website resmi kampus)</span></div>
-          <div><b>Layanan Psikologi Mhs</b><span style="color:var(--muted); font-weight:bold;">Biro Psikologi / Konseling kampus (verifikasi Juni 2026)</span></div>
-          <div><b>Hotline Nasional</b><a href="tel:129" style="color:var(--primary); font-weight:bold; text-decoration: underline;">129</a> <span style="color:var(--muted);">(SAPA 129 - Kementerian PPPA, verifikasi Juni 2026)</span></div>
-          <div><b>Polisi</b><a href="tel:110" style="color:var(--primary); font-weight:bold; text-decoration: underline;">110</a> <span style="color:var(--muted);">(Polri, verifikasi Juni 2026)</span></div>
-          <div><b>PSC / Ambulans</b><a href="tel:119" style="color:var(--primary); font-weight:bold; text-decoration: underline;">119</a> <span style="color:var(--muted);">(Pusat Panggilan Darurat, verifikasi Juni 2026)</span></div>
+        <div class="emergency-contact-list">
+          <a class="emergency-contact emergency-contact-urgent" href="tel:110">
+            <strong>Polisi — 110</strong>
+            <span>Untuk ancaman, kekerasan, atau bahaya keamanan yang sedang terjadi.</span>
+            <span class="contact-action">Telepon 110</span>
+          </a>
+          <a class="emergency-contact" href="tel:119">
+            <strong>PSC / Ambulans — 119</strong>
+            <span>Untuk kondisi medis darurat atau kebutuhan ambulans.</span>
+            <span class="contact-action">Telepon 119</span>
+          </a>
+          <a class="emergency-contact" href="tel:129">
+            <strong>SAPA 129 — 129</strong>
+            <span>Layanan Kementerian PPPA untuk kekerasan terhadap perempuan dan anak.</span>
+            <span class="contact-action">Telepon 129</span>
+          </a>
         </div>
-        <p class="muted" style="margin-top:1rem; font-size:0.85rem;">
-          <strong>Catatan:</strong> Nomor nasional di atas sudah diverifikasi dan dapat ditelepon langsung (tautan <code>tel:</code>). Untuk kontak spesifik kampus/fakultas pilot, hubungi bagian Kemahasiswaan atau cek website resmi kampus. Contoh: Satgas PPKS Fakultas Pilot tersedia via portal internal atau (021) XXX-XXXX (periksa sumber resmi).
-        </p>
+        <div class="campus-contact-note" role="note">
+          <h3>Kontak kampus belum dikonfigurasi pada layanan pilot ini.</h3>
+          <p>Gunakan kanal resmi kampus untuk menghubungi Satgas PPKS, keamanan, kemahasiswaan, atau layanan konseling. Jangan gunakan nomor atau alamat yang tidak berasal dari sumber resmi kampusmu.</p>
+        </div>
       </section>
     </div>
 
     <div id="page-chat" class="page">
       <section class="section card chat-section">
         <div class="card-header">
-          <h2>Chat Bersama SafeBot & Ahli</h2>
-          <p class="muted">Ceritakan keluh kesahmu dengan aman. SafeBot membantu mengenali risiko dan mengarahkan langkah berikutnya.</p>
+          <h2>Dukungan Awal dari SafeBot</h2>
+          <p class="muted">SafeBot membantu mengenali risiko dan mengarahkan langkah berikutnya. SafeBot bukan konselor atau layanan darurat.</p>
         </div>
 
         <div class="safebot-disclaimer" role="note">
@@ -805,18 +809,18 @@
       </section>
     </div>
 
-    <div id="a11yWidget" style="position: fixed; bottom: 24px; left: 24px; z-index: 9998;">
+    <div id="a11yWidget" class="a11y-widget">
     
-    <div id="a11yMenu" class="hidden" style="position: absolute; bottom: 60px; left: 0; background: white; padding: 16px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid var(--line); width: 220px; display: flex; flex-direction: column; gap: 10px;">
-      <h4 style="margin: 0 0 4px 0; font-size: 15px; color: var(--ink);">Aksesibilitas</h4>
-      <p style="margin: 0 0 12px 0; font-size: 12px; color: var(--muted); line-height: 1.4;">Sesuaikan tampilan untuk kenyamanan Anda.</p>
+    <div id="a11yMenu" class="a11y-menu hidden">
+      <h4>Aksesibilitas</h4>
+      <p>Sesuaikan tampilan untuk kenyamananmu.</p>
       
-      <button class="btn outline a11y-toggle" data-feature="high-contrast" aria-pressed="false" style="justify-content: flex-start; font-size: 13px;">👁️ Kontras Tinggi</button>
-      <button class="btn outline a11y-toggle" data-feature="large-text" aria-pressed="false" style="justify-content: flex-start; font-size: 13px;">🔎 Perbesar Teks</button>
-      <button class="btn outline a11y-toggle" data-feature="dyslexia" aria-pressed="false" style="justify-content: flex-start; font-size: 13px;">📖 Ramah Disleksia</button>
+      <button class="btn outline a11y-toggle" data-feature="high-contrast" aria-pressed="false">👁️ Kontras Tinggi</button>
+      <button class="btn outline a11y-toggle" data-feature="large-text" aria-pressed="false">🔎 Perbesar Teks</button>
+      <button class="btn outline a11y-toggle" data-feature="dyslexia" aria-pressed="false">📖 Ramah Disleksia</button>
     </div>
 
-    <button id="a11yMenuToggle" style="width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: white; border: none; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); cursor: pointer; display: grid; place-items: center; transition: transform 0.2s;" aria-label="Buka Menu Aksesibilitas" aria-expanded="false" aria-controls="a11yMenu">
+    <button id="a11yMenuToggle" class="a11y-menu-toggle" aria-label="Buka Menu Aksesibilitas" aria-expanded="false" aria-controls="a11yMenu">
       <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2zm0 2a8 8 0 100 16 8 8 0 000-16zm0 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-4 4h8v2h-3v6h-2v-6H8v-2z"/>
       </svg>
@@ -826,7 +830,7 @@
   </main>
 
   <footer>
-    <p>&copy; 2026 Tim Kompetisi Vokasi OLIVIA XI. Mengembangkan inovasi digital berkelanjutan.</p>
+    <p>&copy; 2026 SafeSphere. Layanan pilot pelaporan dan dukungan awal anti-perundungan kampus.</p>
   </footer>
 
   <script src="vendor/chart.umd.min.js"></script>

@@ -36,7 +36,7 @@ test('quick escape cancels active file upload during report submit', async ({ pa
   await page.goto('/#lapor');
 
   // Choose anonymous report
-  await page.locator('#choiceAnonim button').click();
+  await page.locator('#chooseAnonimBtn').click();
 
   // Pass safety check
   await page.locator('#safetySafe').click();
