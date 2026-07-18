@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const { z } = require('zod');
 const express = require('express');
+const { pipeline } = require('stream/promises');
 const db = require('./db');
 const { reportRateLimiter } = require('./rateLimiter');
 const { createBackup, restoreFromBackup, validateBackup } = require('./backup');
@@ -53,6 +54,17 @@ function mapReportFromDb(report) {
 
 function mapReportsFromDb(reports) {
   return reports.map(mapReportFromDb);
+}
+
+function syncReportEvidenceSummary(reportId) {
+  const files = db.prepare(
+    'SELECT safe_name FROM evidence_files WHERE report_id = ? AND deleted_at IS NULL ORDER BY uploaded_at'
+  ).all(reportId);
+  const summary = files.length > 0
+    ? files.map((file) => file.safe_name).join(', ')
+    : 'Tidak ada lampiran';
+  db.prepare('UPDATE reports SET evidence = ? WHERE id = ?').run(summary, reportId);
+  return summary;
 }
 
 function setupReportRoutes(app) {
@@ -154,6 +166,10 @@ function setupReportRoutes(app) {
             } catch {}
           }
         }
+      }
+
+      if (uploadedEvidence.length > 0) {
+        syncReportEvidenceSummary(reportId);
       }
 
       const report = selectReportById.get(reportId);
@@ -609,6 +625,10 @@ function setupReportRoutes(app) {
       }
     }
 
+    if (uploadedEvidence.length > 0) {
+      syncReportEvidenceSummary(reportId);
+    }
+
     res.json({
       success: uploadedEvidence.length > 0,
       uploaded: uploadedEvidence,
@@ -680,6 +700,10 @@ function setupReportRoutes(app) {
       }
     }
 
+    if (uploadedEvidence.length > 0) {
+      syncReportEvidenceSummary(reportId);
+    }
+
     res.json({
       success: uploadedEvidence.length > 0,
       uploaded: uploadedEvidence,
@@ -719,14 +743,21 @@ function setupReportRoutes(app) {
     res.setHeader('Content-Disposition', `attachment; filename="${result.metadata.fileName}"`);
     res.setHeader('X-Content-Type-Options', 'nosniff');
 
-    // Stream file ke response
-    result.stream.pipe(res);
+    try {
+      await pipeline(result.stream, res);
+    } catch (error) {
+      if (!res.headersSent) {
+        return res.status(500).json({ error: 'Gagal mengirim file bukti' });
+      }
+      res.destroy(error);
+    }
   });
 
   // Delete evidence
   app.delete('/api/reports/:reportId/evidence/:fileId', requireAuth, async (req, res) => {
     const result = await deleteEvidence(
       req.params.fileId,
+      req.params.reportId,
       req.session.user.id,
       req.session.user.role
     );
@@ -735,6 +766,7 @@ function setupReportRoutes(app) {
       return res.status(400).json({ error: result.error });
     }
 
+    syncReportEvidenceSummary(req.params.reportId);
     res.json(result);
   });
 

@@ -399,11 +399,11 @@ async function downloadEvidence(evidenceId, userId, userRole) {
 /**
  * Hapus file bukti (soft delete)
  */
-async function deleteEvidence(evidenceId, userId, userRole) {
+async function deleteEvidence(evidenceId, reportId, userId, userRole) {
   const evidence = selectEvidenceById.get(evidenceId);
-  
-  if (!evidence) {
-    return { success: false, error: 'File bukti tidak ditemukan' };
+
+  if (!evidence || evidence.report_id !== reportId) {
+    return { success: false, error: 'File bukti tidak ditemukan pada laporan ini' };
   }
 
   if (evidence.deleted_at) {

@@ -1,4 +1,7 @@
 const crypto = require('crypto');
+const fs = require('fs');
+const fsp = require('fs').promises;
+const { pipeline } = require('stream/promises');
 
 const ALGORITHM = 'aes-256-gcm';
 
@@ -38,8 +41,38 @@ function isEncryptionEnabled() {
     && Boolean(process.env.EVIDENCE_ENCRYPTION_KEY);
 }
 
+/**
+ * Encrypt from input stream to file + write .enc.json metadata.
+ * Avoids loading full file into memory.
+ */
+async function encryptStream(inputStream, outputFilePath) {
+  const metadataPath = `${outputFilePath}.enc.json`;
+  const iv = crypto.randomBytes(16);
+  const salt = crypto.randomBytes(16);
+  const key = crypto.scryptSync(getEncryptionKey(), salt, 32);
+  const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
+  const output = fs.createWriteStream(outputFilePath);
+
+  try {
+    await pipeline(inputStream, cipher, output);
+    const meta = {
+      iv: iv.toString('hex'),
+      salt: salt.toString('hex'),
+      authTag: cipher.getAuthTag().toString('hex')
+    };
+    await fsp.writeFile(metadataPath, JSON.stringify(meta));
+  } catch (error) {
+    await Promise.allSettled([
+      fsp.unlink(outputFilePath),
+      fsp.unlink(metadataPath)
+    ]);
+    throw error;
+  }
+}
+
 module.exports = {
   encryptBuffer,
   decryptBuffer,
-  isEncryptionEnabled
+  isEncryptionEnabled,
+  encryptStream
 };

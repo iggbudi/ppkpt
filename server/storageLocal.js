@@ -8,7 +8,7 @@ const fs = require('fs');
 const fsp = require('fs').promises;
 const path = require('path');
 const { StorageInterface, STORAGE_CONFIG } = require('./storage');
-const { encryptBuffer, decryptBuffer, isEncryptionEnabled } = require('./fileEncryption');
+const { encryptBuffer, decryptBuffer, isEncryptionEnabled, encryptStream } = require('./fileEncryption');
 
 class LocalStorageAdapter extends StorageInterface {
   constructor(options = {}) {
@@ -41,11 +41,16 @@ class LocalStorageAdapter extends StorageInterface {
 
     try {
       await fsp.access(encMetaPath);
-      const meta = JSON.parse(await fsp.readFile(encMetaPath, 'utf8'));
-      return decryptBuffer(raw, meta.iv, meta.salt, meta.authTag);
     } catch {
+      if (this.encryptAtRest) {
+        throw new Error('Metadata enkripsi tidak ditemukan');
+      }
       return raw;
     }
+
+    // Sidecar yang ada harus valid. Gagal parse/decrypt berarti fail-closed.
+    const meta = JSON.parse(await fsp.readFile(encMetaPath, 'utf8'));
+    return decryptBuffer(raw, meta.iv, meta.salt, meta.authTag);
   }
 
   /**
@@ -95,13 +100,17 @@ class LocalStorageAdapter extends StorageInterface {
       if (Buffer.isBuffer(data)) {
         await this.writeEncryptedPayload(filePath, data);
       } else if (data && typeof data.pipe === 'function') {
-        // Stream
-        const writeStream = fs.createWriteStream(filePath);
-        await new Promise((resolve, reject) => {
-          data.pipe(writeStream);
-          writeStream.on('finish', resolve);
-          writeStream.on('error', reject);
-        });
+        // Stream — support encryption without full buffer in memory
+        if (this.encryptAtRest) {
+          await encryptStream(data, filePath);
+        } else {
+          const writeStream = fs.createWriteStream(filePath);
+          await new Promise((resolve, reject) => {
+            data.pipe(writeStream);
+            writeStream.on('finish', resolve);
+            writeStream.on('error', reject);
+          });
+        }
       } else {
         throw new Error('Invalid data type');
       }
@@ -135,10 +144,11 @@ class LocalStorageAdapter extends StorageInterface {
       }
       
       const stat = await fsp.stat(filePath);
+      // Verifikasi tag AES-GCM sepenuhnya sebelum byte plaintext diekspos ke pemanggil.
       const decrypted = await this.readEncryptedPayload(filePath);
       const { Readable } = require('stream');
       const stream = Readable.from(decrypted);
-      
+
       // Baca metadata jika ada
       let metadata = {};
       const metaPath = filePath + '.meta.json';
@@ -228,10 +238,12 @@ class LocalStorageAdapter extends StorageInterface {
       await fsp.rename(sourcePath, destPath);
       
       // Pindahkan metadata juga
-      try {
-        await fsp.rename(sourcePath + '.meta.json', destPath + '.meta.json');
-      } catch {
-        // Metadata tidak ada
+      for (const suffix of ['.meta.json', '.enc.json']) {
+        try {
+          await fsp.rename(sourcePath + suffix, destPath + suffix);
+        } catch {
+          // Metadata tidak ada
+        }
       }
 
       return { success: true };
@@ -263,10 +275,12 @@ class LocalStorageAdapter extends StorageInterface {
       await fsp.rename(sourcePath, destPath);
       
       // Pindahkan metadata juga
-      try {
-        await fsp.rename(sourcePath + '.meta.json', destPath + '.meta.json');
-      } catch {
-        // Metadata tidak ada
+      for (const suffix of ['.meta.json', '.enc.json']) {
+        try {
+          await fsp.rename(sourcePath + suffix, destPath + suffix);
+        } catch {
+          // Metadata tidak ada
+        }
       }
 
       return { success: true };
@@ -339,17 +353,18 @@ class LocalStorageAdapter extends StorageInterface {
       let cleaned = 0;
 
       for (const file of files) {
-        // Skip metadata files
-        if (file.endsWith('.meta.json')) continue;
-        
+        // Sidecar metadata mengikuti lifecycle file utama.
+        if (file.endsWith('.meta.json') || file.endsWith('.enc.json')) continue;
+
         if (!validKeysSet.has(file)) {
           const filePath = path.join(this.basePath, file);
           try {
             await fsp.unlink(filePath);
-            // Hapus metadata juga
-            try {
-              await fsp.unlink(filePath + '.meta.json');
-            } catch {}
+            for (const suffix of ['.meta.json', '.enc.json']) {
+              try {
+                await fsp.unlink(filePath + suffix);
+              } catch {}
+            }
             cleaned++;
           } catch {
             // File mungkin sedang digunakan
@@ -376,8 +391,8 @@ class LocalStorageAdapter extends StorageInterface {
         let fileCount = 0;
 
         for (const file of files) {
-          if (file.endsWith('.meta.json')) continue;
-          
+          if (file.endsWith('.meta.json') || file.endsWith('.enc.json')) continue;
+
           const filePath = path.join(dirPath, file);
           try {
             const stat = await fsp.stat(filePath);
