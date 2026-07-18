@@ -22,6 +22,7 @@ module.exports = {
       SESSION_SECRET: 'e2e-session-secret-with-sufficient-entropy-32',
       ADMIN_USERNAME: 'e2eadmin',
       ADMIN_PASSWORD: 'e2e-admin-password-secure',
+      DATABASE_PATH: ':memory:',
       REPORT_RATE_LIMIT_MAX: '100',
       EVIDENCE_UPLOADS_ENABLED: 'false'
     }

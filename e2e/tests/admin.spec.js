@@ -1,6 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
 test('admin login and dashboard access', async ({ page, request }) => {
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+
   const loginRes = await request.post('/api/auth/login', {
     data: {
       username: 'e2eadmin',
@@ -19,6 +22,8 @@ test('admin login and dashboard access', async ({ page, request }) => {
 
   await page.goto('/#admin');
   await page.waitForFunction(() => window.location.hash === '#admin');
-  await expect(page.locator('#adminDashboardArea')).toBeVisible();
+  await expect(page.locator('#page-admin')).toBeVisible();
   await expect(page.locator('#m-total')).toBeVisible();
+  await expect(page.locator('#m-pending')).toBeVisible();
+  expect(pageErrors).toEqual([]);
 });
