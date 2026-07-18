@@ -88,22 +88,21 @@
       }
     } catch (err) {}
 
+    renderSituationSummary();
+
     var total = reportData.length;
     var tinggi = reportData.filter(function(r) { return r.urgency === 'Tinggi'; }).length;
-    var selesai = reportData.filter(function(r) { return r.status === 'Selesai'; }).length;
+    var belumDitindaklanjuti = reportData.filter(function(r) { return r.status === 'Baru Masuk'; }).length;
 
     var catCounts = {};
-    var dominant = '-';
-    var maxCount = 0;
     reportData.forEach(function(r) {
       catCounts[r.category] = (catCounts[r.category] || 0) + 1;
-      if (catCounts[r.category] > maxCount) { maxCount = catCounts[r.category]; dominant = r.category; }
     });
 
     document.getElementById('m-total').innerText = total;
     document.getElementById('m-tinggi').innerText = tinggi;
-    document.getElementById('m-selesai').innerText = selesai;
-    document.getElementById('m-dominan').innerText = dominant;
+    document.getElementById('m-pending').innerText = belumDitindaklanjuti;
+    document.getElementById('m-avg-time').innerText = '-';
 
     var categories = ['Verbal', 'Sosial', 'Cyberbullying', 'Fisik', 'Seksual'];
     var chartValues = categories.map(function(cat) { return catCounts[cat] || 0; });
@@ -147,62 +146,134 @@
 
   var currentDetailId = null;
 
-  window.viewReportDetail = function(id) {
+  function formatEvidenceSize(bytes) {
+    if (!bytes) return '0 B';
+    var units = ['B', 'KB', 'MB', 'GB'];
+    var i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    return (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1) + ' ' + units[i];
+  }
+
+  async function renderEvidenceList(container, report) {
+    clearElement(container);
+
+    try {
+      var response = await fetch('/api/reports/' + encodeURIComponent(report.id) + '/evidence');
+      if (!response.ok) {
+        throw new Error('Gagal memuat daftar bukti');
+      }
+
+      var data = await response.json();
+      var files = data.evidence || [];
+
+      if (files.length === 0) {
+        container.appendChild(createEl('div', { className: 'muted', text: 'Tidak ada lampiran' }));
+        return;
+      }
+
+      var ul = createEl('ul');
+      files.forEach(function(file) {
+        var li = createEl('li');
+
+        var link = createEl('a', {
+          href: '/api/reports/' + encodeURIComponent(report.id) + '/evidence/' + encodeURIComponent(file.id) + '/download',
+          text: file.safeName + ' (' + formatEvidenceSize(file.size) + ')'
+        });
+
+        li.appendChild(link);
+
+        if (file.scanStatus) {
+          var scan = createEl('span', {
+            className: 'scan',
+            text: file.scanStatus
+          });
+          li.appendChild(scan);
+        }
+
+        ul.appendChild(li);
+      });
+      container.appendChild(ul);
+
+    } catch (err) {
+      container.appendChild(createEl('div', { className: 'muted', text: 'Gagal memuat daftar bukti. Silakan coba lagi.' }));
+    }
+  }
+
+  window.viewReportDetail = async function(id) {
     var report = reportData.find(function(r) { return r.id === id; });
     if (!report) return;
     currentDetailId = id;
 
+    // Title + badge
     document.getElementById('detailTitle').innerText = 'Detail Kasus ' + report.id;
 
-    var contentEl = document.getElementById('detailContent');
-    clearElement(contentEl);
+    var badge = document.getElementById('detailStatusBadge');
+    badge.className = 'status-badge risk-' + report.urgency.toLowerCase();
+    badge.textContent = report.urgency;
 
-    var reporterBox = createEl('div', { style: 'grid-column: 1 / -1; background: #e8f0ff; padding: 12px; border-radius: 8px; border: 1px solid #bfdbfe; margin-bottom: 8px;' });
-    reporterBox.appendChild(createEl('span', { text: 'Pelapor:', style: 'color: var(--primary2);' }));
-    appendBr(reporterBox);
-    reporterBox.appendChild(createEl('strong', { text: report.authorName, style: 'font-size: 16px; color: var(--primary);' }));
-    contentEl.appendChild(reporterBox);
+    // Left column - Reporter
+    var reporterEl = document.getElementById('detailReporter');
+    clearElement(reporterEl);
+    reporterEl.appendChild(createEl('div', { className: 'label', text: 'Pelapor' }));
+    reporterEl.appendChild(createEl('div', { className: 'value', text: report.authorName }));
+
+    // Left column - Fields
+    var fieldsEl = document.getElementById('detailFields');
+    clearElement(fieldsEl);
 
     var fields = [
-      { label: 'Waktu Kejadian:', value: report.incidentDate },
-      { label: 'Kategori:', value: report.category },
-      { label: 'Lokasi Kejadian:', value: report.location },
-      { label: 'Tingkat Risiko:', value: report.urgency }
+      { label: 'Waktu Kejadian', value: report.incidentDate },
+      { label: 'Kategori', value: report.category },
+      { label: 'Lokasi Kejadian', value: report.location },
+      { label: 'Tingkat Risiko', value: report.urgency }
     ];
+
     fields.forEach(function(f) {
-      var d = createEl('div');
-      d.appendChild(createEl('span', { text: f.label }));
-      appendBr(d);
-      d.appendChild(createEl('strong', { text: f.value }));
-      contentEl.appendChild(d);
+      var row = createEl('div', { className: 'field' });
+      row.appendChild(createEl('span', { className: 'label', text: f.label + ':' }));
+      row.appendChild(createEl('span', { className: 'value', text: f.value }));
+      fieldsEl.appendChild(row);
     });
 
-    var evidenceDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
-    evidenceDiv.appendChild(createEl('span', { text: 'Lampiran Bukti:' }));
-    appendBr(evidenceDiv);
-    evidenceDiv.appendChild(createEl('strong', { text: report.evidence || 'Tidak ada lampiran', style: 'color: var(--primary);' }));
-    contentEl.appendChild(evidenceDiv);
+    // Left column - Description
+    var descEl = document.getElementById('detailDescription');
+    clearElement(descEl);
+    descEl.appendChild(createEl('span', { className: 'label', text: 'Kronologi Lengkap' }));
+    descEl.appendChild(createEl('div', { className: 'value', text: report.description }));
 
-    var descDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
-    descDiv.appendChild(createEl('span', { text: 'Kronologi Lengkap:' }));
-    appendBr(descDiv);
-    descDiv.appendChild(createEl('strong', { text: '"' + report.description + '"', style: 'font-weight: 500; font-size: 14px; line-height: 1.5; margin-top: 4px;' }));
-    contentEl.appendChild(descDiv);
+    // Left column - Evidence
+    var evidenceEl = document.getElementById('detailEvidence');
+    await renderEvidenceList(evidenceEl, report);
 
-    var statusDiv = createEl('div', { style: 'grid-column: 1 / -1;' });
-    statusDiv.appendChild(createEl('span', { text: 'Status Terakhir:' }));
-    appendBr(statusDiv);
-    statusDiv.appendChild(createEl('strong', { text: report.status, style: 'color: var(--primary);' }));
-    contentEl.appendChild(statusDiv);
+    // Right column - ringkasan lifecycle berdasarkan data laporan yang tersedia.
+    var timelineEl = document.getElementById('detailTimeline');
+    clearElement(timelineEl);
 
+    var timelineData = [
+      { time: report.incidentDate, text: 'Tanggal kejadian dilaporkan' },
+      { time: 'Status terkini', text: report.status }
+    ];
+
+    timelineData.forEach(function(item) {
+      var div = createEl('div', { className: 'timeline-item' });
+      div.appendChild(createEl('div', { className: 'timeline-dot' }));
+      var content = createEl('div', { className: 'timeline-content' });
+      content.appendChild(createEl('div', { text: item.text }));
+      content.appendChild(createEl('div', { className: 'time', text: item.time }));
+      div.appendChild(content);
+      timelineEl.appendChild(div);
+    });
+
+    // Pre-fill the form (unchanged)
     var selectStatus = report.status;
-    if (selectStatus === 'Baru Masuk' || selectStatus === 'Direview' || selectStatus === 'Diproses' || selectStatus === 'Selesai') {
+    if (['Baru Masuk', 'Direview', 'Diproses', 'Selesai'].includes(selectStatus)) {
       document.getElementById('updateStatusSelect').value = selectStatus;
     } else {
       document.getElementById('updateStatusSelect').value = 'Baru Masuk';
     }
 
     document.getElementById('updateAppointment').value = report.appointment || '';
+
+    // Open modal
     openModal('reportDetailModal');
   };
 
@@ -324,4 +395,21 @@
     var modal1 = document.getElementById('reportDetailModal');
     if (event.target === modal1) closeReportDetailModal();
   });
+
+  // === PHASE 6 ADMIN REDESIGN ===
+  window.renderSituationSummary = function() {
+    const el = document.getElementById('situationSummary');
+    if (!el || !reportData) return;
+
+    const tinggi = reportData.filter(r => r.urgency === 'Tinggi').length;
+    const pending = reportData.filter(r => r.status !== 'Selesai').length;
+
+    clearElement(el);
+    el.appendChild(document.createTextNode('Ada '));
+    el.appendChild(createEl('strong', { text: tinggi + ' laporan berisiko tinggi' }));
+    el.appendChild(document.createTextNode(' dan '));
+    el.appendChild(createEl('strong', { text: pending + ' laporan' }));
+    el.appendChild(document.createTextNode(' yang belum selesai.'));
+  };
+
 })();

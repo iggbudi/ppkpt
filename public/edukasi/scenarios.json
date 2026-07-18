@@ -10,9 +10,9 @@
         "start": {
           "text": "Anda sedang duduk di kantin fakultas dan melihat seorang mahasiswa baru didorong dan diejek oleh sekelompok senior. Mereka merekam kejadian tersebut sambil tertawa. Apa tindakan pertama Anda?",
           "options": [
-            { "text": "A. Langsung menghampiri, marah, dan membentak para senior tersebut.", "nextNode": "agresif" },
-            { "text": "B. Pura-pura tidak melihat sambil melanjutkan makan agar tidak ikut terseret.", "nextNode": "pasif" },
-            { "text": "C. Menjauh ke titik aman, merekam diam-diam sebagai bukti, lalu melapor ke SafeSphere.", "nextNode": "pintar" }
+            { "text": "A. Langsung menghampiri, marah, dan membentak para senior tersebut.", "nextNode": "agresif", "scoreDelta": -5 },
+            { "text": "B. Pura-pura tidak melihat sambil melanjutkan makan agar tidak ikut terseret.", "nextNode": "pasif", "scoreDelta": -5 },
+            { "text": "C. Menjauh ke titik aman, merekam diam-diam sebagai bukti, lalu melapor ke SafeSphere.", "nextNode": "pintar", "scoreDelta": 15 }
           ],
           "feedback": null
         },
@@ -48,9 +48,9 @@
         "start": {
           "text": "Saat berjalan menuju kelas, Anda mendengar sekelompok mahasiswa mengejek teman sekelas dengan julukan menghina. Korban terlihat cemas dan berusaha cepat-cepat pergi. Apa yang Anda lakukan?",
           "options": [
-            { "text": "A. Ikut tertawa agar tidak dianggap aneh.", "nextNode": "ikut" },
-            { "text": "B. Dekati korban setelah pelaku pergi, tawarkan dukungan, dan sarankan melapor.", "nextNode": "pintar" },
-            { "text": "C. Rekam lalu unggah ke story media sosial tanpa izin korban.", "nextNode": "viral" }
+            { "text": "A. Ikut tertawa agar tidak dianggap aneh.", "nextNode": "ikut", "scoreDelta": -5 },
+            { "text": "B. Dekati korban setelah pelaku pergi, tawarkan dukungan, dan sarankan melapor.", "nextNode": "pintar", "scoreDelta": 15 },
+            { "text": "C. Rekam lalu unggah ke story media sosial tanpa izin korban.", "nextNode": "viral", "scoreDelta": -10 }
           ],
           "feedback": null
         },
@@ -86,9 +86,9 @@
         "start": {
           "text": "Di shuttle kampus yang penuh, Anda melihat senior meminta uang paksa dari mahasiswa baru. Korban terlihat takut dan mulai membuka dompet. Apa tindakan Anda?",
           "options": [
-            { "text": "A. Pura-pura tidur dan tidak melihat.", "nextNode": "pasif" },
-            { "text": "B. Catat waktu/rute, beri isyarat aman ke korban, lalu laporkan setelah turun.", "nextNode": "pintar" },
-            { "text": "C. Langsung bentak senior di depan penumpang.", "nextNode": "konfrontasi" }
+            { "text": "A. Pura-pura tidur dan tidak melihat.", "nextNode": "pasif", "scoreDelta": -5 },
+            { "text": "B. Catat waktu/rute, beri isyarat aman ke korban, lalu laporkan setelah turun.", "nextNode": "pintar", "scoreDelta": 15 },
+            { "text": "C. Langsung bentak senior di depan penumpang.", "nextNode": "konfrontasi", "scoreDelta": -5 }
           ],
           "feedback": null
         },
@@ -124,9 +124,9 @@
         "start": {
           "text": "Kamu membuka grup WhatsApp angkatan dan melihat percakapan yang sudah berlangsung lama. Seorang mahasiswa baru sedang diolok-olok karena penampilannya. Pesan sudah lebih dari 50, banyak yang ikut menertawakan dengan sticker dan meme. Apa yang kamu lakukan?",
           "options": [
-            { "text": "A. Ikut menertawakan agar tidak di-bully juga.", "nextNode": "ikut" },
-            { "text": "B. Diam saja, toh bukan urusanmu.", "nextNode": "diam" },
-            { "text": "C. Screenshot, DM korban untuk dukungan, lalu laporkan.", "nextNode": "pintar" }
+            { "text": "A. Ikut menertawakan agar tidak di-bully juga.", "nextNode": "ikut", "scoreDelta": -5 },
+            { "text": "B. Diam saja, toh bukan urusanmu.", "nextNode": "diam", "scoreDelta": -5 },
+            { "text": "C. Screenshot, DM korban untuk dukungan, lalu laporkan.", "nextNode": "pintar", "scoreDelta": 15 }
           ],
           "feedback": null
         },
@@ -162,9 +162,9 @@
         "start": {
           "text": "Di area parkir kampus, kamu melihat sekelompok senior memaksa mahasiswa baru untuk push-up di genangan air sambil diteriaki. Mereka bilang ini tradisi ospek dan menyuruhmu ikut bergabung. Apa reaksimu?",
           "options": [
-            { "text": "A. Ikut-ikutan karena dulu kamu juga pernah mengalaminya.", "nextNode": "ikut" },
-            { "text": "B. Rekam diam-diam, lalu cari bantuan petugas/PPKS.", "nextNode": "pintar" },
-            { "text": "C. Langsung konfrontasi fisik ke senior.", "nextNode": "konfrontasi" }
+            { "text": "A. Ikut-ikutan karena dulu kamu juga pernah mengalaminya.", "nextNode": "ikut", "scoreDelta": -5 },
+            { "text": "B. Rekam diam-diam, lalu cari bantuan petugas/PPKS.", "nextNode": "pintar", "scoreDelta": 15 },
+            { "text": "C. Langsung konfrontasi fisik ke senior.", "nextNode": "konfrontasi", "scoreDelta": -10 }
           ],
           "feedback": null
         },
@@ -200,9 +200,9 @@
         "start": {
           "text": "Di tengah kuliah, dosen membuat komentar bernada seksual kepada seorang mahasiswi di depan kelas. Mahasiswi terlihat tidak nyaman dan menunduk. Tidak ada yang berbicara. Apa yang kamu lakukan?",
           "options": [
-            { "text": "A. Diam, toh itu urusan dosen dan mahasiswi.", "nextNode": "diam" },
-            { "text": "B. Catat kejadian, tawarkan dukungan ke korban setelah kelas.", "nextNode": "pintar" },
-            { "text": "C. Langsung protes keras di depan kelas.", "nextNode": "protes" }
+            { "text": "A. Diam, toh itu urusan dosen dan mahasiswi.", "nextNode": "diam", "scoreDelta": -5 },
+            { "text": "B. Catat kejadian, tawarkan dukungan ke korban setelah kelas.", "nextNode": "pintar", "scoreDelta": 15 },
+            { "text": "C. Langsung protes keras di depan kelas.", "nextNode": "protes", "scoreDelta": -5 }
           ],
           "feedback": null
         },
