@@ -1,5 +1,7 @@
 # UX Sprint 01 — Protective Entry Experience
 
+**Status:** Implemented — 18 Juli 2026
+
 **Durasi:** 7 hari kerja
 **Target:** mahasiswa korban/saksi yang mengakses dari ponsel dalam kondisi stres
 **Area:** beranda dan pintu masuk pelaporan
@@ -278,7 +280,17 @@ Manual review:
 - Diff direview untuk simplicity, safety copy, accessibility, dan klaim keamanan.
 - Working tree hanya memuat file sprint yang disetujui sebelum commit.
 
-## 13. Risiko
+## 13. Hasil Implementasi
+
+- 80/80 server tests lulus.
+- 14/14 Playwright tests lulus, termasuk 6 test protective entry baru.
+- Reflow tanpa horizontal overflow tervalidasi pada 320, 390, 768, 950, dan 1440px.
+- Reduced motion, keyboard entry, focus management, emergency route, confidential guest route, dan quick escape tervalidasi otomatis.
+- Contrast token yang disentuh lulus perhitungan WCAG AA; detail tercatat di `docs/ACCESSIBILITY-AUDIT.md`.
+- Before/after screenshot tersimpan sebagai artifact lokal yang di-ignore di `.pi-subagents/ux-sprint-01/`.
+- Manual NVDA/VoiceOver, manual browser zoom 200%, axe/Lighthouse, dan usability test dengan mahasiswa tetap menjadi tindak lanjut.
+
+## 14. Risiko
 
 - Perubahan token global dapat memengaruhi seluruh SPA; lakukan smoke visual pada halaman non-scope.
 - Direct anonymous entry dapat membawa stale state pada browser back/hash navigation.

@@ -146,7 +146,7 @@ Endpoint destruktif (seed, clear, import) hanya tersedia di development/test.
 # API & unit tests (80 tests)
 cd server && npm test
 
-# Browser E2E Playwright (8 tests)
+# Browser E2E Playwright (14 tests)
 cd e2e && npm install && npx playwright install chromium && npm test
 
 # Semua dari root
@@ -196,7 +196,7 @@ Checklist sebelum go-live: [DEPLOYMENT.md](docs/DEPLOYMENT.md), rotasi secret: [
 |   |-- opsHealth.js        # Operational health checks
 |   |-- test/               # 80 automated tests
 |   `-- .env.example
-|-- e2e/                    # Playwright browser tests (8)
+|-- e2e/                    # Playwright browser tests (14)
 |-- deploy/                 # systemd unit file
 |-- docs/                   # Deployment, security, pilot docs
 `-- INCIDENT-RESPONSE-EVIDENCE.md

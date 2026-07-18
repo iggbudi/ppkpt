@@ -1,6 +1,6 @@
 # SafeSphere — Progress
 
-Terakhir diperbarui: 14 Juni 2026 (maintenance selesai)
+Terakhir diperbarui: 18 Juli 2026 (UX Sprint 01 selesai)
 Live: [safesphere.my.id](https://safesphere.my.id)
 Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 
@@ -9,10 +9,11 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 | Aspek | Status |
 |-------|--------|
 | Sprint 0–5 (release gate pilot) | ✅ Selesai |
+| UX Sprint 01 — Protective Entry | ✅ Selesai |
 | Pilot terbatas (1 fakultas, 30 hari) | ✅ Siap dijalankan |
 | Backend production (PM2 + Apache) | ✅ Berjalan |
 | Upload bukti di production | ✅ Aktif |
-| Test otomatis | ✅ 80 server + 8 E2E Playwright |
+| Test otomatis | ✅ 80 server + 14 E2E Playwright |
 
 ---
 
@@ -83,6 +84,18 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 - [x] Cleanup referensi OTP/social login (hapus dead CSS + update docs agar konsisten "sengaja disembunyikan")
 - [x] Update `progress.md` dengan status maintenance lengkap (task 7)
 
+### UX Sprint 01 — Protective Entry (18 Juli 2026)
+- [x] Protective calm tokens: warm off-white, deep teal, sage, restrained radius/shadow
+- [x] Beranda memprioritaskan reassurance, laporan anonim, dan bantuan darurat
+- [x] CTA beranda membuka safety check anonim dalam satu aktivasi
+- [x] Pilihan laporan anonim/rahasia menggunakan tombol semantik dan copy faktual
+- [x] Safety check memisahkan jalur darurat dan jalur aman secara jelas
+- [x] SDG dipindahkan setelah konten keselamatan dan proses pelaporan
+- [x] Responsive reflow tanpa horizontal overflow pada 320–1440px
+- [x] Reduced motion, keyboard focus, dan quick escape tetap terverifikasi
+- [x] Playwright `victim-entry.spec.js` menambah 6 regression tests
+- [x] Audit aksesibilitas diperbarui secara faktual
+
 ### Fitur Utama yang Berjalan
 - Pelaporan anonim dan rahasia + workflow status
 - Upload bukti foto/dokumen (anonim & login)
@@ -146,7 +159,7 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 | Evidence production-ready | ✅ |
 | Klaim UI = implementasi | ✅ |
 | `npm test` 100% | ✅ (80 tests) |
-| Playwright E2E | ✅ (8 tests) |
+| Playwright E2E | ✅ (14 tests) |
 | WCAG manual audit | ✅ |
 | Pentest Critical/High terbuka | ✅ (0, internal) |
 
@@ -156,8 +169,9 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 
 1. **Rotasi** `ADMIN_PASSWORD` setelah pilot dimulai.
 2. **Jadwalkan** pentest eksternal jika pilot diperluas melampaui 1 fakultas.
-3. **Masukkan Playwright ke CI** setelah waktu eksekusi dan instalasi browser disepakati.
-4. **Evaluasi streaming end-to-end** bila batas file dinaikkan di atas 10 MB.
+3. **Lakukan usability test trauma-informed** untuk entry flow dengan skenario stres rendah.
+4. **Masukkan Playwright ke CI** setelah waktu eksekusi dan instalasi browser disepakati.
+5. **Evaluasi streaming end-to-end** bila batas file dinaikkan di atas 10 MB.
 
 (Lihat juga rencana implementasi untuk item low/opsional. Beberapa sudah selesai di maintenance Juni 2026: E2E quick escape, streaming, edukasi scoring, cleanup OTP/social.)
 
@@ -167,6 +181,7 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 
 | Dokumen | Isi |
 |---------|-----|
+| [docs/UX-SPRINT-01-PROTECTIVE-ENTRY.md](docs/UX-SPRINT-01-PROTECTIVE-ENTRY.md) | Scope, acceptance, dan hasil UX Sprint 01 |
 | [docs/RELEASE-NOTES-PILOT.md](docs/RELEASE-NOTES-PILOT.md) | Catatan rilis pilot |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Panduan deployment dan operasi |
 | [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) | Threat model dan accepted risks |
@@ -174,4 +189,4 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 
 ---
 
-*Dokumen ini diperbarui setelah Sprint 5 + maintenance Juni 2026 (task 1–7: E2E quick escape, docs sync, kontak, streaming, edukasi scoring, OTP/social cleanup, progress update).*
+*Dokumen ini diperbarui setelah UX Sprint 01: protective entry, direct anonymous reporting, safety check, responsive/a11y validation, dan regression test.*

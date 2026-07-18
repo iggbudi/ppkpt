@@ -39,7 +39,7 @@ SafeSphere siap **pilot terbatas** (1 fakultas, 30 hari, monitoring ketat) setel
 | Evidence production-ready | ✅ |
 | Klaim UI = implementasi | ✅ |
 | npm test 100% | ✅ (80 tests) |
-| Playwright E2E | ✅ (8 tests) |
+| Playwright E2E | ✅ (14 tests) |
 | WCAG manual audit | ✅ (lihat ACCESSIBILITY-AUDIT.md) |
 | Pentest Critical/High | ✅ (0 terbuka, internal) |
 

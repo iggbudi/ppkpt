@@ -116,7 +116,7 @@ SafeSphere dibangun dengan pendekatan **security-first**:
 | Backend      | Node.js, Express, Zod (validasi)       |
 | Database     | SQLite                                 |
 | Keamanan     | AES-256-GCM, Sharp, Helmet, CSP        |
-| Testing      | 80 server test + 8 Playwright E2E      |
+| Testing      | 80 server test + 14 Playwright E2E     |
 | Deployment   | Apache, PM2, systemd                   |
 | Dokumentasi  | Threat Model, Security Scan, Accessibility Audit, Deployment Guide, Release Notes |
 
@@ -127,7 +127,7 @@ SafeSphere dibangun dengan pendekatan **security-first**:
 - **Sprint 0–5** telah selesai
 - Semua release gate terpenuhi
 - **Siap untuk pilot terbatas** (1 fakultas, 30 hari, monitoring ketat)
-- 80 server test + 8 E2E browser test hijau
+- 80 server test + 14 E2E browser test hijau
 - Dokumentasi sangat lengkap (termasuk Threat Model, Incident Response, Secret Rotation, dll.)
 
 **Item pasca-pilot** (bukan blocker):
