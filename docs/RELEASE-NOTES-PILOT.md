@@ -23,7 +23,7 @@ SafeSphere siap **pilot terbatas** (1 fakultas, 30 hari, monitoring ketat) setel
 - Kontak kampus spesifik masih generik (hotline nasional diverifikasi: 110, 119, 129)
 - Chat history tidak disimpan di database (metadata audit saja)
 - Streaming response SafeBot belum tersedia
-- Multipart streaming file besar belum diimplementasi
+- Adapter storage mendukung streaming encryption; validasi upload utama masih buffer-based dengan batas 10 MB/file
 - Pentest eksternal belum dilakukan — internal structured scan selesai
 
 ## Release Gate Status
@@ -38,8 +38,8 @@ SafeSphere siap **pilot terbatas** (1 fakultas, 30 hari, monitoring ketat) setel
 | Rate limit & validasi API | ✅ |
 | Evidence production-ready | ✅ |
 | Klaim UI = implementasi | ✅ |
-| npm test 100% | ✅ (78 tests) |
-| Playwright E2E | ✅ |
+| npm test 100% | ✅ (80 tests) |
+| Playwright E2E | ✅ (8 tests) |
 | WCAG manual audit | ✅ (lihat ACCESSIBILITY-AUDIT.md) |
 | Pentest Critical/High | ✅ (0 terbuka, internal) |
 

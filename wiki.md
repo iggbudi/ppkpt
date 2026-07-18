@@ -15,7 +15,7 @@ Fokus fitur saat ini:
 - Edukasi anti-perundungan + simulasi bystander.
 - Quick escape, mode aksesibilitas, responsive navigation.
 
-> **Status:** MVP fungsional untuk demo. Belum siap data nyata di production penuh.
+> **Status:** Pilot siap (Sprint 0–5 selesai + release gate ✅). Lihat progress.md untuk detail dan item pasca-pilot.
 
 ## Arsitektur Deployment
 
@@ -154,22 +154,23 @@ File: `repo/server/.env`
 | `ADMIN_USERNAME/PASSWORD` | Kredensial bootstrap admin |
 | `MIMO_API_KEY` | API key Xiaomi MiMo |
 | `TRUST_PROXY` | `1` (Apache reverse proxy) |
-| `EVIDENCE_UPLOADS_ENABLED` | `false` (sampai scanner + storage production siap) |
+| `EVIDENCE_UPLOADS_ENABLED` | `true` untuk production setelah encryption key dan scanner strict dikonfigurasi |
+| `EVIDENCE_ENCRYPTION_KEY` | Kunci enkripsi evidence; wajib jika upload production aktif |
+| `EVIDENCE_SCANNER_MODE` | `strict` untuk production |
 
-## Yang Belum Selesai
+## Batasan Pilot dan Backlog
 
-Lihat `docs/ROADMAP-SPRINT.md` untuk roadmap lengkap. Ringkas:
+Lihat `progress.md` untuk status lengkap. Ringkas:
 
-- Evidence upload di production
-- Registrasi/OTP nyata (masih simulasi)
-- Session store persistent (Redis)
-- Scanner malware & S3 storage nyata
-- Browser E2E, pentest, audit WCAG manual
+- OTP, reset password, dan social login sengaja belum tersedia.
+- Session persisten menggunakan SQLite dan sesuai untuk pilot single-node.
+- Storage lokal terenkripsi tersedia; adapter S3 bersifat opsional.
+- Browser E2E dan audit WCAG manual tersedia; pentest eksternal belum dilakukan.
+- Multi-kampus, live handoff operator, dan RAG SOP ditunda sampai pasca-pilot.
 
 ## Dokumentasi Terkait
 
-- `repo/README.md` — dokumentasi teknis lengkap
-- `docs/ROADMAP-SPRINT.md` — roadmap sprint S0–S5
-- `repo/docs/DEPLOYMENT.md` — panduan deploy
-- `repo/docs/THREAT-MODEL.md` — threat model
-- `context.md` — konteks menu edukasi
+- `README.md` — dokumentasi teknis lengkap
+- `progress.md` — status maintenance dan backlog
+- `docs/DEPLOYMENT.md` — panduan deploy
+- `docs/THREAT-MODEL.md` — threat model

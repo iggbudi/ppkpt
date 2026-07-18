@@ -143,10 +143,10 @@ Endpoint destruktif (seed, clear, import) hanya tersedia di development/test.
 ## Testing
 
 ```bash
-# API & unit tests (78 tests)
+# API & unit tests (80 tests)
 cd server && npm test
 
-# Browser E2E Playwright (7 tests)
+# Browser E2E Playwright (8 tests)
 cd e2e && npm install && npx playwright install chromium && npm test
 
 # Semua dari root
@@ -194,9 +194,9 @@ Checklist sebelum go-live: [DEPLOYMENT.md](docs/DEPLOYMENT.md), rotasi secret: [
 |   |-- piiRedaction.js     # PII & prompt injection filter
 |   |-- mimoCircuitBreaker.js
 |   |-- opsHealth.js        # Operational health checks
-|   |-- test/               # 78 automated tests
+|   |-- test/               # 80 automated tests
 |   `-- .env.example
-|-- e2e/                    # Playwright browser tests (7)
+|-- e2e/                    # Playwright browser tests (8)
 |-- deploy/                 # systemd unit file
 |-- docs/                   # Deployment, security, pilot docs
 `-- INCIDENT-RESPONSE-EVIDENCE.md
@@ -211,21 +211,21 @@ Checklist sebelum go-live: [DEPLOYMENT.md](docs/DEPLOYMENT.md), rotasi secret: [
 - [Accessibility audit](docs/ACCESSIBILITY-AUDIT.md)
 - [Secret rotation](docs/SECRET-ROTATION.md)
 - [Incident drill log](docs/INCIDENT-DRILL-LOG.md)
-- [Roadmap sprint](https://github.com/iggbudi/ppkpt/blob/master/docs/ROADMAP-SPRINT.md) *(jika ada di repo root docs)*
+- [Status dan backlog](progress.md)
 
 ## Batasan Pilot
 
-- OTP / reset password belum tersedia.
-- Social login tidak tersedia.
-- Kontak kampus spesifik masih generik (hotline nasional: 110, 119, 129).
+- OTP / reset password & social login: sengaja disembunyikan (bukan klaim palsu).
+- Kontak kampus spesifik masih generik (hotline nasional 110/119/129 diverifikasi).
 - Chat isi pesan tidak disimpan DB (metadata audit saja).
-- Pentest eksternal belum dilakukan.
-- Multipart streaming file besar belum diimplementasi.
+- Pentest eksternal belum dilakukan (internal selesai, 0 Critical/High).
+- Pipeline evidence memiliki dukungan stream pada adapter storage, tetapi validasi upload utama masih memproses file maksimal 10 MB sebagai buffer.
+- Riwayat chat tidak disimpan agar batas privasi dan retensi tetap sederhana selama pilot.
 
 ## Kontribusi
 
 1. Buat branch untuk perubahan.
-2. Pastikan `cd server && npm test` lulus (78/78).
+2. Pastikan `cd server && npm test` lulus (80/80).
 3. Untuk perubahan UI, jalankan `cd e2e && npm test` jika memungkinkan.
 4. Jangan commit secret, `.env`, database, atau file evidence.
 5. Sertakan test untuk perubahan auth, laporan, evidence, atau lifecycle data.

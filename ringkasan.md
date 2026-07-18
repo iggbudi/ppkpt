@@ -116,7 +116,7 @@ SafeSphere dibangun dengan pendekatan **security-first**:
 | Backend      | Node.js, Express, Zod (validasi)       |
 | Database     | SQLite                                 |
 | Keamanan     | AES-256-GCM, Sharp, Helmet, CSP        |
-| Testing      | 78+ Unit Test + 7 Playwright E2E       |
+| Testing      | 80 server test + 8 Playwright E2E      |
 | Deployment   | Apache, PM2, systemd                   |
 | Dokumentasi  | Threat Model, Security Scan, Accessibility Audit, Deployment Guide, Release Notes |
 
@@ -127,13 +127,13 @@ SafeSphere dibangun dengan pendekatan **security-first**:
 - **Sprint 0–5** telah selesai
 - Semua release gate terpenuhi
 - **Siap untuk pilot terbatas** (1 fakultas, 30 hari, monitoring ketat)
-- 78 unit test + E2E browser test hijau
+- 80 server test + 8 E2E browser test hijau
 - Dokumentasi sangat lengkap (termasuk Threat Model, Incident Response, Secret Rotation, dll.)
 
 **Item pasca-pilot** (bukan blocker):
 - Kontak kampus spesifik
 - OTP / social login
-- Multipart streaming file besar
+- Streaming end-to-end sebelum validasi file (adapter storage sudah mendukung stream; upload utama dibatasi 10 MB/file)
 - Pentest eksternal
 
 ---
@@ -160,7 +160,7 @@ repo/
 
 - [README.md](README.md) — Dokumentasi utama
 - [wiki.md](wiki.md) — Panduan codebase & deployment
-- [docs/ROADMAP-SPRINT.md](docs/ROADMAP-SPRINT.md)
+- [progress.md](progress.md) — Status maintenance dan backlog
 - [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md)
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 - [docs/RELEASE-NOTES-PILOT.md](docs/RELEASE-NOTES-PILOT.md)
