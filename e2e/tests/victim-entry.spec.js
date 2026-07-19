@@ -10,11 +10,11 @@ test('homepage prioritizes anonymous reporting and emergency help', async ({ pag
   const pageErrors = collectPageErrors(page);
   await page.goto('/#beranda');
 
-  await expect(page.locator('#homeHeading')).toHaveText('Kamu nggak sendirian.');
+  await expect(page.locator('#homeHeading')).toHaveText('Anda tidak sendirian.');
   await expect(page.locator('#heroAnonymousCta')).toBeVisible();
   await expect(page.locator('#heroEmergencyCta')).toHaveAttribute('href', '#kontak');
   await expect(page.locator('.trust-list')).toContainText('Identitas akun tidak dicatat');
-  await expect(page.locator('#processHeading')).toHaveText('Apa yang terjadi setelah kamu melapor?');
+  await expect(page.locator('#processHeading')).toHaveText('Apa yang terjadi setelah Anda melapor?');
   expect(pageErrors).toEqual([]);
 });
 

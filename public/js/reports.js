@@ -78,7 +78,7 @@
         }
 
         if (reportData.report.isAnonymous) {
-          resultBox.appendChild(createEl('p', { text: 'Laporan ini anonim: identitas akun nggak dicatat. Statusnya juga nggak bisa dicek dari dashboard.', style: 'color:var(--muted); font-size:13px;' }));
+          resultBox.appendChild(createEl('p', { text: 'Laporan ini bersifat anonim: identitas akun tidak dicatat. Status laporan tidak dapat dilacak melalui dasbor.', style: 'color:var(--muted); font-size:13px;' }));
         } else {
           var trackBtn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
           trackBtn.addEventListener('click', function() { viewInvoiceFromSubmit(reportId); });
@@ -116,7 +116,7 @@
         resultBox.appendChild(createEl('b', { text: data.report.id }));
         resultBox.appendChild(document.createElement('br'));
         if (data.report.isAnonymous) {
-          resultBox.appendChild(createEl('p', { text: 'Laporan ini anonim: identitas akun nggak dicatat. Statusnya juga nggak bisa dicek dari dashboard.', style: 'color:var(--muted); font-size:13px;' }));
+          resultBox.appendChild(createEl('p', { text: 'Laporan ini bersifat anonim: identitas akun tidak dicatat. Status laporan tidak dapat dilacak melalui dasbor.', style: 'color:var(--muted); font-size:13px;' }));
         } else {
           var trackBtn = createEl('button', { className: 'btn secondary', type: 'button', text: 'Lacak Status', style: 'margin-top: 10px;' });
           trackBtn.addEventListener('click', function() { viewInvoiceFromSubmit(data.report.id); });
