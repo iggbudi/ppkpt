@@ -1,0 +1,17 @@
+<svg width="760" height="760" viewBox="0 0 760 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Ilustrasi ruang dukungan SafeSphere</title>
+  <desc>Dua mahasiswa berada di bawah bentuk lengkung yang melambangkan perlindungan, dukungan, dan ruang untuk bernapas.</desc>
+  <rect width="760" height="760" rx="380" fill="#F0B84B"/>
+  <path d="M111 598V339C111 184 237 58 392 58C547 58 673 184 673 339V598H566V344C566 248 488 170 392 170C296 170 218 248 218 344V598H111Z" fill="#3B2146"/>
+  <path d="M218 598V381C218 285 296 207 392 207C488 207 566 285 566 381V598H218Z" fill="#F9F4EB"/>
+  <path d="M218 454C272 415 326 396 381 396C456 396 518 426 566 486V598H218V454Z" fill="#E76850"/>
+  <circle cx="319" cy="354" r="55" fill="#3B2146"/>
+  <path d="M226 588C229 485 259 421 319 421C379 421 410 485 412 588H226Z" fill="#3B2146"/>
+  <circle cx="468" cy="392" r="43" fill="#6C4B73"/>
+  <path d="M397 588C401 507 424 455 468 455C513 455 536 507 540 588H397Z" fill="#6C4B73"/>
+  <path d="M333 455C373 466 406 491 432 531" stroke="#F9F4EB" stroke-width="18" stroke-linecap="round"/>
+  <path d="M414 529C442 500 469 484 497 481" stroke="#F9F4EB" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="625" cy="130" r="52" fill="#E76850"/>
+  <path d="M72 184C72 147 102 117 139 117H170V251H139C102 251 72 221 72 184Z" fill="#86A88F"/>
+  <path d="M593 642H688C688 694 646 736 593 736V642Z" fill="#86A88F"/>
+</svg>

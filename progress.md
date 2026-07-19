@@ -1,6 +1,6 @@
 # SafeSphere — Progress
 
-Terakhir diperbarui: 18 Juli 2026 (UX Sprint 01 selesai)
+Terakhir diperbarui: 19 Juli 2026 (Protective Embrace redesign selesai)
 Live: [safesphere.my.id](https://safesphere.my.id)
 Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 
@@ -10,6 +10,7 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 |-------|--------|
 | Sprint 0–5 (release gate pilot) | ✅ Selesai |
 | UX Sprint 01 — Protective Entry | ✅ Selesai |
+| UX Sprint 02 — Protective Embrace visual system | ✅ Selesai |
 | Pilot terbatas (1 fakultas, 30 hari) | ✅ Siap dijalankan |
 | Backend production (PM2 + Apache) | ✅ Berjalan |
 | Upload bukti di production | ✅ Aktif |
@@ -95,6 +96,17 @@ Repo: [iggbudi/ppkpt](https://github.com/iggbudi/ppkpt)
 - [x] Reduced motion, keyboard focus, dan quick escape tetap terverifikasi
 - [x] Playwright `victim-entry.spec.js` menambah 6 regression tests
 - [x] Audit aksesibilitas diperbarui secara faktual
+
+### UX Sprint 02 — Protective Embrace (19 Juli 2026)
+- [x] Mengganti visual plain/generic SaaS dengan identitas editorial `Protective Embrace`
+- [x] Motif lengkung perlindungan dan ilustrasi orisinal mahasiswa (`protective-embrace.svg`)
+- [x] Hierarki beranda asimetris, tipografi editorial besar, dan pathway berdasarkan situasi pengguna
+- [x] Dua mode visual: halaman dukungan ekspresif dan alur pelaporan yang lebih tenang/fokus
+- [x] Relayout pilihan laporan, safety check, formulir, evidence upload, review, edukasi, kontak, SafeBot, auth, dashboard pengguna, dan footer
+- [x] Desktop quick exit ditambahkan sebagai landmark permanen; Esc×2 tetap tersedia
+- [x] Copy edukasi diubah agar tidak menghakimi, tidak memaksa, dan tidak membuat klaim hukum/mental yang berlebihan
+- [x] Contrast warna teks kecil dikoreksi dengan token `--coral-text`
+- [x] 80/80 server tests dan 14/14 Playwright tests lulus
 
 ### Fitur Utama yang Berjalan
 - Pelaporan anonim dan rahasia + workflow status

@@ -47,7 +47,7 @@
     history.pushState({ discreet: true }, '', window.location.pathname + '#beranda');
 
     var overlay = document.getElementById('discreetOverlay');
-    var escapeBtn = document.getElementById('quickEscapeBtn');
+    var escapeButtons = document.querySelectorAll('#quickEscapeBtn, [data-quick-escape]');
     var closeBtn = document.getElementById('discreetCloseBtn');
     discreetModeActive = true;
     if (overlay) {
@@ -55,7 +55,7 @@
       overlay.classList.add('is-active');
       overlay.setAttribute('aria-hidden', 'false');
     }
-    if (escapeBtn) escapeBtn.classList.add('is-hidden');
+    escapeButtons.forEach(function(button) { button.classList.add('is-hidden'); });
     document.body.classList.add('discreet-mode');
     document.title = 'Wikipedia bahasa Indonesia';
     if (closeBtn) closeBtn.focus();
@@ -63,14 +63,14 @@
 
   window.deactivateDiscreetMode = function() {
     var overlay = document.getElementById('discreetOverlay');
-    var escapeBtn = document.getElementById('quickEscapeBtn');
+    var escapeButtons = document.querySelectorAll('#quickEscapeBtn, [data-quick-escape]');
     discreetModeActive = false;
     if (overlay) {
       overlay.classList.remove('is-active');
       overlay.setAttribute('aria-hidden', 'true');
     }
     restoreApplicationInteraction();
-    if (escapeBtn) escapeBtn.classList.remove('is-hidden');
+    escapeButtons.forEach(function(button) { button.classList.remove('is-hidden'); });
     document.body.classList.remove('discreet-mode');
     document.title = originalTitle;
 
@@ -81,6 +81,10 @@
     focusBeforeDiscreetMode = null;
     if (focusTarget) focusTarget.focus();
   };
+
+  document.querySelectorAll('[data-quick-escape]').forEach(function(button) {
+    button.addEventListener('click', function() { window.activateDiscreetMode(); });
+  });
 
   window.addEventListener('keydown', function(e) {
     if (discreetModeActive) {
