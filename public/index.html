@@ -4,15 +4,15 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; frame-src https://id.wikipedia.org; object-src 'none'; base-uri 'self'; form-action 'self';">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SafeSphere - Pelaporan Anonim Anti-Perundungan</title>
+  <title>SafeSphere — Lapor perundungan secara anonim</title>
   <meta name="theme-color" content="#3b2146">
-  <meta name="description" content="Ruang aman digital untuk mahasiswa melapor perundungan secara anonim, mengakses dukungan awal, dan menemukan bantuan darurat.">
-  <link rel="stylesheet" href="style.css?v=20260719b">
+  <meta name="description" content="Tempat aman buat mahasiswa lapor perundungan secara anonim, minta bantuan awal, atau hubungi layanan darurat.">
+  <link rel="stylesheet" href="style.css?v=20260719c">
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
+  <a href="#main-content" class="skip-link">Langsung ke isi halaman</a>
   <div id="pilotBanner" class="pilot-banner">
-    <span>Kamu berhak merasa aman. Jika situasi mendesak, gunakan bantuan darurat yang tersedia.</span>
+    <span>Kamu berhak merasa aman. Kalau lagi bahaya, langsung buka bantuan darurat.</span>
     <button id="dismissBanner" class="pilot-banner-close" type="button" aria-label="Tutup banner">&times;</button>
   </div>
 
@@ -128,7 +128,7 @@
           </span>
           <span class="brand-copy">
             <span class="brand-text">SafeSphere</span>
-            <span class="brand-sub">UNISBANK · Ruang aman</span>
+            <span class="brand-sub">UNISBANK · tempat aman lapor</span>
           </span>
         </a>
       </div>
@@ -215,27 +215,27 @@
     <div id="page-beranda" class="page active">
       <section class="hero section" aria-labelledby="homeHeading">
         <div class="hero-text">
-          <p class="hero-eyebrow"><span>Ruang aman digital</span> untuk mahasiswa</p>
-          <h3 id="welcomeMessage" class="hidden">Selamat datang, <span id="welcomeName"></span>.</h3>
-          <h1 id="homeHeading">Kamu tidak harus menghadapi ini sendirian.</h1>
-          <p class="hero-lead">Yang terjadi padamu penting. Ceritakan dengan ritmemu sendiri—tanpa akun, tanpa tekanan, dan tanpa harus menyiapkan semuanya sekaligus.</p>
+          <p class="hero-eyebrow"><span>Buat mahasiswa</span> yang butuh tempat aman</p>
+          <h3 id="welcomeMessage" class="hidden">Hai, <span id="welcomeName"></span>.</h3>
+          <h1 id="homeHeading">Kamu nggak sendirian.</h1>
+          <p class="hero-lead">Yang kamu alami penting. Cerita sebisamu aja—nggak perlu bikin akun, nggak dipaksa, dan nggak harus lengkap dari awal.</p>
           <div class="cta-row" aria-label="Tindakan utama">
-            <a class="btn primary" id="heroAnonymousCta" href="#lapor">Mulai laporan anonim <span aria-hidden="true">→</span></a>
-            <a class="btn emergency-link" id="heroEmergencyCta" href="#kontak">Saya butuh bantuan sekarang</a>
+            <a class="btn primary" id="heroAnonymousCta" href="#lapor">Lapor anonim dulu <span aria-hidden="true">→</span></a>
+            <a class="btn emergency-link" id="heroEmergencyCta" href="#kontak">Aku butuh bantuan sekarang</a>
           </div>
-          <p class="hero-privacy-note"><strong>Privasi sejak awal.</strong> Identitas akun dan alamat IP tidak dicatat dalam audit pembuatan laporan anonim. Kamu dapat keluar cepat kapan saja.</p>
+          <p class="hero-privacy-note"><strong>Soal privasi.</strong> Di laporan anonim, identitas akun dan alamat IP nggak dicatat di audit. Mau keluar cepat? Bisa kapan saja.</p>
         </div>
 
-        <div class="hero-visual" aria-label="Ruang perlindungan dan dukungan">
-          <img src="image/protective-embrace.svg" alt="Dua mahasiswa berada dalam ruang perlindungan dan saling mendukung">
+        <div class="hero-visual" aria-label="Ilustrasi dukungan antarmahasiswa">
+          <img src="image/protective-embrace.svg" alt="Dua mahasiswa saling mendukung di ruang yang aman">
           <aside class="trust-panel" aria-labelledby="trustHeading">
-            <p class="trust-kicker">Kendali tetap di tanganmu</p>
-            <h2 id="trustHeading">Aman bukan sekadar janji.</h2>
+            <p class="trust-kicker">Kamu yang pegang kendali</p>
+            <h2 id="trustHeading">Bukan cuma janji di brosur.</h2>
             <ul class="trust-list">
-              <li><strong>Tanpa akun</strong><span>Mulai laporan anonim langsung.</span></li>
-              <li><strong>Identitas akun tidak dicatat</strong><span>Pada laporan anonim dan audit pembuatannya.</span></li>
-              <li><strong>Keluar cepat</strong><span>Tekan Esc dua kali dari halaman mana pun.</span></li>
-              <li><strong>Bukti dilindungi</strong><span>Diperiksa dan disimpan di area privat.</span></li>
+              <li><strong>Nggak perlu akun</strong><span>Langsung bisa lapor anonim.</span></li>
+              <li><strong>Identitas akun tidak dicatat</strong><span>Di laporan anonim dan auditnya.</span></li>
+              <li><strong>Keluar cepat</strong><span>Tekan Esc dua kali, dari halaman mana pun.</span></li>
+              <li><strong>Bukti dijaga</strong><span>Dicek dulu, disimpan di area privat.</span></li>
             </ul>
           </aside>
         </div>
@@ -243,44 +243,44 @@
 
       <section class="support-pathways section" aria-labelledby="pathwayHeading">
         <div class="pathway-heading">
-          <p class="section-overline">Mulai dari keadaanmu sekarang</p>
-          <h2 id="pathwayHeading">Tidak semua orang datang dengan kebutuhan yang sama.</h2>
-          <p>Pilih jalan yang paling dekat dengan situasimu. Tidak ada pilihan yang mengunci langkah berikutnya.</p>
+          <p class="section-overline">Mulai dari kondisi kamu sekarang</p>
+          <h2 id="pathwayHeading">Tiap orang butuhnya beda.</h2>
+          <p>Pilih yang paling pas. Nggak ada yang bikin kamu terkunci di satu jalur.</p>
         </div>
         <nav class="pathway-list" aria-label="Pilihan dukungan">
-          <a href="#lapor"><span class="pathway-number">01</span><span><strong>Aku mengalami sesuatu</strong><small>Ceritakan tanpa identitas akun</small></span><b aria-hidden="true">↗</b></a>
-          <a href="#edukasi"><span class="pathway-number">02</span><span><strong>Aku melihat kejadian</strong><small>Pelajari cara membantu dengan aman</small></span><b aria-hidden="true">↗</b></a>
-          <a href="#chat"><span class="pathway-number">03</span><span><strong>Aku belum siap melapor</strong><small>Susun langkah awal bersama SafeBot</small></span><b aria-hidden="true">↗</b></a>
-          <a href="#kontak" class="pathway-emergency"><span class="pathway-number">SOS</span><span><strong>Ada bahaya sekarang</strong><small>Temukan bantuan yang dapat dihubungi</small></span><b aria-hidden="true">↗</b></a>
+          <a href="#lapor"><span class="pathway-number">01</span><span><strong>Aku lagi kena sesuatu</strong><small>Lapor tanpa nama akun</small></span><b aria-hidden="true">↗</b></a>
+          <a href="#edukasi"><span class="pathway-number">02</span><span><strong>Aku lihat kejadian</strong><small>Cara bantu tanpa bahayakan diri</small></span><b aria-hidden="true">↗</b></a>
+          <a href="#chat"><span class="pathway-number">03</span><span><strong>Belum siap lapor</strong><small>Ngobrol dulu sama SafeBot</small></span><b aria-hidden="true">↗</b></a>
+          <a href="#kontak" class="pathway-emergency"><span class="pathway-number">SOS</span><span><strong>Lagi bahaya</strong><small>Nomor darurat yang bisa dihubungi</small></span><b aria-hidden="true">↗</b></a>
         </nav>
       </section>
 
       <section class="report-process section" aria-labelledby="processHeading">
         <div class="section-intro">
-          <p class="section-overline">Tidak ada kejutan</p>
+          <p class="section-overline">Biar nggak kaget</p>
           <h2 id="processHeading">Apa yang terjadi setelah kamu melapor?</h2>
-          <p>Kamu dapat berhenti sebelum mengirim. Bukti tidak wajib. Kami menjelaskan setiap langkah sebelum kamu mengambil keputusan.</p>
+          <p>Boleh berhenti sebelum dikirim. Bukti nggak wajib. Tiap langkah dijelaskan dulu, baru kamu putuskan.</p>
         </div>
         <ol class="process-list">
-          <li><span>01</span><div><strong>Pilih tingkat privasi</strong><p>Anonim tanpa akun, atau rahasia agar status dapat dipantau.</p></div></li>
-          <li><span>02</span><div><strong>Ceritakan yang kamu ingat</strong><p>Tidak harus sempurna. Tambahkan bukti hanya jika aman.</p></div></li>
-          <li><span>03</span><div><strong>Tim meninjau laporan</strong><p>Informasi diperiksa oleh pengelola yang memiliki akses.</p></div></li>
-          <li><span>04</span><div><strong>Kamu menentukan langkah lanjut</strong><p>Laporan dengan akun dapat dipantau dari ruang pribadimu.</p></div></li>
+          <li><span>01</span><div><strong>Pilih cara lapor</strong><p>Anonim tanpa akun, atau rahasia biar statusnya bisa dipantau.</p></div></li>
+          <li><span>02</span><div><strong>Cerita yang kamu ingat</strong><p>Nggak harus sempurna. Bukti boleh ditambah kalau emang aman.</p></div></li>
+          <li><span>03</span><div><strong>Tim baca laporanmu</strong><p>Yang cek cuma pengelola yang memang punya akses.</p></div></li>
+          <li><span>04</span><div><strong>Lanjutannya kamu yang tentukan</strong><p>Kalau pakai akun, status bisa dicek di dashboard.</p></div></li>
         </ol>
       </section>
 
       <section class="home-manifesto" aria-labelledby="manifestoHeading">
-        <p>SafeSphere percaya</p>
-        <h2 id="manifestoHeading">Meminta perlindungan bukan berarti kehilangan kendali.</h2>
-        <a href="#lapor">Ceritakan saat kamu siap <span aria-hidden="true">→</span></a>
+        <p>Yang kami yakini</p>
+        <h2 id="manifestoHeading">Butuh perlindungan nggak bikin kamu kehilangan kendali.</h2>
+        <a href="#lapor">Cerita kalau kamu sudah siap <span aria-hidden="true">→</span></a>
       </section>
 
       <section class="sdg-section" aria-labelledby="sdgHeading">
         <div>
-          <p class="sdg-overline">Dibangun untuk kampus yang berpihak</p>
-          <h2 id="sdgHeading">Perlindungan harus terasa manusiawi, mudah dijangkau, dan dapat dipertanggungjawabkan.</h2>
+          <p class="sdg-overline">Buat kampus yang berpihak ke mahasiswa</p>
+          <h2 id="sdgHeading">Bantuan harus gampang diakses, manusiawi, dan prosesnya jelas.</h2>
         </div>
-        <p>SafeSphere mendukung SDG 3, 4, dan 16 melalui akses bantuan, edukasi saksi, dan proses pelaporan yang transparan.</p>
+        <p>SafeSphere mendukung SDG 3, 4, dan 16: akses bantuan, edukasi saksi, dan pelaporan yang transparan.</p>
       </section>
     </div>
 
@@ -288,32 +288,32 @@
       <!-- Choice screen -->
       <section class="section card report-entry-shell" id="reportChoiceScreen">
         <div class="card-header">
-          <p class="page-kicker">Ruang pelaporan</p>
-          <h2>Ceritakan dengan kendali penuh.</h2>
-          <p class="muted">Mulai tanpa akun atau simpan akses untuk memantau perkembangan. Kamu boleh kembali, berhenti, atau keluar kapan saja.</p>
+          <p class="page-kicker">Lapor di sini</p>
+          <h2>Cerita dengan cara yang kamu pilih.</h2>
+          <p class="muted">Bisa tanpa akun, atau pakai akun biar statusnya bisa dipantau. Kamu boleh mundur, berhenti, atau keluar kapan saja.</p>
         </div>
         <div class="report-choice-grid">
           <article class="report-choice-card report-choice-primary" id="choiceAnonim">
-            <p class="choice-label">Pilihan utama</p>
-            <h3>Lapor tanpa identitas akun</h3>
-            <p>Identitas akun tidak dicatat pada laporan atau audit pembuatannya. Pilih ini jika kamu tidak perlu melacak status.</p>
+            <p class="choice-label">Paling banyak dipilih</p>
+            <h3>Lapor anonim</h3>
+            <p>Nama akun nggak dicatat di laporan atau auditnya. Cocok kalau kamu nggak perlu cek status.</p>
             <ul>
-              <li>Tidak perlu login</li>
+              <li>Nggak perlu login</li>
               <li>Identitas akun tidak dicatat</li>
-              <li>Status tidak dapat dilacak</li>
+              <li>Status nggak bisa dilacak</li>
             </ul>
-            <button class="btn primary full" id="chooseAnonimBtn" type="button">Mulai laporan anonim</button>
+            <button class="btn primary full" id="chooseAnonimBtn" type="button">Mulai lapor anonim</button>
           </article>
           <article class="report-choice-card" id="choiceRahasia">
-            <p class="choice-label">Dengan akun</p>
+            <p class="choice-label">Pakai akun</p>
             <h3>Lapor rahasia</h3>
-            <p>Identitas akun disimpan dengan akses terbatas agar kamu dapat melihat perkembangan laporan.</p>
+            <p>Akunmu disimpan dengan akses terbatas, biar kamu bisa lihat perkembangan laporan.</p>
             <ul>
-              <li>Perlu login</li>
-              <li>Akses identitas dibatasi</li>
-              <li>Status dapat dilacak</li>
+              <li>Perlu login dulu</li>
+              <li>Identitas dibatasi yang boleh lihat</li>
+              <li>Status bisa dipantau</li>
             </ul>
-            <button class="btn secondary full" id="chooseRahasiaBtn" type="button">Pilih laporan rahasia</button>
+            <button class="btn secondary full" id="chooseRahasiaBtn" type="button">Pilih lapor rahasia</button>
           </article>
         </div>
       </section>
@@ -321,19 +321,19 @@
       <!-- Report form section (hidden initially) -->
       <section class="section card report-form-shell hidden" id="reportFormSection">
         <div class="card-header">
-          <h2 id="reportFormTitle">Form Lapor Anonim</h2>
-          <p class="muted" id="reportFormSubtitle">Isi sesuai yang kamu ketahui. Kamu dapat berhenti sebelum laporan dikirim.</p>
+          <h2 id="reportFormTitle">Formulir lapor anonim</h2>
+          <p class="muted" id="reportFormSubtitle">Isi sebisamu. Boleh berhenti sebelum dikirim.</p>
           <button class="btn outline" id="backToChoice" type="button" style="margin-top: 8px;">Kembali</button>
         </div>
 
         <!-- Safety check -->
         <div id="safetyCheck" class="safety-check" aria-labelledby="safetyCheckHeading">
-          <p class="safety-kicker">Periksa keselamatanmu terlebih dahulu</p>
-          <h3 id="safetyCheckHeading" tabindex="-1">Apakah kamu dalam bahaya sekarang?</h3>
-          <p>SafeSphere bukan layanan respons darurat. Jika ada ancaman langsung, cari tempat aman dan hubungi bantuan. Kamu boleh keluar dari halaman ini kapan saja.</p>
+          <p class="safety-kicker">Cek dulu: kamu aman nggak sekarang?</p>
+          <h3 id="safetyCheckHeading" tabindex="-1">Kamu lagi dalam bahaya?</h3>
+          <p>SafeSphere bukan layanan tanggap darurat. Kalau ada ancaman langsung, cari tempat aman dulu dan hubungi bantuan. Kamu boleh keluar dari halaman ini kapan saja.</p>
           <div class="safety-options">
-            <button class="btn danger full" id="safetyDanger" type="button">Saya dalam bahaya sekarang</button>
-            <button class="btn primary full" id="safetySafe" type="button">Saya aman untuk melanjutkan</button>
+            <button class="btn danger full" id="safetyDanger" type="button">Iya, aku lagi bahaya</button>
+            <button class="btn primary full" id="safetySafe" type="button">Aku aman, lanjut isi laporan</button>
           </div>
         </div>
 
@@ -349,33 +349,33 @@
           <div class="form-section" id="formStep1">
             <div class="form-section-intro">
               <span>Langkah 1 dari 4</span>
-              <h3>Mulai dari hal yang paling mudah diingat.</h3>
-              <p>Tidak apa-apa jika waktunya tidak persis atau kamu belum tahu semua detail.</p>
+              <h3>Mulai dari yang paling gampang diingat.</h3>
+              <p>Nggak apa-apa kalau waktunya nggak pas atau detailnya masih kurang.</p>
             </div>
-            <label for="category">Jenis Kejadian
+            <label for="category">Jenis kejadian
               <select id="category" required>
-                <option value="">Pilih kategori perundungan</option>
-                <option value="Verbal">Verbal (Mengejek, Menghina)</option>
-                <option value="Sosial">Sosial (Mengucilkan, Fitnah)</option>
-                <option value="Cyberbullying">Cyberbullying (Media Sosial)</option>
-                <option value="Fisik">Fisik (Memukul, Mendorong)</option>
-                <option value="Seksual">Kekerasan/Pelecehan Seksual</option>
+                <option value="">Pilih jenis perundungan</option>
+                <option value="Verbal">Verbal (ejekan, hinaan)</option>
+                <option value="Sosial">Sosial (dikucilkan, difitnah)</option>
+                <option value="Cyberbullying">Cyberbullying (media sosial)</option>
+                <option value="Fisik">Fisik (dipukul, didorong)</option>
+                <option value="Seksual">Kekerasan / pelecehan seksual</option>
               </select>
             </label>
 
-            <label for="location">Lokasi Kejadian
-              <input id="location" type="text" placeholder="Contoh: Gedung Fakultas Vokasi, Grup WA Angkatan" required>
+            <label for="location">Lokasi kejadian
+              <input id="location" type="text" placeholder="Contoh: Gedung Vokasi, grup WA angkatan" required>
             </label>
 
-            <label for="incidentDate">Waktu Kejadian
+            <label for="incidentDate">Kapan kejadiannya
               <input id="incidentDate" type="date" required>
             </label>
 
-            <label for="urgent">Tingkat Urgensi
+            <label for="urgent">Seberapa mendesak
               <select id="urgent" required>
-                <option value="Rendah">Rendah (Hanya Melapor)</option>
-                <option value="Sedang">Sedang (Butuh Konseling)</option>
-                <option value="Tinggi">Tinggi (Butuh Tindakan Cepat/Fisik)</option>
+                <option value="Rendah">Rendah — cuma mau lapor dulu</option>
+                <option value="Sedang">Sedang — butuh konseling</option>
+                <option value="Tinggi">Tinggi — butuh penanganan cepat</option>
               </select>
             </label>
 
@@ -388,8 +388,8 @@
           <div class="form-section hidden" id="formStep2">
             <div class="form-section-intro full">
               <span>Langkah 2 dari 4</span>
-              <h3>Ceritakan dengan kata-katamu sendiri.</h3>
-              <p>Kamu tidak perlu memakai bahasa resmi. Hindari menulis identitas yang tidak diperlukan.</p>
+              <h3>Cerita pakai bahasamu sendiri.</h3>
+              <p>Nggak perlu bahasa formal. Kalau bisa, jangan tulis identitas orang yang nggak perlu.</p>
             </div>
             <label class="full" for="description">Apa yang terjadi?
               <textarea id="description" placeholder="Mulai dari bagian yang paling kamu ingat..." required></textarea>
@@ -397,7 +397,7 @@
                 <div class="safety-signal-track">
                   <div id="sentimentBar" class="safety-signal-bar"></div>
                 </div>
-                <span id="sentimentText">Memeriksa kebutuhan bantuan...</span>
+                <span id="sentimentText">Mengecek apakah butuh bantuan lebih cepat...</span>
               </div>
             </label>
 
@@ -410,61 +410,61 @@
           <div class="form-section hidden" id="formStep3">
             <div class="form-section-intro full">
               <span>Langkah 3 dari 4</span>
-              <h3>Bukti dapat membantu, tetapi tidak wajib.</h3>
-              <p>Jangan mengambil risiko baru hanya untuk mendapatkan bukti. Kirim hanya file yang aman kamu akses.</p>
+              <h3>Bukti membantu, tapi nggak wajib.</h3>
+              <p>Jangan ambil risiko baru cuma buat dapat bukti. Kirim file yang memang aman buat kamu buka.</p>
             </div>
-            <label class="full" for="evidence">Catatan tentang bukti (opsional)
-              <input id="evidence" type="text" placeholder="Contoh: tangkapan layar percakapan tanggal 12 Juni">
+            <label class="full" for="evidence">Catatan soal bukti (opsional)
+              <input id="evidence" type="text" placeholder="Contoh: SS chat tanggal 12 Juni">
             </label>
 
             <div class="full evidence-field">
-              <label>Unggah file bukti <span>(opsional)</span></label>
+              <label>Upload file bukti <span>(opsional)</span></label>
               <div id="fileDropZone" class="evidence-dropzone">
                 <div class="evidence-dropzone-mark" aria-hidden="true"><span></span></div>
                 <div>
-                  <p>Pilih atau seret file ke area ini</p>
+                  <p>Klik atau seret file ke sini</p>
                   <small>PDF, gambar, audio, atau video · Maks. 10 MB/file · 5 file</small>
                 </div>
                 <input type="file" id="evidenceFiles" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.mp3,.m4a,.mp4" hidden>
               </div>
               <div id="fileWarnings" class="evidence-warning">
-                <strong>Sebelum mengunggah</strong>
-                <span>File dapat memuat nama, lokasi, wajah, suara, atau metadata perangkat. Anonim tidak berarti anonim dari jaringan.</span>
+                <strong>Sebelum upload</strong>
+                <span>File bisa nyimpen nama, lokasi, wajah, suara, atau data perangkat. Anonim di sini bukan berarti anonim di jaringan.</span>
               </div>
             </div>
 
             <div id="fileList" class="full" style="display: none;">
-              <label style="font-weight: 600; display: block; margin-bottom: 8px;">File Terpilih</label>
+              <label style="font-weight: 600; display: block; margin-bottom: 8px;">File yang dipilih</label>
               <div id="fileListItems"></div>
               <div id="uploadProgress" style="display: none; margin-top: 10px;">
                 <div style="background: #e9ecef; border-radius: 10px; height: 8px; overflow: hidden;">
                   <div id="uploadProgressBar" style="background: var(--primary); height: 100%; width: 0%; transition: width 0.3s;"></div>
                 </div>
-                <p id="uploadProgressText" style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Mengupload...</p>
+                <p id="uploadProgressText" style="margin: 5px 0 0 0; font-size: 13px; color: #666;">Sedang diupload...</p>
               </div>
             </div>
 
             <label class="full anonymous-confirmation" for="isAnonymous">
               <input type="checkbox" id="isAnonymous" checked>
-              <span><strong>Kirim sebagai anonim</strong><small>Identitas akun tidak dicatat pada laporan ini.</small></span>
+              <span><strong>Kirim sebagai anonim</strong><small>Identitas akun nggak dicatat di laporan ini.</small></span>
             </label>
 
             <div class="form-nav">
               <button class="btn outline" type="button" id="prevStep3">Kembali</button>
-              <button class="btn primary" type="button" id="nextStep3">Review Laporan</button>
+              <button class="btn primary" type="button" id="nextStep3">Cek lagi sebelum kirim</button>
             </div>
           </div>
 
           <div class="form-section hidden" id="formStep4">
             <div class="form-section-intro full">
               <span>Langkah 4 dari 4</span>
-              <h3>Periksa sebelum kamu mengirim.</h3>
-              <p>Kamu masih dapat kembali untuk mengubah atau menghapus informasi.</p>
+              <h3>Cek sekali lagi sebelum dikirim.</h3>
+              <p>Masih bisa balik buat ubah atau hapus isian.</p>
             </div>
             <div id="reviewSummary" class="review-summary"></div>
             <div class="form-nav">
               <button class="btn outline" type="button" id="prevStep4">Kembali</button>
-              <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim Laporan</button>
+              <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Kirim laporan</button>
             </div>
           </div>
         </form>
@@ -476,38 +476,38 @@
     <div id="page-edukasi" class="page">
       <section class="section card education-shell">
         <div class="card-header education-header">
-          <p class="page-kicker">Belajar untuk berpihak</p>
-          <h2>Melihat sesuatu? Kamu bisa membantu tanpa membahayakan diri.</h2>
-          <p class="muted">Latih responsmu melalui situasi kampus yang nyata—bukan untuk mengejar skor, tetapi agar kamu tidak membeku saat seseorang membutuhkan dukungan.</p>
+          <p class="page-kicker">Belajar berpihak</p>
+          <h2>Lihat ada yang dibully? Kamu bisa bantu tanpa bahayakan diri.</h2>
+          <p class="muted">Latihan lewat situasi kampus yang mirip aslinya—bukan buat kejar skor, tapi biar nggak blank pas ada yang butuh bantuan.</p>
         </div>
 
         <div class="edu-container">
           <div class="edu-grid">
             <article>
-              <h3>Kenali apa yang sedang terjadi</h3>
-              <p>Perundungan dapat berbentuk ejekan, pengucilan, intimidasi digital, sentuhan tanpa persetujuan, atau kekerasan fisik. Dampaknya nyata meski tidak meninggalkan luka yang terlihat.</p>
+              <h3>Kenali dulu apa yang terjadi</h3>
+              <p>Perundungan bisa berupa ejekan, dikucilkan, diancam di chat, disentuh tanpa izin, atau kekerasan fisik. Dampaknya nyata, meski nggak selalu kelihatan.</p>
             </article>
             <article>
-              <h3>Respons setiap orang berbeda</h3>
-              <p>Seseorang mungkin menjadi cemas, diam, sulit berkonsentrasi, atau menarik diri. Jangan memaksa mereka bercerita. Dengarkan dan tanyakan bantuan apa yang mereka inginkan.</p>
+              <h3>Reaksi tiap orang beda</h3>
+              <p>Ada yang cemas, diam, susah konsentrasi, atau menjauh. Jangan paksa dia cerita. Dengarkan dulu, tanya mau dibantu seperti apa.</p>
             </article>
             <article>
-              <h3>Bantu tanpa mengambil alih</h3>
-              <p>Utamakan keselamatan, tawarkan dukungan, simpan bukti hanya jika aman, dan hormati keputusan orang yang mengalami kejadian. Kamu juga dapat melapor sebagai saksi.</p>
+              <h3>Bantu, jangan ambil alih</h3>
+              <p>Utamakan keselamatan. Tawarkan dukungan, simpan bukti kalau aman, dan hormati keputusan orang yang kena. Kamu juga boleh lapor sebagai saksi.</p>
             </article>
           </div>
 
           <!-- Progress Bar -->
           <div class="edu-progress-container">
             <div class="edu-progress-header">
-              <span class="edu-progress-label">Progress Edukasi</span>
+              <span class="edu-progress-label">Progres edukasi</span>
               <span id="eduProgressText" class="edu-progress-count">0/6 skenario selesai</span>
             </div>
             <div class="edu-progress-bar-track">
               <div id="eduProgressBar" class="edu-progress-bar-fill"></div>
             </div>
             <div id="eduChampionBadge" class="edu-champion-badge hidden">
-              🏆 <strong>Bystander Champion!</strong> Kamu telah menyelesaikan semua skenario. Luar biasa!
+              🏆 <strong>Mantap!</strong> Semua skenario sudah selesai.
             </div>
           </div>
 
@@ -543,30 +543,30 @@
     <div id="page-kontak" class="page">
       <section class="section card emergency-section emergency-shell" aria-labelledby="emergencyHeading">
         <div class="card-header">
-          <p class="safety-kicker">Bantuan yang dapat dihubungi sekarang</p>
-          <h2 id="emergencyHeading">Jika ada ancaman langsung, hubungi layanan darurat.</h2>
-          <p class="muted">Cari tempat yang lebih aman jika memungkinkan. Pilih layanan sesuai kebutuhanmu.</p>
+          <p class="safety-kicker">Nomor yang bisa dihubungi sekarang</p>
+          <h2 id="emergencyHeading">Kalau ada ancaman langsung, hubungi layanan darurat.</h2>
+          <p class="muted">Cari tempat lebih aman dulu kalau bisa. Pilih nomor sesuai kebutuhanmu.</p>
         </div>
         <div class="emergency-contact-list">
           <a class="emergency-contact emergency-contact-urgent" href="tel:110">
             <strong>Polisi — 110</strong>
-            <span>Untuk ancaman, kekerasan, atau bahaya keamanan yang sedang terjadi.</span>
+            <span>Untuk ancaman, kekerasan, atau situasi yang bahaya sekarang.</span>
             <span class="contact-action">Telepon 110</span>
           </a>
           <a class="emergency-contact" href="tel:119">
             <strong>PSC / Ambulans — 119</strong>
-            <span>Untuk kondisi medis darurat atau kebutuhan ambulans.</span>
+            <span>Untuk kondisi medis darurat atau butuh ambulans.</span>
             <span class="contact-action">Telepon 119</span>
           </a>
           <a class="emergency-contact" href="tel:129">
             <strong>SAPA 129 — 129</strong>
-            <span>Layanan Kementerian PPPA untuk kekerasan terhadap perempuan dan anak.</span>
+            <span>Hotline KemenPPPA untuk kekerasan terhadap perempuan dan anak.</span>
             <span class="contact-action">Telepon 129</span>
           </a>
         </div>
         <div class="campus-contact-note" role="note">
-          <h3>Kontak kampus belum dikonfigurasi pada layanan pilot ini.</h3>
-          <p>Gunakan kanal resmi kampus untuk menghubungi Satgas PPKS, keamanan, kemahasiswaan, atau layanan konseling. Jangan gunakan nomor atau alamat yang tidak berasal dari sumber resmi kampusmu.</p>
+          <h3>Kontak kampus belum diisi di versi pilot ini.</h3>
+          <p>Hubungi Satgas PPKS, satpam, kemahasiswaan, atau konseling lewat kanal resmi kampus. Jangan pakai nomor yang sumbernya nggak jelas.</p>
         </div>
       </section>
     </div>
@@ -574,35 +574,35 @@
     <div id="page-chat" class="page">
       <section class="section card chat-section support-chat-shell">
         <div class="card-header">
-          <p class="page-kicker">Saat kamu belum siap melapor</p>
-          <h2>Tarik napas. Kita susun langkah berikutnya.</h2>
-          <p class="muted">SafeBot dapat membantu merapikan situasi dan menunjukkan pilihan. Ia bukan manusia, konselor, atau layanan darurat.</p>
+          <p class="page-kicker">Kalau belum siap lapor</p>
+          <h2>Tarik napas dulu. Kita urutkan langkahnya bareng.</h2>
+          <p class="muted">SafeBot bisa bantu merapikan situasi dan nunjukin pilihan. Ini AI, bukan manusia, bukan konselor, dan bukan layanan darurat.</p>
         </div>
 
         <div class="safebot-disclaimer" role="note">
-          <strong>Catatan keamanan:</strong> SafeBot adalah asisten AI, bukan konselor atau profesional kesehatan mental. Output AI bukan diagnosis medis atau hukum. Untuk situasi darurat, hubungi kontak darurat kampus atau orang terpercaya di sekitarmu.
+          <strong>Catatan penting:</strong> SafeBot adalah asisten AI, bukan konselor atau tenaga kesehatan mental. Jawabannya bukan diagnosis medis atau hukum. Kalau darurat, hubungi kontak darurat kampus atau orang yang kamu percaya.
         </div>
 
         <div id="chatConsent" class="chat-consent">
-          <h3>Persetujuan Pemrosesan AI</h3>
-          <p>Sebelum menggunakan SafeBot, harap dipahami:</p>
+          <h3>Sebelum mulai chat</h3>
+          <p>Perlu kamu tahu dulu:</p>
           <ul>
-            <li>Pesan Anda akan dikirim ke layanan AI pihak ketiga</li>
-            <li>Hanya teks pesan yang dikirim ke layanan AI</li>
-            <li>Data teknis (seperti alamat IP) dapat dicatat untuk keamanan dan audit</li>
-            <li>Untuk situasi berisiko tinggi, informasi tambahan dapat dicatat demi keselamatan Anda</li>
-            <li>AI digunakan untuk memberikan panduan awal, bukan diagnosis</li>
-            <li>Untuk situasi darurat, hubungi kontak darurat langsung</li>
+            <li>Pesanmu dikirim ke layanan AI pihak ketiga</li>
+            <li>Yang dikirim ke AI cuma teks pesan</li>
+            <li>Data teknis (misalnya alamat IP) bisa dicatat buat keamanan</li>
+            <li>Kalau situasinya berisiko tinggi, info tambahan bisa dicatat demi keselamatanmu</li>
+            <li>AI cuma buat panduan awal, bukan diagnosis</li>
+            <li>Kalau darurat, hubungi nomor darurat langsung</li>
           </ul>
-          <button class="btn primary" id="consentAccept" type="button">Saya Setuju & Mulai Chat</button>
+          <button class="btn primary" id="consentAccept" type="button">Saya setuju, mulai chat</button>
         </div>
 
         <div class="chat-container">
           <div class="chat-messages" id="chatMessages" aria-live="polite">
-            <div class="chat-message bot">Halo. Saya SafeBot. Ceritakan apa yang kamu alami. Perlu diketahui: untuk situasi berisiko tinggi, informasi dapat dicatat demi keselamatanmu. Ada yang ingin kamu ceritakan hari ini?</div>
+            <div class="chat-message bot">Hai, aku SafeBot. Kamu boleh cerita sebisanya. Catatan: kalau situasinya berisiko tinggi, info bisa dicatat demi keselamatanmu. Mau mulai dari mana?</div>
           </div>
           <div class="chat-input-area">
-            <textarea id="chatInput" placeholder="Ceritakan detail kejadiannya di sini... (Enter untuk kirim, Shift + Enter untuk baris baru)" rows="4" aria-label="Ketik pesan Anda"></textarea>
+            <textarea id="chatInput" placeholder="Tulis di sini... (Enter kirim, Shift+Enter baris baru)" rows="4" aria-label="Ketik pesan"></textarea>
             <button class="btn primary" id="chatSendBtn" type="button">Kirim</button>
           </div>
         </div>
@@ -612,23 +612,23 @@
     <div id="page-register" class="page">
       <section class="section card auth-shell register-shell" style="max-width: 980px; margin-left: auto; margin-right: auto;">
         <div class="card-header">
-          <p class="page-kicker">Ruang pribadimu</p>
-          <h2>Simpan akses untuk mengikuti perkembangan.</h2>
-          <p class="muted">Akun tidak diperlukan untuk laporan anonim. Buat akun hanya jika kamu ingin mengirim laporan rahasia dan memantau statusnya.</p>
+          <p class="page-kicker">Buat akun</p>
+          <h2>Biar bisa pantau perkembangan laporan.</h2>
+          <p class="muted">Lapor anonim nggak butuh akun. Buat akun cuma kalau kamu mau lapor rahasia dan cek statusnya.</p>
         </div>
         
         <form id="registerForm" class="form-grid">
           
-          <label class="full" for="regName">Nama Lengkap
-            <input id="regName" type="text" placeholder="Masukkan nama lengkap Anda" required>
+          <label class="full" for="regName">Nama lengkap
+            <input id="regName" type="text" placeholder="Nama lengkap kamu" required>
           </label>
 
-          <label class="full" for="regStatus">Status Pengguna
+          <label class="full" for="regStatus">Status
             <select id="regStatus" required>
-              <option value="">Pilih Status Anda...</option>
+              <option value="">Pilih status...</option>
               <option value="Mahasiswa">Mahasiswa</option>
-              <option value="Umum">Umum / Pekerja</option>
-              <option value="Lainnya">Lain-lain</option>
+              <option value="Umum">Umum / pekerja</option>
+              <option value="Lainnya">Lainnya</option>
             </select>
           </label>
 
@@ -648,16 +648,16 @@
 
           <label class="full" for="regPassword">Password
             <input id="regPassword" type="password" placeholder="Buat password yang kuat" required>
-            <span id="pwHelper" class="form-helper">Minimal 6 karakter, 1 huruf kapital, 1 angka, dan 1 karakter spesial (@,#,$,dll).</span>
+            <span id="pwHelper" class="form-helper">Minimal 6 karakter, ada huruf besar, angka, dan karakter spesial (@, #, $, dll).</span>
           </label>
 
-          <label class="full" for="regConfirmPassword">Konfirmasi Password
+          <label class="full" for="regConfirmPassword">Ulangi password
             <input id="regConfirmPassword" type="password" placeholder="Ketik ulang password" required>
             <span id="pwMatchHelper" class="form-helper"></span>
           </label>
           <div id="registerError" class="result error hidden" style="margin-bottom: 20px; text-align: left;"></div>
           <div class="full" style="margin-top: 10px;">
-            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Daftar Sekarang</button>
+            <button class="btn primary full" type="submit" style="padding: 14px; font-size: 16px;">Daftar</button>
           </div>
         </form>
 
@@ -668,24 +668,24 @@
     <div id="page-login" class="page">
       <section class="section card auth-shell login-shell" style="max-width: 920px; margin-left: auto; margin-right: auto;">
         <div class="card-header" style="border-bottom: none; padding-bottom: 0;">
-          <p class="page-kicker">Kembali ke ruangmu</p>
-          <h2>Masuk untuk melihat perkembangan laporan.</h2>
+          <p class="page-kicker">Masuk lagi</p>
+          <h2>Cek perkembangan laporanmu.</h2>
         </div>
 
         <div style="display: flex; border-bottom: 1px solid var(--line); margin-bottom: 24px; margin-top: 16px;">
-          <button id="tabMahasiswa" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid var(--primary); color: var(--primary);">Mahasiswa / Umum</button>
-          <button id="tabAdmin" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid transparent; color: var(--muted);">Admin Kampus</button>
+          <button id="tabMahasiswa" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid var(--primary); color: var(--primary);">Mahasiswa / umum</button>
+          <button id="tabAdmin" class="btn" style="flex: 1; border-radius: 0; background: transparent; border-bottom: 2px solid transparent; color: var(--muted);">Admin kampus</button>
         </div>
 
-        <p id="loginSubtitle" class="muted" style="margin-bottom: 24px;">Silakan masukkan email/nama dan password Anda untuk melanjutkan.</p>
+        <p id="loginSubtitle" class="muted" style="margin-bottom: 24px;">Isi email atau nama, plus password, biar bisa lanjut.</p>
         <div id="loginError" class="result error hidden" style="margin-bottom: 20px; text-align: left;"></div>
 
         <form class="form-grid">
-          <label class="full" style="text-align: left;">Nama / Email
-            <input type="text" id="loginEmail" placeholder="Masukkan nama atau email" required>
+          <label class="full" style="text-align: left;">Nama / email
+            <input type="text" id="loginEmail" placeholder="Nama atau email" required>
           </label>
           <label class="full" style="text-align: left;">Password
-            <input type="password" id="loginPass" placeholder="Masukkan password" required>
+            <input type="password" id="loginPass" placeholder="Password" required>
 
           </label>
           <div class="full" style="margin-top: 10px;">
@@ -851,15 +851,15 @@
         
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
           <div>
-            <h2 id="userNameDisplay">Halo, Mahasiswa!</h2>
-            <p class="muted">Pantau status laporan yang pernah Anda buat di SafeSphere.</p>
+            <h2 id="userNameDisplay">Halo!</h2>
+            <p class="muted">Di sini kamu bisa pantau status laporan yang pernah dikirim.</p>
           </div>
-          <a href="#lapor" class="btn primary">Buat Laporan Baru</a>
+          <a href="#lapor" class="btn primary">Buat laporan baru</a>
         </div>
 
         <div style="background: #f8fafc; padding: 24px; border-radius: 12px; border: 1px solid var(--line); margin-bottom: 24px;">
-          <h3 style="margin-top: 0; color: var(--ink);">Riwayat Laporan Anda</h3>
-          <p class="muted" style="margin-bottom: 16px;">Daftar di bawah ini adalah laporan Anda. Klik pada salah satu laporan untuk melihat detail dan *invoice* pembaruan status.</p>
+          <h3 style="margin-top: 0; color: var(--ink);">Riwayat laporan</h3>
+          <p class="muted" style="margin-bottom: 16px;">Klik salah satu laporan buat lihat detail dan pembaruan statusnya.</p>
           
           <div id="userReportList" class="report-list">
             </div>
@@ -875,7 +875,7 @@
     
     <div id="a11yMenu" class="a11y-menu hidden">
       <h4>Aksesibilitas</h4>
-      <p>Sesuaikan tampilan untuk kenyamananmu.</p>
+      <p>Atur tampilan biar lebih nyaman dibaca.</p>
       
       <button class="btn outline a11y-toggle" data-feature="high-contrast" aria-pressed="false">👁️ Kontras Tinggi</button>
       <button class="btn outline a11y-toggle" data-feature="large-text" aria-pressed="false">🔎 Perbesar Teks</button>
@@ -893,22 +893,22 @@
 
   <footer>
     <div class="footer-mark">SafeSphere</div>
-    <p>Ruang pelaporan dan dukungan awal anti-perundungan kampus.</p>
-    <p class="footer-safety">Dalam bahaya? <a href="#kontak">Buka bantuan darurat</a> · Keluar cepat: Esc 2×</p>
-    <small>&copy; 2026 SafeSphere · Layanan pilot</small>
+    <p>Tempat lapor dan minta bantuan awal soal perundungan di kampus.</p>
+    <p class="footer-safety">Lagi bahaya? <a href="#kontak">Buka bantuan darurat</a> · Keluar cepat: Esc 2×</p>
+    <small>&copy; 2026 SafeSphere · Versi pilot</small>
   </footer>
 
   <script src="vendor/chart.umd.min.js"></script>
-  <script src="js/storage.js?v=20260719b"></script>
-  <script src="js/utils.js?v=20260719b"></script>
-  <script src="js/auth.js?v=20260719b"></script>
-  <script src="js/reports.js?v=20260719b"></script>
-  <script src="js/admin.js?v=20260719b"></script>
-  <script src="js/edukasi.js?v=20260719b"></script>
-  <script src="js/a11y.js?v=20260719b"></script>
-  <script src="js/safety.js?v=20260719b"></script>
-  <script src="js/chat.js?v=20260719b"></script>
-  <script src="js/evidence-upload.js?v=20260719b"></script>
-  <script src="app.js?v=20260719b"></script>
+  <script src="js/storage.js?v=20260719c"></script>
+  <script src="js/utils.js?v=20260719c"></script>
+  <script src="js/auth.js?v=20260719c"></script>
+  <script src="js/reports.js?v=20260719c"></script>
+  <script src="js/admin.js?v=20260719c"></script>
+  <script src="js/edukasi.js?v=20260719c"></script>
+  <script src="js/a11y.js?v=20260719c"></script>
+  <script src="js/safety.js?v=20260719c"></script>
+  <script src="js/chat.js?v=20260719c"></script>
+  <script src="js/evidence-upload.js?v=20260719c"></script>
+  <script src="app.js?v=20260719c"></script>
 </body>
 </html>

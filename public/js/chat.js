@@ -91,7 +91,7 @@
         if (response.status === 429 && data && data.message) {
           addChatMessage(data.message, 'bot');
         } else {
-          addChatMessage('Maaf, terjadi kesalahan. Coba lagi nanti.', 'bot');
+          addChatMessage('Maaf, lagi ada gangguan. Coba lagi sebentar ya.', 'bot');
         }
       } else {
         addChatMessage(data.reply, 'bot', data.actions || []);
@@ -102,12 +102,12 @@
 
       var riskScore = getRiskScore(message);
       if (riskScore.score >= 5 || riskScore.foundHighRisk) {
-        addChatMessage('Maaf, SafeBot sedang tidak dapat dihubungi. Namun pesanmu menunjukkan kemungkinan situasi darurat. Segera cari tempat aman, hubungi kontak darurat kampus atau orang terpercaya.', 'bot', [
-          { href: '#kontak', text: 'Kontak Darurat', className: 'btn danger' },
-          { href: '#lapor', text: 'Buat Laporan', className: 'btn primary' }
+        addChatMessage('Maaf, SafeBot lagi nggak bisa dihubungi. Dari pesanmu, situasinya mungkin darurat. Cari tempat aman dulu, lalu hubungi kontak darurat kampus atau orang yang kamu percaya.', 'bot', [
+          { href: '#kontak', text: 'Kontak darurat', className: 'btn danger' },
+          { href: '#lapor', text: 'Buat laporan', className: 'btn primary' }
         ]);
       } else {
-        addChatMessage('Maaf, SafeBot sedang tidak dapat dihubungi. Jika situasi darurat, segera hubungi kontak kampus atau orang terpercaya di sekitarmu.', 'bot');
+        addChatMessage('Maaf, SafeBot lagi nggak bisa dihubungi. Kalau darurat, segera hubungi kontak kampus atau orang terpercaya di sekitarmu.', 'bot');
       }
     }
 

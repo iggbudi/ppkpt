@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test('beranda loads with protective entry message', async ({ page }) => {
   await page.goto('/#beranda');
-  await expect(page.locator('#homeHeading')).toHaveText('Kamu tidak harus menghadapi ini sendirian.');
+  await expect(page.locator('#homeHeading')).toHaveText('Kamu nggak sendirian.');
   await expect(page.locator('#pilotBanner')).toContainText('Kamu berhak merasa aman');
 });
 

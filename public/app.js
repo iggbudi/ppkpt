@@ -654,10 +654,10 @@ function setupEventListeners() {
     if (reportForm) reportForm.classList.add('hidden');
 
     var isAnonymousMode = mode === 'anonymous';
-    document.getElementById('reportFormTitle').innerText = isAnonymousMode ? 'Laporan tanpa identitas akun' : 'Laporan rahasia';
+    document.getElementById('reportFormTitle').innerText = isAnonymousMode ? 'Lapor anonim' : 'Lapor rahasia';
     document.getElementById('reportFormSubtitle').innerText = isAnonymousMode
-      ? 'Identitas akun tidak dicatat pada laporan atau audit pembuatannya.'
-      : 'Identitas akun disimpan dengan akses terbatas agar kamu dapat melacak status.';
+      ? 'Nama akun nggak dicatat di laporan atau auditnya. Isi sebisamu, boleh berhenti sebelum dikirim.'
+      : 'Akunmu disimpan dengan akses terbatas biar status laporan bisa dipantau.';
 
     var anonCheckbox = document.getElementById('isAnonymous');
     if (anonCheckbox) {
